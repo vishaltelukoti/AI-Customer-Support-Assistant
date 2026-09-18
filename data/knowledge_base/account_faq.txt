@@ -1,0 +1,3 @@
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC FAQ, not an approved business policy.
+
+Use the Forgot password link to request a reset email and check the spam folder. If the email does not arrive, contact support through the approved account recovery process. Profile settings contain contact and delivery details. Support agents should never ask customers to share passwords or one-time sign-in codes.

@@ -1,0 +1,3 @@
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC policy, not an approved business policy.
+
+For this sample store, customers may request a return of an unused item within 30 days of delivery. A support agent should confirm eligibility and the order reference before proceeding. Approved refunds return to the original payment method and may take 5-10 business days. Escalate missing or incorrect refunds for manual review.

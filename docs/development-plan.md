@@ -1,12 +1,12 @@
 # Development plan
 
-Days 1 and 2 are complete. Day 3 has not started; all later phases remain planned.
+Days 1, 2 and 3 are complete. Later phases remain planned.
 
 | Day | Scope / status |
 | --- | --- |
 | 1 | COMPLETE: architecture, API/UI, configuration, synthetic data/KB, preprocessing and saved splits, tests, Docker and documentation foundation |
 | 2 | COMPLETE: independent TF-IDF + Logistic Regression category/priority baselines, train/validation/test evaluation, saved models, tested standalone inference and probability confidence |
-| 3 | NOT STARTED: hyperparameter optimization with grid, random and Bayesian search |
+| 3 | COMPLETE: hyperparameter optimization with Grid Search, Randomized Search and Bayesian Optimization |
 | 4 | CNN / RNN / LSTM experiments |
 | 5 | Attention and a pre-trained model |
 | 6 | Embeddings and FAISS; similar historical tickets |
@@ -20,6 +20,6 @@ Days 1 and 2 are complete. Day 3 has not started; all later phases remain planne
 
 Day 2 uses the unchanged English splits from the selected synthetic Kaggle CSV. Both models are trained only on train.csv; validation and test are evaluation-only. The fixed unweighted baseline has no parameter search, resampling, combined target or API integration. Full measured results, per-class reports, examples and reproducibility details are in [baseline-ml.md](baseline-ml.md). The API still returns null prediction fields.
 
-Day 3 hyperparameter optimization has NOT been implemented. Grid Search: NOT IMPLEMENTED. Random Search: NOT IMPLEMENTED. Bayesian Optimization: NOT IMPLEMENTED. No automatic progression to Day 3 is part of this work.
+Day 3 adds lightweight hyperparameter optimization for the same TF-IDF + Logistic Regression pipelines. Grid Search, Randomized Search and Optuna Bayesian Optimization run separately for category and priority using train.csv only with 3-fold CV and macro-F1 scoring. Validation macro-F1 selects the final configuration; the selected model is retrained on train + validation and evaluated once on test. Both targets selected Randomized Search with `C=10.0`, `class_weight=None`, `ngram_range=(1,2)`, `min_df=1`, `max_df=0.95`, `max_features=20000` and `sublinear_tf=False`. Final optimized test macro-F1 is 0.641538 for category and 0.662208 for priority. No API integration was added.
 
 Synthetic results do not establish real-world performance. Baseline artifacts now populate experiments/baseline; other experiment folders, MLflow, Airflow and future backend modules remain placeholders. Days 4-13 in the table are planned only.

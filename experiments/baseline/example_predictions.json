@@ -1,0 +1,51 @@
+[
+  {
+    "input": "My payment failed while placing an order.",
+    "category": "Billing and Payments",
+    "category_confidence": 0.5356843827807716,
+    "priority": "medium",
+    "priority_confidence": 0.4395608329747832
+  },
+  {
+    "input": "I was charged twice for the same order.",
+    "category": "Technical Support",
+    "category_confidence": 0.2422759943412346,
+    "priority": "high",
+    "priority_confidence": 0.6386845453041837
+  },
+  {
+    "input": "I cannot log into my account.",
+    "category": "Technical Support",
+    "category_confidence": 0.35082021543896746,
+    "priority": "medium",
+    "priority_confidence": 0.44505635141248784
+  },
+  {
+    "input": "My package has not arrived yet.",
+    "category": "Technical Support",
+    "category_confidence": 0.2667407111719715,
+    "priority": "medium",
+    "priority_confidence": 0.3891850343173805
+  },
+  {
+    "input": "Our production network is down and all employees are unable to work. Please restore service urgently.",
+    "category": "Technical Support",
+    "category_confidence": 0.24054728068769204,
+    "priority": "high",
+    "priority_confidence": 0.6304054451476373
+  },
+  {
+    "input": "Where can I find the employee vacation policy and benefits handbook?",
+    "category": "Product Support",
+    "category_confidence": 0.21218650989429086,
+    "priority": "high",
+    "priority_confidence": 0.35043316059229357
+  },
+  {
+    "input": "Could you send pricing and a product demonstration for your enterprise plan?",
+    "category": "Billing and Payments",
+    "category_confidence": 0.3244408508617178,
+    "priority": "medium",
+    "priority_confidence": 0.5727997799875406
+  }
+]

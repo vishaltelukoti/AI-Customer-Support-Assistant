@@ -1,0 +1,11 @@
+true_label / predicted_label,Billing and Payments,Customer Service,General Inquiry,Human Resources,IT Support,Product Support,Returns and Exchanges,Sales and Pre-Sales,Service Outages and Maintenance,Technical Support
+Billing and Payments,188,15,0,0,2,13,1,0,0,22
+Customer Service,6,216,0,0,11,41,3,1,0,83
+General Inquiry,0,4,14,0,4,2,0,0,0,12
+Human Resources,0,7,0,18,7,5,0,0,1,14
+IT Support,1,26,0,1,164,34,1,3,2,60
+Product Support,6,43,0,0,18,289,5,3,4,93
+Returns and Exchanges,2,16,0,0,3,18,61,2,1,20
+Sales and Pre-Sales,2,5,0,0,3,17,0,37,0,12
+Service Outages and Maintenance,1,4,0,0,4,4,0,0,80,6
+Technical Support,8,48,0,0,49,65,3,1,3,533

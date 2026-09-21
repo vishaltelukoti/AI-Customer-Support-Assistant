@@ -2,7 +2,7 @@
 
 ## Objective and scope
 
-Establish a reproducible reference for two independent tasks: `ticket_text -> category` and `ticket_text -> priority`. Both use scikit-learn TF-IDF + Logistic Regression. Day 2 is complete; hyperparameter optimization and all later AI features remain unimplemented. The existing HTTP endpoint still acknowledges tickets with null classification fields.
+Establish a reproducible reference for two independent tasks: `ticket_text -> category` and `ticket_text -> priority`. Both use scikit-learn TF-IDF + Logistic Regression. Day 2 fixed baselines and Day 3 hyperparameter optimization are complete. The existing HTTP endpoint still acknowledges tickets with null classification fields.
 
 ## Dataset and leakage controls
 
@@ -193,14 +193,58 @@ Two complete training/evaluation runs using the same environment, input hashes, 
 
 The 24 new Day 2 tests use lightweight real classifiers. They cover strict loading/labels, cross-split leakage, audit mismatch, answer exclusion, exact training fit inputs, held-out vocabulary exclusion, evaluation without mutation, artifact export/load errors, real probabilities, invalid input and deterministic predictions/training. Existing API/data tests remain unchanged. See [the validation record](validation.md) for final local, Docker and application checks.
 
-## Limitations and Day 3 boundary
+## Day 3 optimization
+
+Day 3 keeps the same model family and data contract, then compares Grid Search, Randomized Search and Optuna Bayesian Optimization for both targets. Searches use `train.csv` only with 3-fold cross-validation and `f1_macro` scoring. Validation macro-F1 selects the configuration. Test labels are used once after selection, when the selected pipeline is retrained on train + validation.
+
+Grid Search uses a deliberately small explicit grid: `ngram_range` `(1,1)` or `(1,2)`, `min_df=2`, `max_df=0.95`, `sublinear_tf=True`, `max_features=20000`, `C=1.0`, and `class_weight` as `None` or `balanced`. Randomized Search runs 10 iterations over the broader POC space: `ngram_range` `(1,1)` or `(1,2)`, `min_df` 1/2/5, `max_df` 0.95/1.0, `sublinear_tf` true/false, `max_features` 20000/50000, `C` 0.1/1.0/10.0, and `class_weight` `None`/`balanced`. Bayesian Optimization uses Optuna with 10 TPE trials over the same broader choices. Seed 42 is used throughout.
+
+### Optimized category
+
+| Method | CV/Objective Macro-F1 | Validation Macro-F1 |
+| --- | ---: | ---: |
+| Grid | 0.467677 | 0.479943 |
+| Random | 0.525552 | 0.574854 |
+| Bayesian | 0.465354 | 0.502149 |
+
+Selected configuration: Randomized Search with `C=10.0`, `class_weight=None`, `ngram_range=(1,2)`, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`.
+
+| Final test metric | Value |
+| --- | ---: |
+| accuracy | 0.652795 |
+| precision_macro | 0.771353 |
+| recall_macro | 0.584357 |
+| f1_macro | 0.641538 |
+| f1_weighted | 0.651417 |
+
+### Optimized priority
+
+| Method | CV/Objective Macro-F1 | Validation Macro-F1 |
+| --- | ---: | ---: |
+| Grid | 0.563099 | 0.590207 |
+| Random | 0.603171 | 0.630936 |
+| Bayesian | 0.528075 | 0.526622 |
+
+Selected configuration: Randomized Search with `C=10.0`, `class_weight=None`, `ngram_range=(1,2)`, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`.
+
+| Final test metric | Value |
+| --- | ---: |
+| accuracy | 0.676867 |
+| precision_macro | 0.682126 |
+| recall_macro | 0.652074 |
+| f1_macro | 0.662208 |
+| f1_weighted | 0.674342 |
+
+Artifacts are saved in `experiments/optimization/`: `optimization_results.json`, `optimization_results.md`, optimized model joblibs, and optimized test confusion matrices. The API endpoint still does not load these models.
+
+## Limitations and later-day boundary
 
 - Synthetic English-only data and source label quality limit generalization to real customer tickets and other languages.
 - Exact/grouped split checks cannot rule out every paraphrase or generation-template relationship.
 - Fixed lexical features and unweighted classification miss many minority-category and low-priority tickets; high aggregate precision can obscure low recall.
-- No probability calibration, hyperparameter optimization, deep-learning comparison, retrieval, RAG or API integration is included.
+- No probability calibration, deep-learning comparison, retrieval, RAG or API integration is included.
 - Privacy masking reuses Day 1 preprocessing; it is not a new runtime security implementation or a guarantee that text is PII-free.
 
-**Day 3 hyperparameter optimization has NOT been implemented.** Grid Search, Random Search and Bayesian Optimization are all NOT IMPLEMENTED.
+**Day 4 has not been implemented.** CNN/RNN/LSTM experiments and transformer/pretrained model experiments are NOT IMPLEMENTED.
 
 Implementation references: [TF-IDF](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html), [Logistic Regression and predict_proba](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), and [model persistence/version compatibility](https://scikit-learn.org/stable/model_persistence.html).

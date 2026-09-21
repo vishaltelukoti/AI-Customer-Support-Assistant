@@ -1,12 +1,12 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1 and 2 implement the application foundation, prepared dataset, and offline baseline ML classification.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Two trained classifiers are available through a separate inference service and CLI.
+A single-developer AI-powered customer-support POC. **Days 1-3 implement the application foundation, prepared dataset, offline baseline ML classification, and lightweight hyperparameter optimization.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers are available through separate offline services and CLIs.
 
-Planned later capabilities include model optimization and API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
+Planned later capabilities include deep-learning experiments, API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
 
 ## Stack and structure
 
-Python 3.12+, FastAPI, Uvicorn, Pydantic/pydantic-settings, pytest, httpx, scikit-learn, joblib and Matplotlib; React, TypeScript, Vite, Axios and plain CSS. No database or external AI account is required.
+Python 3.12+, FastAPI, Uvicorn, Pydantic/pydantic-settings, pytest, httpx, scikit-learn, Optuna, joblib and Matplotlib; React, TypeScript, Vite, Axios and plain CSS. No database or external AI account is required.
 
 ```text
 backend/
@@ -25,8 +25,8 @@ data/
   raw/                  # selected Kaggle CSV; legacy 20-row sample retained
   processed/            # train/validation/test, audit JSON, historical tickets
   knowledge_base/       # four short fictional sample documents
-experiments/baseline/   # measured results, confusion matrices, ignored model artifacts
-experiments/            # other experiment folders remain placeholders
+experiments/baseline/   # Day 2 measured results, confusion matrices, ignored model artifacts
+experiments/optimization/ # Day 3 search results and ignored optimized model artifacts
 airflow/                # placeholder only
 mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
@@ -157,7 +157,26 @@ The training command saves full joblib pipelines, metrics JSON, a generated repo
 | Category | 0.528356 | 0.376067 | 0.495198 |
 | Priority | 0.611179 | 0.559960 | 0.593776 |
 
-All seven aggregate metrics, all classes and all three splits are in the [generated results](experiments/baseline/baseline_results.md) and [baseline documentation](docs/baseline-ml.md). Macro-F1 exposes weak minority-class performance that accuracy alone obscures. These synthetic-data results are a reference for later work, not evidence of production readiness. Hyperparameter optimization is deferred to Day 3.
+All seven aggregate metrics, all classes and all three splits are in the [generated results](experiments/baseline/baseline_results.md) and [baseline documentation](docs/baseline-ml.md). Macro-F1 exposes weak minority-class performance that accuracy alone obscures. These synthetic-data results are a reference for later work, not evidence of production readiness.
+
+## Hyperparameter optimization
+
+Day 3 compares **Grid Search**, **Randomized Search**, and **Optuna Bayesian Optimization** for the same category and priority TF-IDF + Logistic Regression pipelines. Searches use `train.csv` only with 3-fold CV and `f1_macro`; validation macro-F1 selects the final configuration. The selected model is retrained on train + validation and evaluated once on test.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.optimization
+```
+
+The command saves measured search results, optimized model artifacts, and optimized test confusion matrices under `experiments/optimization/`. Model files are ignored by Git.
+
+| Target | Selected method | Validation macro-F1 | Test accuracy | Test macro-F1 | Test weighted-F1 |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Category | Randomized Search | 0.574854 | 0.652795 | 0.641538 | 0.651417 |
+| Priority | Randomized Search | 0.630936 | 0.676867 | 0.662208 | 0.674342 |
+
+Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`. Full measured values are in [the generated optimization report](experiments/optimization/optimization_results.md) and [baseline ML documentation](docs/baseline-ml.md). The API endpoint remains unchanged.
 
 ## Tests and build
 
@@ -174,7 +193,7 @@ npm run test:api
 
 Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
 
-Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities.
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -202,9 +221,9 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Architecture diagram and extension points](docs/architecture.md)
 - [Assumptions and decisions](docs/assumptions.md)
 - [Baseline ML experiment and results](docs/baseline-ml.md)
-- [Completed Days 1-2 and remaining Days 3-13](docs/development-plan.md)
+- [Completed Days 1-3 and remaining Days 4-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification is implemented. API integration, tuning, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, deep learning, retrieval, fairness, monitoring or CI/CD runs now.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification and optimization are implemented. API integration, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, deep learning, retrieval, fairness, monitoring or CI/CD runs now.
 
 Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

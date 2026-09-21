@@ -1,17 +1,18 @@
 # AI Customer Support Assistant
 
-A single-developer customer-support POC. **Day 1 implements ticket intake and the application foundation only.** The form submits a customer message to FastAPI and displays a typed acknowledgement. Category, priority, and confidence are `null`; there are no AI predictions or stored tickets.
+A single-developer AI-powered customer-support POC. **Days 1 and 2 implement the application foundation, prepared dataset, and offline baseline ML classification.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Two trained classifiers are available through a separate inference service and CLI.
 
-Planned later capabilities include classification, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md). None of these AI features run yet.
+Planned later capabilities include model optimization and API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
 
 ## Stack and structure
 
-Python 3.12+, FastAPI, Uvicorn, Pydantic/pydantic-settings, pytest and httpx; React, TypeScript, Vite, Axios and plain CSS. No database or external AI account is required.
+Python 3.12+, FastAPI, Uvicorn, Pydantic/pydantic-settings, pytest, httpx, scikit-learn, joblib and Matplotlib; React, TypeScript, Vite, Axios and plain CSS. No database or external AI account is required.
 
 ```text
 backend/
-  app/                  # main, api/routes, core, schemas, services, utils
-  tests/                # health, ticket contract, validation and CORS tests
+  app/                  # API, schemas, services, preprocessing, baseline ML/evaluation
+                        # empty models, rag, agents, security, explainability, monitoring
+  tests/                # API, CORS, preprocessing, leakage and real-model inference tests
   requirements.txt
   .env.example
   Dockerfile
@@ -21,10 +22,13 @@ frontend/
   .env.example
   Dockerfile
 data/
-  raw/                  # 20 SAMPLE tickets, not approved training data
-  processed/            # empty future output directory
+  raw/                  # selected Kaggle CSV; legacy 20-row sample retained
+  processed/            # train/validation/test, audit JSON, historical tickets
   knowledge_base/       # four short fictional sample documents
-experiments/            # empty cnn, rnn, lstm, attention, pretrained folders
+experiments/baseline/   # measured results, confusion matrices, ignored model artifacts
+experiments/            # other experiment folders remain placeholders
+airflow/                # placeholder only
+mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
 .github/workflows/      # placeholder only; no CI/CD
 docker-compose.yml
@@ -97,6 +101,64 @@ Example response (the UUID changes per request):
 
 The API accepts 1-10,000 characters after trimming surrounding whitespace. Blank, missing, non-string or oversized text and unexpected fields are rejected. The UI handles empty input, loading, success, validation errors, API failures and a 15-second timeout.
 
+## Prepare the selected ML dataset
+
+The original 20-record `sample_tickets.csv` was used to test the Day 1 foundation. It remains unchanged for historical reference and is no longer an active preprocessing input.
+
+The only selected ML input is `data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv`: **Customer IT Support - Ticket Dataset**, by **Tobias Bueck**, from [Kaggle](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets). The [creator describes it as synthetically generated](https://softoft.de/blog/ticket-dataset/); it is not real customer data. No other dataset variants are used.
+
+From the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.preprocessing
+```
+
+Optional explicit configuration:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.preprocessing --input data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv --output-dir data/processed --seed 42
+```
+
+From `backend`, use `.\.venv\Scripts\python.exe -m app.ml.preprocessing`. Defaults resolve relative to the repository. No additional dependencies are required.
+
+```text
+Selected raw CSV -> schema/version/language/label/text audit -> English selection
+                 -> conservative cleaning + privacy masking -> deduplication
+                 -> grouped queue/priority 70/15/15 split -> processed outputs
+```
+
+The source has **28,587 rows and 16 columns**. All **16,338 English records**, **10 queue labels** and **3 lowercase priority labels** are retained across all three versions. No invalid or duplicate combined texts were removed. Split sizes are **11,436 train / 2,451 validation / 2,451 test**, seed **42**. Related records stay in one split; priority distributions remain within 0.08 percentage points of the overall distribution. The raw source stays byte-identical.
+
+Outputs in `data/processed/`:
+
+- `train.csv`, `validation.csv`, `test.csv`: exactly `ticket_id,ticket_text,category,priority`.
+- `dataset_audit.json`: measured schema, distributions, version overlap, missing values, text statistics, privacy findings, leakage decisions, split checks and hashes.
+- `historical_tickets.csv`: masked answers and provenance/tag/type metadata stored separately for future retrieval. Use only training rows as a future evaluation retrieval corpus.
+
+Classification input is **subject + body**. Agent answers, assigned type/tags and other metadata are excluded; category and priority are targets. IDs are generated from the raw checksum and source record because no source ID exists. Repeat runs replace the five named outputs deterministically. Failures before export leave previous outputs in place; inspect the command result before using them.
+
+Important limitations: synthetic label quality, substantial queue imbalance (about 20:1), English-only scope, possible paraphrase/template similarity beyond exact grouping, and lightweight privacy patterns that cannot guarantee PII-free text. One ticket-text phone and 70 answer phones are masked. The API still returns null classification fields and does not load these datasets. See [the full dataset audit](docs/dataset.md).
+
+## Baseline ML classification
+
+Day 2 trains two independent **TF-IDF + Logistic Regression** pipelines for category and priority. Only `train.csv` is fitted; validation and test are evaluation-only. `ticket_text` is the only feature, with answers excluded. The fixed baseline uses unigrams/bigrams, a 50,000-feature cap, seed 42 and `class_weight=None`. No hyperparameter search or resampling is performed.
+
+Run from the repository root after installing `backend/requirements.txt`:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.baseline_models
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.predict_examples
+```
+
+The training command saves full joblib pipelines, metrics JSON, a generated report, and test confusion matrices under `experiments/baseline/`. Model files are ignored by Git. The example command loads those actual models and saves predictions with separate category/priority probabilities. The API endpoint remains unchanged.
+
+| Target | Test accuracy | Test macro-F1 | Test weighted-F1 |
+| --- | ---: | ---: | ---: |
+| Category | 0.528356 | 0.376067 | 0.495198 |
+| Priority | 0.611179 | 0.559960 | 0.593776 |
+
+All seven aggregate metrics, all classes and all three splits are in the [generated results](experiments/baseline/baseline_results.md) and [baseline documentation](docs/baseline-ml.md). Macro-F1 exposes weak minority-class performance that accuracy alone obscures. These synthetic-data results are a reference for later work, not evidence of production readiness. Hyperparameter optimization is deferred to Day 3.
+
 ## Tests and build
 
 ```powershell
@@ -111,6 +173,8 @@ npm run test:api
 ```
 
 Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
+
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -137,9 +201,10 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Dataset format and sample-data boundaries](docs/dataset.md)
 - [Architecture diagram and extension points](docs/architecture.md)
 - [Assumptions and decisions](docs/assumptions.md)
-- [Remaining Days 2-13](docs/development-plan.md)
+- [Baseline ML experiment and results](docs/baseline-ml.md)
+- [Completed Days 1-2 and remaining Days 3-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The included 20 sample tickets and four knowledge-base documents are fictional, not an approved dataset or business policy. The API does not read them. No persistence, authentication, actual classification, model training/tuning, deep learning, embeddings, retrieval, RAG, agents, security analysis, explainability, fairness, MLOps, monitoring, or CI/CD is implemented. There is no model performance claim.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification is implemented. API integration, tuning, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, deep learning, retrieval, fairness, monitoring or CI/CD runs now.
 
-Before Day 2, supply the approved assessment dataset and confirm label definitions. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. Git has not been initialized automatically.
+Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

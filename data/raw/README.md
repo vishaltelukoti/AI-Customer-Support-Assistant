@@ -1,5 +1,9 @@
-# SAMPLE DATA ONLY
+# Raw dataset provenance
 
-`sample_tickets.csv` contains 20 hand-written, fictional examples for local API/UI testing. IDs start with `SAMPLE-`. These are NOT the final approved assessment dataset and must not be used to report model quality. No assessment dataset was present when the workspace was inspected.
+The only selected preprocessing input is `aa_dataset-tickets-multi-lang-5-2-50-version.csv`, supplied locally by the project owner. It is the Customer IT Support - Ticket Dataset by Tobias Bueck, from [Kaggle](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets). The [creator describes it as synthetic](https://softoft.de/blog/ticket-dataset/). It is not production customer data.
 
-The API does not read or append to this CSV. Copy a ticket's text into the UI to try it. See [dataset documentation](../../docs/dataset.md) before adding approved data.
+The file has 28,587 rows, 16 columns, English/German tickets and three row-version labels. Its raw bytes are preserved; preprocessing filters English rows without deleting German rows. No other dataset variants are downloaded, added or combined.
+
+`sample_tickets.csv` is the original 20-record hand-written Day 1 fixture, retained unchanged solely for historical reference. It is not read by the current pipeline or tests. The application API reads neither CSV.
+
+See [the dataset audit](../../docs/dataset.md) for the raw checksum, field mapping, measurements, privacy handling and split decisions, and [the README](../../README.md) for the exact preprocessing command.

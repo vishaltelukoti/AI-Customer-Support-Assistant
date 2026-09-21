@@ -17,7 +17,7 @@ logs/
 .DS_Store
 Thumbs.db
 # Future generated artifacts (source and documentation remain tracked).
-models/
+/models/
 artifacts/
 *.pkl
 *.joblib
@@ -28,6 +28,12 @@ artifacts/
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/sample_tickets.csv
+!data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv
 !data/raw/README.md
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/train.csv
+!data/processed/validation.csv
+!data/processed/test.csv
+!data/processed/dataset_audit.json
+!data/processed/historical_tickets.csv

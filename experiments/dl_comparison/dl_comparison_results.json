@@ -1,0 +1,97 @@
+{
+  "configuration": {
+    "dense_max_iter": 200,
+    "embedding_dim": 32,
+    "hidden_dim": 32,
+    "hyperparameter_optimization": false,
+    "models": [
+      "cnn",
+      "rnn",
+      "lstm"
+    ],
+    "seed": 42,
+    "sequence_length": 60,
+    "task": "ticket_text_to_category",
+    "vocabulary_size": 5000
+  },
+  "dataset": {
+    "test": {
+      "rows": 2451,
+      "sha256": "7078fa22d7510476bb2191c027ec474cfea5c62fb30faa48854e3431178a21ee"
+    },
+    "train": {
+      "rows": 11436,
+      "sha256": "f1e027454bb4f3d52304bc808a025083e9b821fedc9c6e84dbadbd11bd76a1df"
+    },
+    "validation": {
+      "rows": 2451,
+      "sha256": "044ad717a86e9437e8be8592a4b80686d7f4da2a110bdbd13e09556ff46ea734"
+    }
+  },
+  "environment": {
+    "joblib": "1.5.3",
+    "numpy": "2.5.3",
+    "python": "3.14.4",
+    "scikit-learn": "1.9.1",
+    "threadpoolctl": "3.7.0"
+  },
+  "leakage_checks": {
+    "audit_hashes_verified": true,
+    "priority_models_trained": false,
+    "test_used_during_training": false,
+    "train_validation_test_split_unchanged": true
+  },
+  "models": {
+    "cnn": {
+      "test": {
+        "accuracy": 0.2892696858425133,
+        "f1_macro": 0.04487341772151899,
+        "precision_macro": 0.02893877551020408,
+        "recall_macro": 0.09985915492957746
+      },
+      "training_time_seconds": 1.786946700012777,
+      "validation": {
+        "accuracy": 0.29008567931456547,
+        "f1_macro": 0.04548767304808732,
+        "precision_macro": 0.12897959183673469,
+        "recall_macro": 0.10027624309392265
+      }
+    },
+    "lstm": {
+      "test": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      },
+      "training_time_seconds": 2.1219543000042904,
+      "validation": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      }
+    },
+    "rnn": {
+      "test": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      },
+      "training_time_seconds": 0.8549535000056494,
+      "validation": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      }
+    }
+  },
+  "selected": {
+    "model": "cnn",
+    "selection_metric": "validation_f1_macro",
+    "test_f1_macro": 0.04487341772151899,
+    "validation_f1_macro": 0.04548767304808732
+  }
+}

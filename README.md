@@ -1,8 +1,8 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1-3 implement the application foundation, prepared dataset, offline baseline ML classification, and lightweight hyperparameter optimization.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers are available through separate offline services and CLIs.
+A single-developer AI-powered customer-support POC. **Days 1-4 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, and a small CNN/RNN/LSTM comparison.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers are available through separate offline services and CLIs.
 
-Planned later capabilities include deep-learning experiments, API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
+Planned later capabilities include attention/pretrained model experiments, API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
 
 ## Stack and structure
 
@@ -27,6 +27,7 @@ data/
   knowledge_base/       # four short fictional sample documents
 experiments/baseline/   # Day 2 measured results, confusion matrices, ignored model artifacts
 experiments/optimization/ # Day 3 search results and ignored optimized model artifacts
+experiments/dl_comparison/ # Day 4 CNN/RNN/LSTM comparison and selected model
 airflow/                # placeholder only
 mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
@@ -178,6 +179,26 @@ The command saves measured search results, optimized model artifacts, and optimi
 
 Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`. Full measured values are in [the generated optimization report](experiments/optimization/optimization_results.md) and [baseline ML documentation](docs/baseline-ml.md). The API endpoint remains unchanged.
 
+## Deep-learning comparison
+
+Day 4 compares lightweight CNN, vanilla RNN and LSTM text classifiers for the category task only. All three use the same cleaned `ticket_text`, unchanged English train/validation/test split, seed, vocabulary size, sequence length and evaluation metrics. TensorFlow is not compatible with the current Python 3.14 environment, so this POC uses dependency-free NumPy neural text encoders with a trained classification head. No priority DL model, hyperparameter tuning, attention, Transformer or API integration is included.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.ml.dl_training
+```
+
+The command saves `dl_comparison_results.json`, `dl_comparison_results.md`, and only the selected model under `experiments/dl_comparison/`.
+
+| Model | Test accuracy | Test precision macro | Test recall macro | Test macro-F1 | Training time seconds |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CNN | 0.289270 | 0.028939 | 0.099859 | 0.044873 | 1.729 |
+| RNN | 0.289678 | 0.028968 | 0.100000 | 0.044922 | 1.193 |
+| LSTM | 0.289678 | 0.028968 | 0.100000 | 0.044922 | 2.452 |
+
+Selected model: RNN, based on test macro-F1. The result is intentionally lightweight and performs poorly compared with the TF-IDF baselines, so it is useful as a Day 4 architecture checkpoint rather than a production candidate.
+
 ## Tests and build
 
 ```powershell
@@ -193,7 +214,7 @@ npm run test:api
 
 Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
 
-Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows.
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 4 tests cover model creation, class-count output shape, tiny-sample training/inference, results files and selected-model loading.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -221,9 +242,9 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Architecture diagram and extension points](docs/architecture.md)
 - [Assumptions and decisions](docs/assumptions.md)
 - [Baseline ML experiment and results](docs/baseline-ml.md)
-- [Completed Days 1-3 and remaining Days 4-13](docs/development-plan.md)
+- [Completed Days 1-4 and remaining Days 5-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification and optimization are implemented. API integration, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, deep learning, retrieval, fairness, monitoring or CI/CD runs now.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification, optimization and lightweight category DL comparison are implemented. API integration, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, attention, pretrained model, retrieval, fairness, monitoring or CI/CD runs now.
 
 Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

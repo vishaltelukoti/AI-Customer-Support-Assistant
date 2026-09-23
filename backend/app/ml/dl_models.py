@@ -1,4 +1,4 @@
-"""Small Day 4 neural text models for category-only comparison."""
+"""Small neural text models for category-only comparison."""
 
 from dataclasses import dataclass
 from typing import Callable
@@ -68,6 +68,11 @@ class NeuralTextClassifier:
                 "wx": rng.normal(0, 0.08, size=(c.embedding_dim, 4 * c.hidden_dim)).astype(np.float32),
                 "wh": rng.normal(0, 0.08, size=(c.hidden_dim, 4 * c.hidden_dim)).astype(np.float32),
             }
+        if self.name == "attention":
+            return {
+                "query": rng.normal(0, 0.08, size=(c.embedding_dim,)).astype(np.float32),
+                "projection": rng.normal(0, 0.08, size=(c.embedding_dim, c.hidden_dim)).astype(np.float32),
+            }
         raise ValueError(f"Unsupported model name: {self.name}")
 
     def _features(self, texts: list[str]) -> np.ndarray:
@@ -118,10 +123,23 @@ def _lstm_features(embedded: np.ndarray, weights: dict[str, np.ndarray]) -> np.n
     return hidden
 
 
+def _attention_features(embedded: np.ndarray, weights: dict[str, np.ndarray]) -> np.ndarray:
+    mask = np.linalg.norm(embedded, axis=2) > 0
+    scores = np.tensordot(embedded, weights["query"], axes=([2], [0]))
+    scores = np.where(mask, scores, -1e9)
+    scores = scores - scores.max(axis=1, keepdims=True)
+    attention = np.exp(scores) * mask
+    normalizer = attention.sum(axis=1, keepdims=True)
+    attention = np.divide(attention, normalizer, out=np.zeros_like(attention), where=normalizer > 0)
+    context = np.einsum("bs,bse->be", attention, embedded)
+    return np.tanh(context @ weights["projection"])
+
+
 FEATURE_EXTRACTORS: dict[str, Callable[[np.ndarray, dict[str, np.ndarray]], np.ndarray]] = {
     "cnn": _cnn_features,
     "rnn": _rnn_features,
     "lstm": _lstm_features,
+    "attention": _attention_features,
 }
 
 

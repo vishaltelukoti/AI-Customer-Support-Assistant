@@ -1,8 +1,8 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1-4 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, and a small CNN/RNN/LSTM comparison.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers are available through separate offline services and CLIs.
+A single-developer AI-powered customer-support POC. **Days 1-7 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, CNN/RNN/LSTM comparison, attention/DistilBERT comparison, local FAISS similar-ticket retrieval, and a simple grounded RAG suggested-resolution pipeline.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers, retrieval, and RAG are available through separate offline services and CLIs.
 
-Planned later capabilities include attention/pretrained model experiments, API integration, similar historical tickets, suggested resolutions with sources, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
+Planned later capabilities include API integration, complex-ticket investigation, security status, and classification explanations. See [the development plan](docs/development-plan.md).
 
 ## Stack and structure
 
@@ -27,7 +27,9 @@ data/
   knowledge_base/       # four short fictional sample documents
 experiments/baseline/   # Day 2 measured results, confusion matrices, ignored model artifacts
 experiments/optimization/ # Day 3 search results and ignored optimized model artifacts
-experiments/dl_comparison/ # Day 4 CNN/RNN/LSTM comparison and selected model
+experiments/dl_comparison/ # Day 4 and Day 5 category DL comparisons
+experiments/retrieval/ # Day 6 FAISS index, metadata, and retrieval evaluation
+experiments/rag/ # Day 7 RAG configuration and evaluation
 airflow/                # placeholder only
 mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
@@ -181,7 +183,9 @@ Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams
 
 ## Deep-learning comparison
 
-Day 4 compares lightweight CNN, vanilla RNN and LSTM text classifiers for the category task only. All three use the same cleaned `ticket_text`, unchanged English train/validation/test split, seed, vocabulary size, sequence length and evaluation metrics. TensorFlow is not compatible with the current Python 3.14 environment, so this POC uses dependency-free NumPy neural text encoders with a trained classification head. No priority DL model, hyperparameter tuning, attention, Transformer or API integration is included.
+Day 4 compares lightweight CNN, vanilla RNN and LSTM text classifiers for the category task only. Day 5 extends the same comparison with a small attention encoder and a pretrained DistilBERT classifier. All models use cleaned `ticket_text`, the unchanged English train/validation/test split, seed 42, and validation Macro-F1 for model selection. Test metrics are final reporting only. No priority DL model, hyperparameter tuning, or API integration is included.
+
+TensorFlow is not compatible with the current Python 3.14 environment, so the CNN/RNN/LSTM/Attention paths use dependency-light NumPy sequence encoders with a trained Logistic Regression head. DistilBERT uses `distilbert-base-uncased`, freezes the base encoder, trains one epoch on a deterministic train-only cap of 60 examples per category, and evaluates validation/test on the full held-out splits.
 
 Run from the repository root:
 
@@ -189,15 +193,61 @@ Run from the repository root:
 .\backend\.venv\Scripts\python.exe -m backend.app.ml.dl_training
 ```
 
-The command saves `dl_comparison_results.json`, `dl_comparison_results.md`, and only the selected model under `experiments/dl_comparison/`.
+The command saves Day 5 artifacts under `experiments/dl_comparison/day5/` because the existing Day 4 artifacts on this machine are locked to SYSTEM/Administrators. The selected Day 5 model is saved as a Hugging Face Transformers artifact in `experiments/dl_comparison/day5/models/distilbert/`.
 
-| Model | Test accuracy | Test precision macro | Test recall macro | Test macro-F1 | Training time seconds |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| CNN | 0.289270 | 0.028939 | 0.099859 | 0.044873 | 1.729 |
-| RNN | 0.289678 | 0.028968 | 0.100000 | 0.044922 | 1.193 |
-| LSTM | 0.289678 | 0.028968 | 0.100000 | 0.044922 | 2.452 |
+| Model | Validation macro-F1 | Test accuracy | Test macro-F1 | Test weighted-F1 |
+| --- | ---: | ---: | ---: | ---: |
+| CNN | 0.045488 | 0.289270 | 0.044873 | 0.129988 |
+| RNN | 0.044922 | 0.289678 | 0.044922 | 0.130130 |
+| LSTM | 0.044922 | 0.289678 | 0.044922 | 0.130130 |
+| Attention | 0.044922 | 0.289678 | 0.044922 | 0.130130 |
+| DistilBERT | 0.121775 | 0.194206 | 0.120542 | 0.187129 |
 
-Selected model: RNN, based on test macro-F1. The result is intentionally lightweight and performs poorly compared with the TF-IDF baselines, so it is useful as a Day 4 architecture checkpoint rather than a production candidate.
+Selected Day 5 DL model: DistilBERT, selected based on validation Macro-F1. Its final test Macro-F1 is 0.120542. This remains far below the Day 3 optimized category TF-IDF result and is not production-ready. Full measured values and limitations are in [the generated Day 5 report](experiments/dl_comparison/day5/dl_comparison_results.md) and [the DL documentation](docs/deep-learning.md).
+
+## Similar-ticket retrieval
+
+Day 6 builds local similar-ticket retrieval for future RAG work. It embeds training-only historical ticket text with `sentence-transformers/all-MiniLM-L6-v2`, stores normalized 384-dimensional vectors in a FAISS `IndexFlatIP`, and saves metadata separately so search results include ticket ID, ticket text, category, priority, answer, source/version/type, tags, and similarity score. No validation or test tickets are indexed, and answer text is not used for embeddings.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.rag.retrieval
+```
+
+The command saves `tickets.faiss`, `metadata.jsonl`, `retrieval_config.json`, `retrieval_evaluation.json`, and `retrieval_evaluation.md` under `experiments/retrieval/`. Default Top-K is 3. The evaluation uses 250 validation and 250 test tickets as held-out queries; a retrieval is relevant when the returned training ticket has the same category as the query.
+
+| Metric | Value |
+| --- | ---: |
+| Indexed training tickets | 11,436 |
+| Embedding dimension | 384 |
+| Recall@1 | 0.656000 |
+| Recall@3 | 0.764000 |
+| Recall@5 | 0.844000 |
+| MRR | 0.722500 |
+
+No API key is required for the local Sentence Transformer + FAISS retrieval implementation. Retrieval is not connected to FastAPI yet, and Day 6 does not implement RAG.
+
+## Suggested-resolution RAG
+
+Day 7 adds a small local RAG pipeline on top of the Day 6 FAISS index. The flow is: incoming `ticket_text` -> retrieve similar training historical tickets -> build bounded context with prior resolutions -> generate a concise suggested resolution with `google/flan-t5-base` -> return supporting source tickets. Retrieved answer text is allowed in the generation context as historical resolution evidence, but answers are still not used for retrieval embeddings.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.rag.rag_service --use-local-model-for-eval
+```
+
+The command saves `rag_config.json`, `rag_evaluation.json`, and `rag_evaluation.md` under `experiments/rag/`. Default Top-K is 3 and the POC retrieval threshold is 0.55. If no retrieved ticket meets the threshold, the service returns `insufficient_evidence` and does not fabricate a resolution.
+
+| Metric | Value |
+| --- | ---: |
+| Source attribution rate | 1.000000 |
+| Grounded acceptable response rate | 1.000000 |
+| Insufficient-information pass rate | 1.000000 |
+| Overall acceptance rate | 1.000000 |
+
+No API key is required for the local retrieval plus local generation setup. RAG is not connected to FastAPI yet, and Day 7 does not implement LangGraph, agents, memory, streaming, or production observability.
 
 ## Tests and build
 
@@ -214,7 +264,7 @@ npm run test:api
 
 Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
 
-Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 4 tests cover model creation, class-count output shape, tiny-sample training/inference, results files and selected-model loading.
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 5 DL tests cover CNN/RNN/LSTM/Attention construction and inference, mocked DistilBERT configuration/artifact behavior, validation-based selection, leakage metadata, selected-model loading, and valid category prediction. Day 6 retrieval tests cover embedding shape, FAISS index creation/save/load, Top-K behavior, metadata mapping, search, no self-retrieval, training-only indexing, answer exclusion, and repeatable tiny-embedder behavior. Day 7 RAG tests cover context construction, retrieved answer inclusion, source attribution, configurable Top-K, output schema, insufficient-information behavior, prompt-injection resistance, malicious retrieved content handling, and fabricated-source prevention.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -242,9 +292,12 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Architecture diagram and extension points](docs/architecture.md)
 - [Assumptions and decisions](docs/assumptions.md)
 - [Baseline ML experiment and results](docs/baseline-ml.md)
-- [Completed Days 1-4 and remaining Days 5-13](docs/development-plan.md)
+- [Deep-learning comparisons](docs/deep-learning.md)
+- [Similar-ticket retrieval](docs/retrieval.md)
+- [Suggested-resolution RAG](docs/rag.md)
+- [Completed Days 1-7 and remaining Days 8-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files or load models. Offline baseline classification, optimization and lightweight category DL comparison are implemented. API integration, embeddings, RAG, agents, security, explainability and MLOps remain planned. No persistence, authentication, attention, pretrained model, retrieval, fairness, monitoring or CI/CD runs now.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files, load models, search the retrieval index, or call RAG. Offline baseline classification, optimization, category DL comparison, local similar-ticket retrieval, and offline RAG suggested resolutions are implemented. API integration, agents, security, explainability and MLOps remain planned. No persistence, authentication, fairness, monitoring or CI/CD runs now.
 
 Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

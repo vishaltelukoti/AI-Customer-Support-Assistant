@@ -1,0 +1,712 @@
+{
+  "build_time_seconds": 389.6765607999987,
+  "configuration": {
+    "evaluation_limit_per_split": 250,
+    "index_type": "IndexFlatIP",
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "normalize_embeddings": true,
+    "seed": 42,
+    "top_k": 3
+  },
+  "definition": "A retrieved ticket is relevant when its category matches the held-out query ticket category.",
+  "embedding_dimension": 384,
+  "index_type": "IndexFlatIP",
+  "leakage_checks": {
+    "answers_used_for_embeddings": false,
+    "indexed_split": "train",
+    "indexed_tickets": 11436,
+    "self_retrieval_observed": false,
+    "validation_or_test_ids_indexed": false
+  },
+  "limit_per_split": 250,
+  "metrics": {
+    "mrr": 0.7224999999999998,
+    "recall@1": 0.656,
+    "recall@3": 0.764,
+    "recall@5": 0.844
+  },
+  "queries_evaluated": 500,
+  "query_splits": [
+    "validation",
+    "test"
+  ],
+  "sample_queries": [
+    {
+      "query_category": "Technical Support",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000025",
+      "top_results": [
+        {
+          "answer": "Thank you for reaching out regarding the ongoing network connectivity issues affecting your devices. To assist you more effectively, could you please provide details about the specific devices and any error messages you are encountering? Additionally, inform us whether the devices are connected via Wi-Fi or a wired network, and if the network is experiencing issues. This information will help us identify the problem more quickly. If you prefer real-time troubleshooting via phone call, please let us know a convenient time for you.",
+          "category": "Technical Support",
+          "priority": "medium",
+          "rank": 1,
+          "score": 0.7919003367424011,
+          "source_record": "855",
+          "split": "train",
+          "tags": {
+            "tag_1": "Network",
+            "tag_2": "Connectivity",
+            "tag_3": "Disruption",
+            "tag_4": "Hardware",
+            "tag_5": "Troubleshooting"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000855",
+          "ticket_text": "Network Connectivity Difficulties\n\nDear Support Team,\n\nI am encountering ongoing issues with network connection that are impacting the functionality of my integration devices. Despite several troubleshooting attempts, the devices continue to fail to establish reliable connections, which significantly disrupts my workflow. I have verified all physical connections and rebooted the devices, but the problem persists. This matter is urgent as it affects daily operations and productivity. Could you please assist in diagnosing and resolving these connectivity and integration issues as soon as possible? Your guidance and support would be greatly appreciated.",
+          "type": "Problem",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for reporting the intermittent malfunctions. To assist further, could you please provide details about the affected device models, your network setup, available error logs, and whether the issues happen at specific times? Once received, we will investigate and advise on the next steps.",
+          "category": "Technical Support",
+          "priority": "low",
+          "rank": 2,
+          "score": 0.7885451316833496,
+          "source_record": "343",
+          "split": "train",
+          "tags": {
+            "tag_1": "Network",
+            "tag_2": "Hardware",
+            "tag_3": "Performance",
+            "tag_4": "Disruption"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000343",
+          "ticket_text": "Intermittent Malfunctions Across Several Devices\n\nDear Customer Support Team,\n\nI am writing to report a persistent problem impacting multiple units within the network. These devices are experiencing sporadic failures that interfere with normal functioning. The symptoms indicate that the cause might be linked to network instability or power fluctuations, which could negatively influence connected systems.\n\nTo attempt resolution, I have already performed initial troubleshooting procedures such as rebooting the devices and inspecting cable connections. Regrettably, these actions did not resolve the issue.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "<name>, we apologize for the inconvenience caused by the intermittent connectivity issues you are experiencing. We appreciate the steps you have already taken, including reviewing network logs and resetting affected devices. To further investigate, we would like to gather details about the recent network configuration changes made. Could you please provide us with information regarding these changes and any error messages encountered? If necessary, we may need to contact you by phone at <tel_num> to discuss the issue further.",
+          "category": "IT Support",
+          "priority": "medium",
+          "rank": 3,
+          "score": 0.7785823345184326,
+          "source_record": "4945",
+          "split": "train",
+          "tags": {
+            "tag_1": "Network",
+            "tag_2": "Disruption",
+            "tag_3": "Outage",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-004945",
+          "ticket_text": "Connectivity Issue with Network\n\nCustomer Support, preparing a report on intermittent connectivity problems impacting multiple devices and software platforms. The issue began following recent changes to network configurations. After examining network logs and resetting affected devices, the problem still persists. Despite our efforts, the issue remains unresolved. We would appreciate it if you could investigate this matter and provide a solution as soon as possible. Please let us know if additional information is required to resolve the issue.",
+          "type": "Incident",
+          "version": "52"
+        }
+      ]
+    },
+    {
+      "query_category": "Billing and Payments",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000031",
+      "top_results": [
+        {
+          "answer": "Hello, regarding the billing error report for account <acc_num>, we would like to discuss the details with you to resolve the issue. I would be available to discuss this over a call at your convenience to clarify the error and proceed with the necessary steps. Please let us know a suitable time to contact you at <tel_num>. Thank you.",
+          "category": "Billing and Payments",
+          "priority": "low",
+          "rank": 1,
+          "score": 0.8084462881088257,
+          "source_record": "12219",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Payment",
+            "tag_3": "Refund",
+            "tag_4": "Disruption",
+            "tag_5": "Feedback",
+            "tag_6": "IT",
+            "tag_7": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-012219",
+          "ticket_text": "Report on Unusual Billing Issue\n\nDear Customer Support, our marketing agency encountered an unexpected billing error in the latest invoice, which might have resulted from a system glitch or miscommunication. After reviewing previous statements and attempting to contact support for clarification, the error is causing delays in the payment process. We kindly request your assistance in resolving this matter at your earliest convenience. Please inform us of the next steps. We appreciate prompt attention to this issue and look forward to your response.",
+          "type": "Incident",
+          "version": "400"
+        },
+        {
+          "answer": "Thank you for contacting us regarding billing discrepancies and payment problems, <name>. To assist you further, please provide your account number and the email address associated with your account. If possible, include a copy of the latest invoice and screenshots of the error messages encountered during payment. We will review your account promptly and work towards a solution.",
+          "category": "Billing and Payments",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.7970837354660034,
+          "source_record": "318",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Payment",
+            "tag_3": "Account",
+            "tag_4": "Refund",
+            "tag_5": "Outage",
+            "tag_6": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000318",
+          "ticket_text": "Invoicing Concerns\n\nDear Customer Support Team,\n\nI am reaching out to highlight an issue related to billing and payment processing for my account. Recently, I observed inconsistencies in charges on my latest invoice that do not match the services utilized. Furthermore, I have been unable to complete payments as error messages keep appearing during the checkout process.\n\nThis matter is quite troubling as it affects my ability to access services without interruption. I kindly ask for a comprehensive review of my account's billing history and an immediate resolution to this issue.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "<name> is writing an email acknowledging the billing discrepancies issue that the agency is experiencing with multiple products and services. Apologies for the inconvenience caused and will assist in resolving the matter as soon as possible. An investigation will be conducted, and we would like to request additional information. Could you please provide the account number <acc_num> and specific billing statements that show the discrepancies? Additionally, it would be helpful if you could provide details of your communication with the customer support team.",
+          "category": "Billing and Payments",
+          "priority": "medium",
+          "rank": 3,
+          "score": 0.7941344976425171,
+          "source_record": "21332",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Payment",
+            "tag_3": "Refund",
+            "tag_4": "Disruption",
+            "tag_5": "Account",
+            "tag_6": "Documentation"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-021332",
+          "ticket_text": "Concerns Over Billing Discrepancies Identified\n\nDear Customer Support, our organization is encountering billing discrepancies pertaining to several of our products and services. It is possible that there has been a miscommunication regarding subscription renewals or payment processing errors leading to this issue. Despite reviewing our billing statements and reaching out to customer support, the problem remains unresolved. We would greatly appreciate any assistance you could provide in resolving this matter as soon as possible. Please let us know if any additional information is required. Thank you for your time and assistance.",
+          "type": "Incident",
+          "version": "400"
+        }
+      ]
+    },
+    {
+      "query_category": "Billing and Payments",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000061",
+      "top_results": [
+        {
+          "answer": "Please review the account and provide the necessary contact information related to the billing discrepancies.",
+          "category": "Billing and Payments",
+          "priority": "low",
+          "rank": 1,
+          "score": 0.8232235908508301,
+          "source_record": "20437",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Account",
+            "tag_3": "Payment",
+            "tag_4": "Disruption",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-020437",
+          "ticket_text": "Concerns About Billing Variations\n\nWe have noticed discrepancies in the billing for our digital strategy tools and equipment, which may be due to recent account changes or payment processing errors. We have already verified the transaction records and contacted customer support for clarification. We would greatly appreciate it if you could look into this matter and provide a resolution as soon as possible. Please let us know if there is any additional information needed to facilitate the process.",
+          "type": "Incident",
+          "version": "400"
+        },
+        {
+          "answer": "Acknowledging the issue with billing statements. Apologies for the inconvenience caused and assure you of our commitment to resolving this matter as soon as possible. Please assist us in investigating further by providing details about your account number and specifics of the discrepancies observed, along with the dates of the affected billing statements. We are flexible and can schedule a call at your convenience to discuss the issue and ensure a prompt resolution.",
+          "category": "Billing and Payments",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.8202781081199646,
+          "source_record": "24532",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Account",
+            "tag_3": "Refund",
+            "tag_4": "Payment",
+            "tag_5": "Disruption",
+            "tag_6": "IT",
+            "tag_7": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-024532",
+          "ticket_text": "Concerns About Billing Statements\n\nNoted discrepancies in recent billing statements, which may be due to data entry errors or recent system updates. After comparing transactions with previous statements, the issue still exists. We would appreciate your assistance in resolving this matter as soon as possible. Could you please provide us with more details, including your account number and specifics about the discrepancies, as well as the dates of the affected billing statements? It would be convenient for you to schedule a call with us to discuss the issue and ensure it is resolved promptly.",
+          "type": "Problem",
+          "version": "400"
+        },
+        {
+          "answer": "Examine billing inconsistencies, reach out to the relevant contact within 24 hours, and resolve the issue impacting accounts.",
+          "category": "Billing and Payments",
+          "priority": "medium",
+          "rank": 3,
+          "score": 0.8196440935134888,
+          "source_record": "3040",
+          "split": "train",
+          "tags": {
+            "tag_1": "Billing",
+            "tag_2": "Disruption",
+            "tag_3": "Security"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-003040",
+          "ticket_text": "Detected Discrepancy in Billing Statements\n\nA financial organization identified inconsistencies in their billing across various products.",
+          "type": "Incident",
+          "version": "52"
+        }
+      ]
+    },
+    {
+      "query_category": "Customer Service",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000071",
+      "top_results": [
+        {
+          "answer": "Thank you for reporting the compatibility concern. To assist you further, could you please provide the specific device model names and versions of the healthcare software you are attempting to use? This information will help us verify compatibility, recommend supported configurations, and inform you about available updates or patches. If necessary, we can also schedule a call at your convenience to troubleshoot the issue. We look forward to your response.",
+          "category": "Customer Service",
+          "priority": "medium",
+          "rank": 1,
+          "score": 0.9757604002952576,
+          "source_record": "184",
+          "split": "train",
+          "tags": {
+            "tag_1": "Bug",
+            "tag_2": "Compatibility",
+            "tag_3": "Software",
+            "tag_4": "Hardware",
+            "tag_5": "Performance",
+            "tag_6": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000184",
+          "ticket_text": "Compatibility Issue\n\nDear Customer Support,\n\nI am writing to report a problem related to device incompatibility with healthcare software systems. Recently, I tried to connect a device with various healthcare software platforms but faced ongoing issues that hinder proper operation. Despite adhering to the recommended setup procedures and updating the device firmware to the latest version, the software does not recognize or communicate with the device effectively.\n\nThis incompatibility affects my ability to use essential healthcare applications that are crucial for my needs.",
+          "type": "Problem",
+          "version": "51"
+        },
+        {
+          "answer": "To address the software compatibility and integration issue, it would be helpful if you could provide more details about the devices and software involved. To better understand the problem, I would like to schedule a call to discuss further. I am flexible and can accommodate any convenient time for you. Please let me know a suitable time, and I will be happy to assist in resolving this matter and get your project management system running smoothly.",
+          "category": "Customer Service",
+          "priority": "medium",
+          "rank": 2,
+          "score": 0.6736437678337097,
+          "source_record": "20433",
+          "split": "train",
+          "tags": {
+            "tag_1": "Bug",
+            "tag_2": "Performance",
+            "tag_3": "IT",
+            "tag_4": "Tech Support",
+            "tag_5": "Documentation"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-020433",
+          "ticket_text": "Concern Over Software Compatibility and Integration\n\nWe have encountered software compatibility issues across various devices, which is impacting the functionality of our project management system. This issue might stem from an underlying integration problem. We have already tried reinstalling the software and checking device settings, but the problem still persists. Could you please assist us in resolving this matter? We would greatly appreciate any guidance or support you can provide to help our project management system run smoothly.",
+          "type": "Incident",
+          "version": "400"
+        },
+        {
+          "answer": "Thank you for your inquiry regarding compatibility. To provide precise information, please specify the exact product you are interested in and the devices or systems you plan to use it with. Kindly include relevant technical details, supported platforms, and any known limitations. We can then recommend the best configurations or updates necessary for seamless integration. Please respond at your earliest convenience so we can assist you efficiently. We look forward to your reply.",
+          "category": "Customer Service",
+          "priority": "low",
+          "rank": 3,
+          "score": 0.6654002070426941,
+          "source_record": "754",
+          "split": "train",
+          "tags": {
+            "tag_1": "Product",
+            "tag_2": "Compatibility",
+            "tag_3": "Technical Support",
+            "tag_4": "IT"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000754",
+          "ticket_text": "System Compatibility Inquiry\n\nDear Support Team,\n\nI hope this message finds you well. I am reaching out to request comprehensive details about the compatibility of a specific product with various devices and operating systems currently in use. This information is essential to confirm that the product will operate properly within the existing environment. Could you please share the technical specifications, supported platforms, and any limitations we should be aware of? Additionally, I would appreciate guidance on recommended configurations or updates needed for optimal compatibility. Your prompt response would be greatly appreciated.",
+          "type": "Request",
+          "version": "51"
+        }
+      ]
+    },
+    {
+      "query_category": "Service Outages and Maintenance",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000093",
+      "top_results": [
+        {
+          "answer": "We appreciate your prompt alert regarding the critical disruption impacting EMR/PACS integrations. The incident has been escalated to our network security team for immediate investigation. Please keep us informed of any updates and recommended steps. If available, kindly share recent system logs and endpoint information to aid in the analysis.",
+          "category": "Service Outages and Maintenance",
+          "priority": "high",
+          "rank": 1,
+          "score": 0.9666447043418884,
+          "source_record": "123",
+          "split": "train",
+          "tags": {
+            "tag_1": "Disruption",
+            "tag_2": "Network",
+            "tag_3": "Security",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000123",
+          "ticket_text": "Severe Service Disruption Detected in EMR Platform\n\nDear Support Team,\n\nWe have discovered a severe disruption affecting the EMR/PACS connections, seemingly due to a network failure that may also indicate a security breach. Preliminary assessments by the SOC DevSecOps teams revealed immediate vulnerabilities. We are continuing to monitor the situation to ensure the system's security and stability. We urgently seek your help in diagnosing and resolving the problem to restore normal operations as swiftly as possible. Kindly keep us updated on your findings and recommended measures.\n\nThank you for promptly notifying us about this critical issue impacting EMR/PACS integration. We are escalating the matter to our network security specialists for immediate investigation. Please keep us posted on the progress and suggested actions. If possible, provide recent system logs and details of affected endpoints to assist with the analysis.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "We appreciate your prompt notification regarding the possible vulnerability in the EMR/PACS integration. We take such issues very seriously and are collaborating closely with security analysts to implement urgent patches and configuration adjustments. Based on similar incidents affecting other clients and recent security alerts related to EMR/PACS integrations, we recommend keeping all systems updated with the latest patches, enforcing robust authentication measures, encrypting data during transmission and storage, and conducting regular audits of system access.",
+          "category": "Product Support",
+          "priority": "low",
+          "rank": 2,
+          "score": 0.7246126532554626,
+          "source_record": "203",
+          "split": "train",
+          "tags": {
+            "tag_1": "Security",
+            "tag_2": "Alert",
+            "tag_3": "IT",
+            "tag_4": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000203",
+          "ticket_text": "Security Alert: EMR/PACS Integration Compromised\n\nDear Customer Support Team,\n\nI am reaching out to report a recent security breach related to the integration of Electronic Medical Records (EMR) with the Picture Archiving and Communication System (PACS). Routine continuous monitoring by the Security Operations Center (SOC) has identified a potential vulnerability that could compromise the confidentiality and integrity of patient information.\n\nInitial investigations and evaluations have already been carried out by the SOC team. At this stage, they have confirmed active threats exploiting this weakness.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for swiftly reporting the urgent security breach impacting the EMR/PACS integration system. We acknowledge the criticality of this situation and have escalated the case to our security response team for immediate assessment. To facilitate a thorough security review, please provide the following details: error messages encountered, logs of suspicious activities, specific time periods of detected anomalies, details of recent software updates applied, and a list of affected servers and endpoints. Additionally, please",
+          "category": "Product Support",
+          "priority": "medium",
+          "rank": 3,
+          "score": 0.7190091013908386,
+          "source_record": "247",
+          "split": "train",
+          "tags": {
+            "tag_1": "Security",
+            "tag_2": "Bug",
+            "tag_3": "Crash",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000247",
+          "ticket_text": "Critical Security Breach Impacting EMR Integration Platform\n\nDear Customer Support Team,\n\nI am submitting a report regarding a severe security breach identified within the EMR/PACS integration framework. The potential intrusion appears to stem from vulnerabilities possibly introduced during recent software updates. Despite launching an immediate 24/7 monitoring and an extensive penetration test to determine the root cause, our investigations have yet to pinpoint the exact origin of the issue.\n\nConsidering the sensitive nature of the data involved and the critical role of this integration in daily operations,",
+          "type": "Problem",
+          "version": "51"
+        }
+      ]
+    },
+    {
+      "query_category": "Technical Support",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000100",
+      "top_results": [
+        {
+          "answer": "Thank you for bringing this service issue to our attention. We apologize for the inconvenience caused by the intermittent disruptions affecting your workflow and productivity.\n\nAt present, our technical team is aware of the problem impacting the cloud-native SaaS platform and is actively investigating the root cause. Once we have an estimated resolution time, we will inform you promptly. Please be assured that resolving this issue is our top priority, and we are monitoring the situation closely to restore full platform functionality as quickly as possible.\n\nTo help minimize operational impact, we recommend...",
+          "category": "Technical Support",
+          "priority": "medium",
+          "rank": 1,
+          "score": 0.9129908084869385,
+          "source_record": "85",
+          "split": "train",
+          "tags": {
+            "tag_1": "Disruption",
+            "tag_2": "Outage",
+            "tag_3": "Performance",
+            "tag_4": "Feature",
+            "tag_5": "Notification",
+            "tag_6": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000085",
+          "ticket_text": "Issue Notification\n\nDear Customer Support Team,\n\nI am submitting a report regarding a service disruption affecting our cloud-based SaaS platform. We've noticed sporadic interruptions that hinder our ability to fully access the platform's features. These disruptions are causing workflow delays and impacting overall efficiency.\n\nCould you please provide an update on the current status of this issue and an estimated timeframe for resolution? Additionally, any recommended measures to reduce the impact would be greatly appreciated.\n\nThank you for your prompt attention to this matter. I look forward to your response.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "[Your Name],\n\nThank you for informing us about the outage affecting the Cloud SaaS platform. We understand the importance of these critical services and sincerely apologize for the inconvenience caused.\n\nOur technical team is actively investigating the root cause of the outage and working to restore the service as swiftly as possible. Although we do not yet have an estimated time for resolution, we will keep you updated as soon as more information becomes available.\n\nTo help reduce the impact during this period, we recommend saving any unsynchronized work locally.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.8716298937797546,
+          "source_record": "393",
+          "split": "train",
+          "tags": {
+            "tag_1": "Outage",
+            "tag_2": "Disruption",
+            "tag_3": "Recovery",
+            "tag_4": "Security"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000393",
+          "ticket_text": "Service Interruption\n\nDear Customer Support,\n\nI am submitting a report concerning a technical failure impacting the Cloud SaaS platform. The service is currently inaccessible, causing significant operational disruptions. Could you please provide an update on the cause of the outage, an estimated time for resolution, and any information on measures to lessen the impact duration? We depend heavily on the platform and hope for a prompt resolution.\n\nThank you for your immediate attention to this issue.\n\nBest regards,\n[Your Name]",
+          "type": "Problem",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for informing us about the recent outage of the cloud-native platform. We recognize the importance of maintaining platform stability for operations and sincerely apologize for the disruption caused. Our technical team is actively investigating the root cause and working towards a resolution. At this time, we cannot specify an exact estimated time for full restoration but will keep you updated on our progress. To prevent future incidents, we are conducting a comprehensive review of system logs and deploying additional monitoring tools. We are committed to keeping you informed throughout the process.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 3,
+          "score": 0.8480744361877441,
+          "source_record": "760",
+          "split": "train",
+          "tags": {
+            "tag_1": "Outage",
+            "tag_2": "Disruption",
+            "tag_3": "Performance",
+            "tag_4": "Stability",
+            "tag_5": "Availability"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000760",
+          "ticket_text": "Downtime of Cloud-Native Platform\n\nDear Customer Support Team,\n\nI am preparing a report regarding the recent outage of the cloud-native platform. We experienced service disruptions that significantly affected our operations. The downtime resulted in workflow delays and impacted our ability to serve customers effectively. We depend greatly on the platform's stability and availability for our daily business functions.\n\nCould you please provide an update on the cause of the incident and an estimated time for resolution? Additionally, I would appreciate information on the preventive measures being implemented to avoid similar issues in the future.",
+          "type": "Problem",
+          "version": "51"
+        }
+      ]
+    },
+    {
+      "query_category": "Technical Support",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000101",
+      "top_results": [
+        {
+          "answer": "To assist with the headset connectivity issue, please provide your operating system and device details. We may need to call <tel_num> to resolve the issue promptly.",
+          "category": "Returns and Exchanges",
+          "priority": "medium",
+          "rank": 1,
+          "score": 0.5403434038162231,
+          "source_record": "17664",
+          "split": "train",
+          "tags": {
+            "tag_1": "Hardware",
+            "tag_2": "Network",
+            "tag_3": "Performance",
+            "tag_4": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-017664",
+          "ticket_text": "Problem with Connecting HyperX Cloud II Wireless Headset\n\nI'm encountering connectivity problems with my HyperX Cloud II Wireless Headset across different software like Zoom and Spotify. I've already updated the drivers and reconfigured the settings, but the issue still persists. I've attempted some troubleshooting steps, but the problem remains. I suspect it might be due to outdated drivers or software conflicts. I would greatly appreciate your help in resolving this issue to ensure compatibility with various applications. Could you please provide some additional troubleshooting steps or recommendations to resolve this issue? I'm looking forward to your assistance.",
+          "type": "Incident",
+          "version": "400"
+        },
+        {
+          "answer": "Let's research the issue and contact us at <tel_num> to troubleshoot. We can schedule a call at your convenience to resolve this problem.",
+          "category": "IT Support",
+          "priority": "medium",
+          "rank": 2,
+          "score": 0.53163743019104,
+          "source_record": "26336",
+          "split": "train",
+          "tags": {
+            "tag_1": "Network",
+            "tag_2": "Hardware",
+            "tag_3": "Performance",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-026336",
+          "ticket_text": "Troubleshooting Connectivity Problems with Bose QuietComfort 35 II Gaming Headset\n\nWe are encountering connectivity problems with our Bose QuietComfort 35 II Gaming Headset during virtual meetings. We suspect recent software updates, specifically with Cisco Webex, might be the cause of incompatibility. We have already tried restarting the headset, updating the drivers, and reinstalling Webex, but the issue still persists. We need assistance to resolve this matter.",
+          "type": "Problem",
+          "version": "400"
+        },
+        {
+          "answer": "To help resolve your headset connectivity issue, please provide your operating system and device details. We may need to call <tel_num> to address the problem promptly.",
+          "category": "Returns and Exchanges",
+          "priority": "medium",
+          "rank": 3,
+          "score": 0.5315133929252625,
+          "source_record": "19809",
+          "split": "train",
+          "tags": {
+            "tag_1": "Hardware",
+            "tag_2": "Network",
+            "tag_3": "Performance",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-019809",
+          "ticket_text": "Issues with Connecting HyperX Cloud II Wireless Headset\n\nI am having connectivity problems with my HyperX Cloud II Wireless Headset across different software like Zoom and Spotify. I have already updated the drivers and reconfigured the settings, but the issues still persist. I have tried troubleshooting, but the problem remains. I suspect it might be due to outdated drivers or software conflicts. I would greatly appreciate some assistance to ensure compatibility with my applications. Could you please provide additional troubleshooting steps or recommendations to resolve the issue? Thank you.",
+          "type": "Incident",
+          "version": "400"
+        }
+      ]
+    },
+    {
+      "query_category": "IT Support",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000102",
+      "top_results": [
+        {
+          "answer": "Thank you for your inquiry regarding the application of Python-based machine learning technologies and big data systems in ESG analytics and rule-based investment strategies. Our workflows incorporate Python ML libraries such as scikit-learn and TensorFlow for data analysis and predictive modeling, integrated with large-scale data platforms like Apache Hadoop and Spark for scalable data management. This combination allows us to efficiently process extensive ESG datasets, thereby enhancing the accuracy and speed of our investment algorithms.",
+          "category": "Customer Service",
+          "priority": "low",
+          "rank": 1,
+          "score": 0.7452396154403687,
+          "source_record": "470",
+          "split": "train",
+          "tags": {
+            "tag_1": "Feature",
+            "tag_2": "Data",
+            "tag_3": "Analytics",
+            "tag_4": "Machine Learning"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000470",
+          "ticket_text": "Python Machine Learning Insights\n\nDear Customer Support,\n\nI am reaching out to inquire about the company's use of Python-driven machine learning models in conjunction with large-scale data repositories to enhance Environmental, Social, and Governance (ESG) analytics and rule-based investment strategies for institutional clients. Gaining an understanding of the technological frameworks and methodologies employed would greatly aid in assessing integration capabilities.\n\nSpecifically, I am interested in learning how Python's machine learning libraries are utilized within ESG analytics processes, and how big data lakes support data processing and management.",
+          "type": "Request",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for sharing your upgrade proposals. To provide an accurate timeline for assessment, could you please specify the current setup of your platform and preferred technology stacks? This information will help us evaluate feasibility, required resources, and outline the subsequent steps.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.7213677167892456,
+          "source_record": "20",
+          "split": "train",
+          "tags": {
+            "tag_1": "Product",
+            "tag_2": "Feature",
+            "tag_3": "Feedback",
+            "tag_4": "IT"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000020",
+          "ticket_text": "Proposal for Upgrades to Big Data Analytics Systems\n\nDear Customer Support Team,\n\nI hope this message reaches you well. I am writing to request improvements to our existing big data analytics infrastructure. Our goal is to enhance support for advanced machine learning models developed in Python, enable automated rebalancing of investment portfolios, and customize ESG (Environmental, Social, and Governance) investment strategies tailored specifically for institutional clients.\n\nAt present, our system manages large data sets and aims to incorporate complex machine learning algorithms to deliver real-time analytics efficiently.",
+          "type": "Change",
+          "version": "51"
+        },
+        {
+          "answer": "Hi [Name], we are happy to assist in optimizing your data analytics infrastructure. To provide tailored recommendations, could you please provide details about your current hardware and software setup? We will be able to offer guidance and suggestions for potential upgrades and improvements to streamline your data analytics pipeline.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 3,
+          "score": 0.6985982060432434,
+          "source_record": "14527",
+          "split": "train",
+          "tags": {
+            "tag_1": "Product",
+            "tag_2": "Feature",
+            "tag_3": "Performance",
+            "tag_4": "IT",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-014527",
+          "ticket_text": "Enhancing Data Analytics Infrastructure\n\nCustomer Support, seeking assistance in optimizing our data analytics infrastructure to gain better investment insights, which will impact our various hardware and software products. We are currently experiencing inefficiencies in data processing and analysis, leading to delayed decision-making. We would appreciate guidance on how to streamline our data analytics pipeline, including recommendations for hardware and software upgrades, which would enable us to make informed investment decisions and improve our overall business.",
+          "type": "Change",
+          "version": "400"
+        }
+      ]
+    },
+    {
+      "query_category": "Technical Support",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000111",
+      "top_results": [
+        {
+          "answer": "Thank you for your urgent notification regarding the platform service outage impacting device connectivity. To assist you promptly, could you please share the latest error logs from the Kubernetes clusters and any recent modifications made to the environment since the outage began? Additionally, let us know a convenient time for a phone call to conduct real-time troubleshooting. Your cooperation will help us accelerate the resolution and restore normal service swiftly. We appreciate your patience and look forward to your quick response.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 1,
+          "score": 0.9316470623016357,
+          "source_record": "589",
+          "split": "train",
+          "tags": {
+            "tag_1": "Outage",
+            "tag_2": "Disruption",
+            "tag_3": "Network",
+            "tag_4": "Hardware",
+            "tag_5": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000589",
+          "ticket_text": "Immediate Attention Required: Platform Disruption Impacting Device Connectivity\n\nDear Customer Support Team,\n\nI am submitting a report concerning a critical outage of the platform services that is currently hindering device connectivity throughout operations. This disruption has blocked access to the SaaS platform, greatly impairing functions such as barcode scanners and RAID controllers, which are vital for daily operations.\n\nPreliminary investigations suggest the issue may be linked to failures in Kubernetes orchestration. Attempts to resolve the problem by restarting pods and redeploying microservices have not been successful, and the issue remains unresolved.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for reaching out regarding the critical system outage impacting the infrastructure. We recognize the urgency and are prioritizing this case. Based on your description, the issue appears to stem from a Kubernetes orchestration failure, despite initial remediation efforts such as restarting pods and checking configurations.\n\nTo assist us effectively, please provide recent logs from the Kubernetes control plane components, including kube-apiserver, kube-controller-manager, and kube-scheduler. Additionally, any error messages or unusual system behavior would be helpful.",
+          "category": "Service Outages and Maintenance",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.872353196144104,
+          "source_record": "641",
+          "split": "train",
+          "tags": {
+            "tag_1": "Outage",
+            "tag_2": "Disruption",
+            "tag_3": "Recovery",
+            "tag_4": "Infrastructure",
+            "tag_5": "Microservices",
+            "tag_6": "System",
+            "tag_7": "Performance"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000641",
+          "ticket_text": "System Downtime\n\nDear Customer Support,\n\nI am submitting a report about a significant system outage currently impacting numerous connected devices across our infrastructure. The issue seems to originate from a failure in Kubernetes orchestration within our microservices setup. Although initial attempts to restart the affected pods were made, the problem remains unresolved. Multiple teams have been involved in troubleshooting, but a definitive solution has not yet been found.\n\nThis downtime severely affects customer experience and operational continuity. The system has been monitored.",
+          "type": "Incident",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for reporting this issue. To assist further, kindly provide recent logs from the Kubernetes deployment, error messages from the CI/CD pipeline, and relevant timestamps of the downtime. This information will aid us in diagnosing the root cause swiftly. Once received, we will review and suggest best practices to prevent future occurrences. Please let us know if an urgent call or coordination is needed.",
+          "category": "Technical Support",
+          "priority": "high",
+          "rank": 3,
+          "score": 0.821406364440918,
+          "source_record": "663",
+          "split": "train",
+          "tags": {
+            "tag_1": "Outage",
+            "tag_2": "Disruption",
+            "tag_3": "Maintenance",
+            "tag_4": "Tech Support"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000663",
+          "ticket_text": "Immediate Attention Needed: Suspected Platform Outage Due to Microservice Malfunction\n\nDear Customer Support Team,\n\nI am reaching out to report a critical problem currently impacting the platform. We are experiencing extensive downtime, which we believe is connected to a malfunction in the microservices. Initial investigations indicate that the issue may stem from a misconfigured Kubernetes deployment failure within our CI/CD pipeline.\n\nOur first measures included restarting the affected services and thoroughly verifying resource distribution across the clusters. Despite these efforts, the issue persists, and the platform remains unstable. The downtime continues.",
+          "type": "Incident",
+          "version": "51"
+        }
+      ]
+    },
+    {
+      "query_category": "General Inquiry",
+      "query_id_indexed": false,
+      "query_split": "validation",
+      "query_ticket_id": "KAGGLE-f187c090e595-000112",
+      "top_results": [
+        {
+          "answer": "Thank you for your interest in our agency's services. We offer a comprehensive selection of solutions including digital marketing, brand management, content creation, and campaign planning. Our pricing is flexible; standard packages can be customized to meet specific client requirements, and we often have special promotions. We are happy to send brochures, service agreements, and case studies that showcase our clients' successes. Please reply with your preferred email address to receive these materials. We look forward to assisting you through the onboarding process.",
+          "category": "Product Support",
+          "priority": "high",
+          "rank": 1,
+          "score": 0.7216211557388306,
+          "source_record": "14",
+          "split": "train",
+          "tags": {
+            "tag_1": "Product",
+            "tag_2": "Service",
+            "tag_3": "Feedback",
+            "tag_4": "Sales"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000014",
+          "ticket_text": "Inquiry for Detailed Information on Agency Offerings\n\nDear Customer Support Team,\n\nI hope this message reaches you well. I am writing to request detailed information about the services provided by your agency. Specifically, I am interested in understanding the variety of services available, the pricing models, and any special packages or offers that might be applicable.\n\nAdditionally, I would appreciate it if you could send brochures, service contracts, and case studies highlighting your previous work and client success stories. This information will greatly help me in making an informed decision.",
+          "type": "Request",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for your interest in our agency's services. We offer a wide range of solutions including digital marketing, brand management, content creation, and campaign planning. Our pricing is adaptable; standard packages can be tailored to meet specific client requirements, and we frequently have special offers. We are happy to send you brochures, service agreements, and case studies that demonstrate our success stories. Please reply with your preferred email address so we can provide these materials and guide you through the onboarding process.",
+          "category": "Product Support",
+          "priority": "high",
+          "rank": 2,
+          "score": 0.7151879072189331,
+          "source_record": "170",
+          "split": "train",
+          "tags": {
+            "tag_1": "Customer Service",
+            "tag_2": "Feedback",
+            "tag_3": "Inquiry",
+            "tag_4": "Product"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000170",
+          "ticket_text": "Inquiry for In-Depth Details on Agency Offerings\n\nDear Customer Support Team,\n\nI hope this message reaches you well. I am reaching out to request comprehensive details about the services provided by your agency. Specifically, I am interested in understanding the scope of services available, the pricing models, and any special packages or promotions that might be applicable.\n\nFurthermore, I would be grateful if you could send brochures, service agreements, and case studies highlighting your previous work and client success stories. This information will be very helpful in making an informed decision.",
+          "type": "Request",
+          "version": "51"
+        },
+        {
+          "answer": "Thank you for contacting us, <name>. We offer a broad selection of products and services, including detailed features and specifications. To provide you with precise information, could you please specify which product lines or services you are interested in? We can then share relevant details such as product specifications, pricing, available service packages, warranty information, support options, and delivery timelines. If you prefer a phone call to discuss your requirements in detail, please let us know.",
+          "category": "Customer Service",
+          "priority": "high",
+          "rank": 3,
+          "score": 0.7101991176605225,
+          "source_record": "657",
+          "split": "train",
+          "tags": {
+            "tag_1": "Product",
+            "tag_2": "Documentation",
+            "tag_3": "Feedback",
+            "tag_4": "Sales"
+          },
+          "ticket_id": "KAGGLE-f187c090e595-000657",
+          "ticket_text": "Inquiry About Product Information\n\nDear Customer Support Team,\n\nI hope this message reaches you well. I am writing to request comprehensive details regarding your products and services. Specifically, I would like to understand the variety of products you offer, including their specifications, pricing, and available service packages. Additionally, information about warranties, support options, and delivery schedules would be greatly appreciated to help me make an informed purchasing decision.\n\nThank you in advance for your assistance. I look forward to your prompt and detailed response.\n\nBest regards,\n\n[Your Name]",
+          "type": "Request",
+          "version": "51"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "activation": "gelu",
+  "architectures": [
+    "DistilBertForSequenceClassification"
+  ],
+  "attention_dropout": 0.1,
+  "bos_token_id": null,
+  "dim": 768,
+  "dropout": 0.1,
+  "dtype": "float32",
+  "eos_token_id": null,
+  "hidden_dim": 3072,
+  "id2label": {
+    "0": "Technical Support",
+    "1": "Product Support",
+    "2": "Customer Service",
+    "3": "IT Support",
+    "4": "Billing and Payments",
+    "5": "Returns and Exchanges",
+    "6": "Service Outages and Maintenance",
+    "7": "Sales and Pre-Sales",
+    "8": "Human Resources",
+    "9": "General Inquiry"
+  },
+  "initializer_range": 0.02,
+  "label2id": {
+    "Billing and Payments": 4,
+    "Customer Service": 2,
+    "General Inquiry": 9,
+    "Human Resources": 8,
+    "IT Support": 3,
+    "Product Support": 1,
+    "Returns and Exchanges": 5,
+    "Sales and Pre-Sales": 7,
+    "Service Outages and Maintenance": 6,
+    "Technical Support": 0
+  },
+  "max_position_embeddings": 512,
+  "model_type": "distilbert",
+  "n_heads": 12,
+  "n_layers": 6,
+  "pad_token_id": 0,
+  "problem_type": "single_label_classification",
+  "qa_dropout": 0.1,
+  "seq_classif_dropout": 0.2,
+  "sinusoidal_pos_embds": false,
+  "tie_weights_": true,
+  "tie_word_embeddings": true,
+  "transformers_version": "5.16.1",
+  "vocab_size": 30522
+}

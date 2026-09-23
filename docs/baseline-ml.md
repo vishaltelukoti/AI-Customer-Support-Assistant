@@ -245,6 +245,6 @@ Artifacts are saved in `experiments/optimization/`: `optimization_results.json`,
 - No probability calibration, deep-learning comparison, retrieval, RAG or API integration is included.
 - Privacy masking reuses Day 1 preprocessing; it is not a new runtime security implementation or a guarantee that text is PII-free.
 
-**Day 4 has not been implemented.** CNN/RNN/LSTM experiments and transformer/pretrained model experiments are NOT IMPLEMENTED.
+Day 4 and Day 5 deep-learning comparisons are now documented separately in [deep-learning.md](deep-learning.md). They do not change the Day 2 or Day 3 classical baselines.
 
 Implementation references: [TF-IDF](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html), [Logistic Regression and predict_proba](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), and [model persistence/version compatibility](https://scikit-learn.org/stable/model_persistence.html).

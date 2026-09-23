@@ -1,0 +1,274 @@
+{
+  "configuration": {
+    "dense_max_iter": 200,
+    "distilbert_checkpoint": "distilbert-base-uncased",
+    "distilbert_max_train_examples_per_class": 60,
+    "distilbert_sequence_length": 48,
+    "embedding_dim": 32,
+    "hidden_dim": 32,
+    "hyperparameter_optimization": false,
+    "models": [
+      "cnn",
+      "rnn",
+      "lstm",
+      "attention",
+      "distilbert"
+    ],
+    "seed": 42,
+    "sequence_length": 60,
+    "task": "ticket_text_to_category",
+    "vocabulary_size": 5000
+  },
+  "dataset": {
+    "test": {
+      "rows": 2451,
+      "sha256": "7078fa22d7510476bb2191c027ec474cfea5c62fb30faa48854e3431178a21ee"
+    },
+    "train": {
+      "rows": 11436,
+      "sha256": "f1e027454bb4f3d52304bc808a025083e9b821fedc9c6e84dbadbd11bd76a1df"
+    },
+    "validation": {
+      "rows": 2451,
+      "sha256": "044ad717a86e9437e8be8592a4b80686d7f4da2a110bdbd13e09556ff46ea734"
+    }
+  },
+  "environment": {
+    "joblib": "1.5.3",
+    "numpy": "2.5.2",
+    "python": "3.14.4",
+    "scikit-learn": "1.9.0",
+    "threadpoolctl": "3.6.0",
+    "torch_transformers_available": true
+  },
+  "leakage_checks": {
+    "audit_hashes_verified": true,
+    "model_selection_metric": "validation_f1_macro",
+    "priority_models_trained": false,
+    "test_used_during_training": false,
+    "train_validation_test_split_unchanged": true
+  },
+  "models": {
+    "attention": {
+      "test": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      },
+      "training_time_seconds": 1.1932052000192925,
+      "validation": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      }
+    },
+    "cnn": {
+      "test": {
+        "accuracy": 0.2892696858425133,
+        "f1_macro": 0.04487341772151899,
+        "f1_weighted": 0.1299882765494838,
+        "precision_macro": 0.02893877551020408,
+        "recall_macro": 0.09985915492957746
+      },
+      "training_time_seconds": 1.7096641000243835,
+      "validation": {
+        "accuracy": 0.29008567931456547,
+        "f1_macro": 0.04548767304808732,
+        "f1_weighted": 0.1309853624110645,
+        "precision_macro": 0.12897959183673469,
+        "recall_macro": 0.10027624309392265
+      }
+    },
+    "distilbert": {
+      "base_encoder_frozen": true,
+      "batch_size": 64,
+      "checkpoint": "distilbert-base-uncased",
+      "epochs": 1,
+      "max_train_examples_per_class": 60,
+      "sequence_length": 48,
+      "status": "completed",
+      "test": {
+        "accuracy": 0.1942064463484292,
+        "f1_macro": 0.12054220604759651,
+        "f1_weighted": 0.18712898195713115,
+        "precision_macro": 0.18228530602609455,
+        "recall_macro": 0.16208537445007765
+      },
+      "train_examples_used": 600,
+      "training_time_seconds": 57.2092932999949,
+      "validation": {
+        "accuracy": 0.18767849857201144,
+        "f1_macro": 0.12177489204053409,
+        "f1_weighted": 0.1872754223278529,
+        "precision_macro": 0.2209837960276436,
+        "recall_macro": 0.14453121421237938
+      }
+    },
+    "lstm": {
+      "test": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      },
+      "training_time_seconds": 4.436216600006446,
+      "validation": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      }
+    },
+    "rnn": {
+      "test": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      },
+      "training_time_seconds": 0.8363590000080876,
+      "validation": {
+        "accuracy": 0.2896776825785394,
+        "f1_macro": 0.044922492881999364,
+        "f1_weighted": 0.13013043633708507,
+        "precision_macro": 0.028967768257853937,
+        "recall_macro": 0.1
+      }
+    }
+  },
+  "selected": {
+    "model": "distilbert",
+    "selection_metric": "validation_f1_macro",
+    "test_confusion_matrix": [
+      [
+        234,
+        0,
+        101,
+        36,
+        7,
+        270,
+        3,
+        0,
+        0,
+        59
+      ],
+      [
+        113,
+        0,
+        66,
+        36,
+        1,
+        188,
+        1,
+        6,
+        0,
+        50
+      ],
+      [
+        58,
+        0,
+        117,
+        16,
+        9,
+        127,
+        1,
+        5,
+        0,
+        28
+      ],
+      [
+        98,
+        0,
+        52,
+        22,
+        1,
+        94,
+        0,
+        2,
+        0,
+        23
+      ],
+      [
+        23,
+        0,
+        49,
+        15,
+        33,
+        112,
+        1,
+        3,
+        0,
+        5
+      ],
+      [
+        24,
+        0,
+        21,
+        9,
+        0,
+        58,
+        0,
+        2,
+        0,
+        9
+      ],
+      [
+        28,
+        0,
+        8,
+        4,
+        1,
+        46,
+        2,
+        0,
+        1,
+        9
+      ],
+      [
+        10,
+        0,
+        33,
+        8,
+        0,
+        17,
+        0,
+        1,
+        0,
+        7
+      ],
+      [
+        12,
+        0,
+        14,
+        6,
+        0,
+        19,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        9,
+        0,
+        5,
+        1,
+        0,
+        12,
+        0,
+        0,
+        0,
+        9
+      ]
+    ],
+    "test_f1_macro": 0.12054220604759651,
+    "validation_f1_macro": 0.12177489204053409
+  }
+}

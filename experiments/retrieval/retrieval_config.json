@@ -1,0 +1,23 @@
+{
+  "answers_used_for_embeddings": false,
+  "configuration": {
+    "evaluation_limit_per_split": 250,
+    "index_type": "IndexFlatIP",
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "normalize_embeddings": true,
+    "seed": 42,
+    "top_k": 3
+  },
+  "corpus_split": "train",
+  "embedding_dimension": 384,
+  "embedding_input": "ticket_text",
+  "environment": {
+    "faiss-cpu": "1.13.2",
+    "numpy": "2.5.2",
+    "python": "3.14.4",
+    "sentence-transformers": "5.2.3"
+  },
+  "index_file": "tickets.faiss",
+  "indexed_tickets": 11436,
+  "metadata_file": "metadata.jsonl"
+}

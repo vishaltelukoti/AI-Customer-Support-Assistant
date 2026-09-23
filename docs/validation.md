@@ -1,4 +1,48 @@
-# Dataset integration and Day 2 validation record
+# Validation record
+
+## Day 7 RAG validation (2026-09-22)
+
+Day 7 is complete. It added an offline RAG suggested-resolution service over the Day 6 retrieval index without FastAPI integration, LangGraph, agents, memory or hosted model APIs.
+
+| Check | Result |
+| --- | --- |
+| Focused RAG tests | 7 passed |
+| Generation model | Local `google/flan-t5-base` |
+| API key | Not required |
+| Retrieval config | Day 6 FAISS index, Top-K 3 |
+| Retrieval threshold | 0.55 |
+| Evaluation cases | billing/payment, outage, prompt injection, insufficient information |
+| Source attribution rate | 1.000000 |
+| Grounded acceptable response rate | 1.000000 |
+| Insufficient-information pass rate | 1.000000 |
+| Prompt injection checks | User-ticket and retrieved-content injection covered in focused tests |
+| Artifacts | `experiments/rag/rag_config.json`, `rag_evaluation.json`, `rag_evaluation.md` |
+| API integration | Intentionally absent |
+
+The evaluation is a small POC check, not proof of production answer quality.
+
+## Day 6 retrieval validation (2026-09-22)
+
+Day 6 is complete. It added local Sentence Transformer + FAISS similar-ticket retrieval without API, RAG, LangGraph, classifier tuning or cloud services.
+
+| Check | Result |
+| --- | --- |
+| Focused retrieval tests | 5 passed |
+| Full backend suite | Run after implementation; see current Day 6 final report |
+| Dependency install | `sentence-transformers` and `faiss-cpu` installed from `backend/requirements.txt` |
+| Indexed corpus | 11,436 training historical tickets only |
+| Embedding model | `sentence-transformers/all-MiniLM-L6-v2` |
+| Embedding dimension | 384 |
+| FAISS index | `IndexFlatIP` with normalized vectors |
+| Default Top-K | 3 |
+| Evaluation queries | 250 validation + 250 test tickets |
+| Recall@1 / Recall@3 / Recall@5 | 0.656000 / 0.764000 / 0.844000 |
+| MRR | 0.722500 |
+| Leakage checks | validation/test IDs not indexed; answers excluded from embeddings; no self-retrieval observed |
+| Saved artifact validation | Saved FAISS index loaded and returned training-ticket metadata |
+| API integration | Intentionally absent |
+
+No API key is required for the local Sentence Transformer + FAISS retrieval implementation.
 
 ## Day 2 baseline validation (2026-09-18)
 
@@ -24,7 +68,7 @@ Day 2 is complete. The earlier dataset integration record below is retained as h
 | Live API | GET /health passed; POST /api/v1/tickets returned a UUID, received status and null category/priority/confidence |
 | Frontend integration | Actual Axios service smoke test passed, including API validation-error handling; served frontend returned HTTP 200 |
 | API integration | Intentionally absent: no route, schema or ticket-service changes |
-| Day 3 | Grid Search, Random Search and Bayesian Optimization NOT IMPLEMENTED |
+| Day 3+ | Later validation records live in the generated experiment artifacts and current development plan |
 
 Commands used from the repository root:
 

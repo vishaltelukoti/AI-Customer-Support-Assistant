@@ -12,3 +12,4 @@ torch>=2.13,<2.14
 transformers>=5.16,<5.17
 sentence-transformers>=5.2,<5.3
 faiss-cpu>=1.13,<1.14
+langgraph>=1.2,<1.3

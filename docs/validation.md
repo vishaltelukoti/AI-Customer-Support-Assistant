@@ -1,5 +1,26 @@
 # Validation record
 
+## Day 8 LangGraph agent validation (2026-09-23)
+
+Day 8 is complete. It added a lightweight LangGraph multi-agent workflow without FastAPI integration, persistent memory, Day 9 security work or retrieval/RAG rebuilding.
+
+| Check | Result |
+| --- | --- |
+| Focused agent tests | 8 passed |
+| Clean process load/execute | Passed |
+| Agents | Retrieval, Investigation, Resolution |
+| Tool | Existing FAISS retrieval exposed as retrieval tool |
+| Routing | Simple: Retrieval -> Resolution; Complex: Investigation -> Retrieval -> Resolution |
+| Evaluation cases | simple payment, complex refund/cancellation, insufficient information, prompt injection |
+| Routing accuracy | 1.000000 |
+| Workflow completion rate | 1.000000 |
+| Source behavior rate | 1.000000 |
+| Trace presence rate | 1.000000 |
+| Graceful failure tests | retrieval failure and generation failure covered |
+| Artifacts | `experiments/agents/agent_config.json`, `agent_evaluation.json`, `agent_evaluation.md` |
+
+The evaluation is POC-scoped and does not claim production accuracy.
+
 ## Day 7 RAG validation (2026-09-22)
 
 Day 7 is complete. It added an offline RAG suggested-resolution service over the Day 6 retrieval index without FastAPI integration, LangGraph, agents, memory or hosted model APIs.

@@ -1,6 +1,6 @@
 # Development plan
 
-Days 1 through 7 are complete. Later phases remain planned.
+Days 1 through 8 are complete. Later phases remain planned.
 
 | Day | Scope / status |
 | --- | --- |
@@ -11,7 +11,7 @@ Days 1 through 7 are complete. Later phases remain planned.
 | 5 | COMPLETE: attention and pretrained DistilBERT category-classification comparison |
 | 6 | COMPLETE: local Sentence Transformer embeddings and FAISS similar-ticket retrieval |
 | 7 | COMPLETE: simple grounded RAG suggested resolutions with supporting sources |
-| 8 | LangGraph multi-agent investigation for complex tickets |
+| 8 | COMPLETE: LangGraph multi-agent workflow for simple/complex ticket handling |
 | 9 | Security: prompt injection, jailbreak and PII checks; security status |
 | 10 | Explainability and fairness; classification explanations |
 | 11 | MLOps: MLflow, Airflow and model monitoring |
@@ -30,4 +30,6 @@ Day 6 adds local similar-ticket retrieval. The index uses `sentence-transformers
 
 Day 7 adds a simple RAG pipeline over the Day 6 FAISS index. It retrieves top-3 similar training historical tickets, builds bounded context including prior resolutions, and uses local `google/flan-t5-base` generation with grounding rules and source attribution. The retrieval threshold is 0.55; weak evidence returns `insufficient_evidence` instead of a fabricated answer. A four-case POC evaluation checks source attribution, acceptable grounded responses, prompt-injection handling and insufficient-information behavior; all measured rates are 1.000000. No API key is required, and no FastAPI, LangGraph, agent or memory integration was added.
 
-Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval and RAG artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval and experiments/rag; MLflow, Airflow and future backend modules remain placeholders. Days 8-13 in the table are planned only.
+Day 8 adds a lightweight LangGraph workflow with Retrieval, Investigation and Resolution agents. Simple tickets route Retrieval -> Resolution; complex tickets route Investigation -> Retrieval -> Resolution. The retrieval tool wraps the existing Day 6 FAISS retriever, and the Resolution Agent reuses the Day 7 RAG service. Shared state carries ticket text, complexity, retrieved sources, investigation result, final response, trace, status/error fields and request-local memory. A four-case POC evaluation reports routing accuracy 1.000000, workflow completion 1.000000, source behavior 1.000000 and trace presence 1.000000. No FastAPI integration, persistent memory or Day 9 security framework was added.
+
+Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval, RAG and agent artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval, experiments/rag and experiments/agents; MLflow, Airflow and future backend modules remain placeholders. Days 9-13 in the table are planned only.

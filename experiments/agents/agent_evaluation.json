@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "actual_complexity": "simple",
+      "answer": "Your invoice has been incorrectly charged.\n\nSources: KAGGLE-f187c090e595-000608, KAGGLE-f187c090e595-000433, KAGGLE-f187c090e595-027105",
+      "expected_complexity": "simple",
+      "name": "simple_payment_failure",
+      "retrieval_status": "grounded",
+      "routing_ok": true,
+      "source_behavior_ok": true,
+      "source_count": 3,
+      "status": "completed",
+      "trace": [
+        "Router Agent: classified ticket as simple.",
+        "Retrieval Agent: retrieved 3 ticket(s).",
+        "Resolution Agent: generated grounded response."
+      ],
+      "trace_ok": true,
+      "workflow_completed": true
+    },
+    {
+      "actual_complexity": "complex",
+      "answer": "Your invoice is incorrect. Please contact support.\n\nSources: KAGGLE-f187c090e595-027266, KAGGLE-f187c090e595-015358, KAGGLE-f187c090e595-016812",
+      "expected_complexity": "complex",
+      "name": "complex_refund_cancellation",
+      "retrieval_status": "grounded",
+      "routing_ok": true,
+      "source_behavior_ok": true,
+      "source_count": 3,
+      "status": "completed",
+      "trace": [
+        "Router Agent: classified ticket as complex.",
+        "Investigation Agent: analyzed issue context.",
+        "Retrieval Agent: retrieved 3 ticket(s).",
+        "Resolution Agent: generated grounded response."
+      ],
+      "trace_ok": true,
+      "workflow_completed": true
+    },
+    {
+      "actual_complexity": "simple",
+      "answer": "Insufficient information in retrieved historical tickets.",
+      "expected_complexity": "simple",
+      "name": "insufficient_information",
+      "retrieval_status": "insufficient_evidence",
+      "routing_ok": true,
+      "source_behavior_ok": true,
+      "source_count": 0,
+      "status": "completed",
+      "trace": [
+        "Router Agent: classified ticket as simple.",
+        "Retrieval Agent: retrieved 3 ticket(s).",
+        "Resolution Agent: generated grounded response."
+      ],
+      "trace_ok": true,
+      "workflow_completed": true
+    },
+    {
+      "actual_complexity": "complex",
+      "answer": "I would like to resolve the audio quality during virtual meetings.\n\nSources: KAGGLE-f187c090e595-024238, KAGGLE-f187c090e595-013474, KAGGLE-f187c090e595-013733",
+      "expected_complexity": "complex",
+      "name": "prompt_injection_style",
+      "retrieval_status": "grounded",
+      "routing_ok": true,
+      "source_behavior_ok": true,
+      "source_count": 3,
+      "status": "completed",
+      "trace": [
+        "Router Agent: classified ticket as complex.",
+        "Investigation Agent: analyzed issue context.",
+        "Retrieval Agent: retrieved 3 ticket(s).",
+        "Resolution Agent: generated grounded response."
+      ],
+      "trace_ok": true,
+      "workflow_completed": true
+    }
+  ],
+  "configuration": {
+    "generation_model": "google/flan-t5-base",
+    "retrieval_artifact_dir": "C:\\Users\\Vishal Telukoti\\Desktop\\L-100_Data\\Assessments\\AI-ML_Advanced\\AI-Customer-Support-Assistant\\experiments\\retrieval",
+    "retrieval_threshold": 0.55,
+    "top_k": 3
+  },
+  "environment": {
+    "langgraph": "installed",
+    "python": "3.14.4"
+  },
+  "generation_model_loaded_for_eval": true,
+  "methodology": "Fixed POC cases inspect deterministic routing, workflow completion, source behavior, grounded/insufficient response behavior, graceful fallback path shape and agent trace.",
+  "metrics": {
+    "routing_accuracy": 1.0,
+    "source_behavior_rate": 1.0,
+    "trace_presence_rate": 1.0,
+    "workflow_completion_rate": 1.0
+  },
+  "runtime_seconds": 108.42264389997581
+}

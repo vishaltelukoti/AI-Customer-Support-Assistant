@@ -1,6 +1,7 @@
 """Simple grounded RAG service using the Day 6 retrieval index."""
 
 import argparse
+import importlib
 import json
 import platform
 import time
@@ -60,10 +61,17 @@ class RAGResponse:
 
 class LocalHFGenerator:
     def __init__(self, model_name: str = DEFAULT_GENERATION_MODEL, max_new_tokens: int = MAX_NEW_TOKENS):
-        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
         self.model_name = model_name
         self.max_new_tokens = max_new_tokens
+        try:
+            transformers = importlib.import_module("transformers")
+        except ImportError as exc:
+            raise RuntimeError(
+                "The local RAG generator requires the 'transformers' package. "
+                "Install backend/requirements.txt in the active Python environment."
+            ) from exc
+        AutoTokenizer = getattr(transformers, "AutoTokenizer")
+        AutoModelForSeq2SeqLM = getattr(transformers, "AutoModelForSeq2SeqLM")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
@@ -146,6 +154,12 @@ class RAGService:
         query = prepare_ticket_text(ticket_text)
         effective_top_k = top_k or self.config.top_k
         retrieved = self.retriever.search_similar_tickets(query, top_k=effective_top_k)
+        return self.generate_from_retrieved(query, retrieved, effective_top_k)
+
+    def generate_from_retrieved(self, ticket_text: str, retrieved: list[RetrievalResult],
+                                top_k: int | None = None) -> RAGResponse:
+        query = prepare_ticket_text(ticket_text)
+        effective_top_k = top_k or self.config.top_k
         strong = [item for item in retrieved if item.score >= self.config.retrieval_threshold]
         sources = [_to_source(item) for item in strong]
         retrieved_dicts = [asdict(item) for item in retrieved]

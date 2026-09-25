@@ -1,8 +1,31 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1-12 implement the application foundation, prepared dataset, optimized ML classification, local FAISS similar-ticket retrieval, simple grounded RAG, a lightweight LangGraph multi-agent workflow, deterministic POC security checks, model explainability/subgroup diagnostics, local MLOps, and an integrated FastAPI/UI flow.** The form submits a support-ticket subject and body, then displays classification, similar historical tickets, workflow route, suggested response, source attribution, security status, explanation terms, and timings. Tickets are not stored.
+A single-developer AI-powered customer-support POC. **Days 1-13 implement the application foundation, prepared dataset, optimized ML classification, deep-learning comparison, local FAISS similar-ticket retrieval, grounded RAG, a lightweight LangGraph multi-agent workflow, deterministic POC security checks, model explainability/subgroup diagnostics, local MLOps, integrated FastAPI/UI flow, and final reviewer documentation.** The form submits a support-ticket subject and body, then displays classification, similar historical tickets, workflow route, suggested response, source attribution, security status, explanation terms, and timings. Tickets are not stored.
 
-Planned later work is final demo/documentation polish. See [the development plan](docs/development-plan.md).
+## Problem statement
+
+Customer-support teams need a fast way to classify incoming tickets, find relevant historical cases, draft grounded responses, and expose enough traceability that a reviewer can understand what happened. This POC demonstrates that workflow locally with synthetic data and saved artifacts, without hosted AI APIs or production infrastructure.
+
+## Key features
+
+- Category and priority prediction using the Day 3 optimized classical classifiers.
+- Similar-ticket retrieval using local Sentence Transformer embeddings and FAISS.
+- Suggested responses grounded in retrieved historical answers.
+- Simple/complex routing with a lightweight LangGraph multi-agent workflow.
+- Deterministic POC security checks before and after the AI workflow.
+- Classification explanations and subgroup diagnostics using available metadata.
+- Local MLOps artifacts: MLflow tracking, Airflow validation DAG, CI workflow, Docker build and in-memory monitoring.
+- React UI plus FastAPI endpoint for end-to-end demo.
+
+## End-to-end flow
+
+```text
+React UI -> FastAPI -> Input Security -> Classification -> Similar Ticket Retrieval
+         -> Complexity Router -> Simple RAG or Complex LangGraph
+         -> Output Security -> Explainability + Monitoring -> Response
+```
+
+See [final-architecture.md](docs/final-architecture.md), [final-evaluation.md](docs/final-evaluation.md), and [demo-guide.md](docs/demo-guide.md) for the reviewer-focused summary.
 
 ## Stack and structure
 
@@ -10,9 +33,8 @@ Python 3.12+, FastAPI, Uvicorn, Pydantic/pydantic-settings, pytest, httpx, sciki
 
 ```text
 backend/
-  app/                  # API, schemas, services, preprocessing, baseline ML/evaluation
-                        # empty models, rag, agents, security, explainability, monitoring
-  tests/                # API, CORS, preprocessing, leakage and real-model inference tests
+  app/                  # API, schemas, services, ML, RAG, agents, security, explainability, monitoring
+  tests/                # API, preprocessing, ML, retrieval, RAG, agents, security, MLOps tests
   requirements.txt
   .env.example
   Dockerfile
@@ -36,10 +58,11 @@ experiments/explainability/ # Day 10 explanations and subgroup diagnostics
 experiments/mlops/ # Day 11 metric summaries and MLflow run metadata
 experiments/mlflow/ # Day 11 local MLflow file store, internals ignored
 experiments/integration/ # Day 12 integrated API/workflow evaluation
-airflow/                # placeholder only
-mlflow/                 # placeholder only
-docs/                   # architecture, dataset, assumptions, development plan
-.github/workflows/      # placeholder only; no CI/CD
+experiments/final_validation/ # Day 13 final validation record
+airflow/                # Airflow DAG for lightweight validation
+mlflow/                 # MLflow placeholder/local support directory
+docs/                   # architecture, evaluation, demo, assumptions, validation
+.github/workflows/      # backend CI workflow
 docker-compose.yml
 LICENSE
 ```
@@ -182,7 +205,7 @@ Outputs in `data/processed/`:
 
 Classification input is **subject + body**. Agent answers, assigned type/tags and other metadata are excluded; category and priority are targets. IDs are generated from the raw checksum and source record because no source ID exists. Repeat runs replace the five named outputs deterministically. Failures before export leave previous outputs in place; inspect the command result before using them.
 
-Important limitations: synthetic label quality, substantial queue imbalance (about 20:1), English-only scope, possible paraphrase/template similarity beyond exact grouping, and lightweight privacy patterns that cannot guarantee PII-free text. One ticket-text phone and 70 answer phones are masked. The API still returns null classification fields and does not load these datasets. See [the full dataset audit](docs/dataset.md).
+Important limitations: synthetic label quality, substantial queue imbalance (about 20:1), English-only scope, possible paraphrase/template similarity beyond exact grouping, and lightweight privacy patterns that cannot guarantee PII-free text. One ticket-text phone and 70 answer phones are masked. The integrated API uses saved artifacts derived from these processed splits. See [the full dataset audit](docs/dataset.md).
 
 ## Baseline ML classification
 
@@ -195,7 +218,7 @@ Run from the repository root after installing `backend/requirements.txt`:
 .\backend\.venv\Scripts\python.exe -m backend.app.ml.predict_examples
 ```
 
-The training command saves full joblib pipelines, metrics JSON, a generated report, and test confusion matrices under `experiments/baseline/`. Model files are ignored by Git. The example command loads those actual models and saves predictions with separate category/priority probabilities. The API endpoint remains unchanged.
+The training command saves full joblib pipelines, metrics JSON, a generated report, and test confusion matrices under `experiments/baseline/`. Model files are ignored by Git. The example command loads those actual models and saves predictions with separate category/priority probabilities. The final API uses the stronger Day 3 optimized models.
 
 | Target | Test accuracy | Test macro-F1 | Test weighted-F1 |
 | --- | ---: | ---: | ---: |
@@ -221,7 +244,7 @@ The command saves measured search results, optimized model artifacts, and optimi
 | Category | Randomized Search | 0.574854 | 0.652795 | 0.641538 | 0.651417 |
 | Priority | Randomized Search | 0.630936 | 0.676867 | 0.662208 | 0.674342 |
 
-Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`. Full measured values are in [the generated optimization report](experiments/optimization/optimization_results.md) and [baseline ML documentation](docs/baseline-ml.md). The API endpoint remains unchanged.
+Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams, `min_df=1`, `max_df=0.95`, `max_features=20000`, and `sublinear_tf=False`. Full measured values are in [the generated optimization report](experiments/optimization/optimization_results.md) and [baseline ML documentation](docs/baseline-ml.md). These are the classifiers used by the integrated API.
 
 ## Deep-learning comparison
 
@@ -268,7 +291,7 @@ The command saves `tickets.faiss`, `metadata.jsonl`, `retrieval_config.json`, `r
 | Recall@5 | 0.844000 |
 | MRR | 0.722500 |
 
-No API key is required for the local Sentence Transformer + FAISS retrieval implementation. Retrieval is not connected to FastAPI yet, and Day 6 does not implement RAG.
+No API key is required for the local Sentence Transformer + FAISS retrieval implementation. Day 6 itself did not implement RAG; the final integrated API now reuses this retrieval service.
 
 ## Suggested-resolution RAG
 
@@ -289,7 +312,7 @@ The command saves `rag_config.json`, `rag_evaluation.json`, and `rag_evaluation.
 | Insufficient-information pass rate | 1.000000 |
 | Overall acceptance rate | 1.000000 |
 
-No API key is required for the local retrieval plus local generation setup. RAG is not connected to FastAPI yet, and Day 7 does not implement LangGraph, agents, memory, streaming, or production observability.
+No API key is required for the local retrieval plus local generation setup. Day 7 itself did not implement LangGraph, agents, memory, streaming, or production observability; the final integrated API now reuses this RAG service.
 
 ## LangGraph agent workflow
 
@@ -310,7 +333,7 @@ Simple tickets route Retrieval -> Resolution. Complex tickets route Investigatio
 | Source behavior rate | 1.000000 |
 | Trace presence rate | 1.000000 |
 
-Artifacts are saved under `experiments/agents/`. The workflow is not connected to FastAPI yet and does not implement persistent memory.
+Artifacts are saved under `experiments/agents/`. The final integrated API now reuses this workflow for complex tickets. Persistent memory is still intentionally absent.
 
 ## Security layer
 
@@ -331,7 +354,7 @@ The command saves `security_config.json`, `security_evaluation.json`, and `secur
 | Normal-ticket allow rate | 1.000000 |
 | Malicious retrieved-content handling rate | 1.000000 |
 
-No API key is required. This is a lightweight rule-based POC layer, not comprehensive security, and it is not connected to FastAPI yet.
+No API key is required. This is a lightweight rule-based POC layer, not comprehensive security. The final integrated API runs these checks before and after the AI workflow.
 
 ## Explainability and subgroup diagnostics
 
@@ -399,6 +422,27 @@ The command saves `integration_config.json`, `integration_evaluation.json`, and 
 
 The fixed evaluation covers simple payment failure, complex multiple-charge/refund/cancellation routing, prompt-injection blocking, insufficient evidence, and PII redaction. No API key is required. This is POC integration, not a production support system.
 
+## Demo scenarios
+
+Use [demo-guide.md](docs/demo-guide.md) for exact inputs. The five reviewer scenarios are simple payment failure, complex multiple-charge/refund/cancellation, prompt injection, insufficient information, and PII-containing ticket.
+
+## Key evaluation results
+
+All predefined POC evaluation cases passed. This does not mean production readiness.
+
+| Area | Result |
+| --- | --- |
+| Optimized category classifier | Test accuracy 0.652795, Macro-F1 0.641538 |
+| Optimized priority classifier | Test accuracy 0.676867, Macro-F1 0.662208 |
+| Selected DL model | DistilBERT, validation Macro-F1 0.121775, test Macro-F1 0.120542 |
+| Retrieval | Recall@1 0.656000, Recall@3 0.764000, Recall@5 0.844000, MRR 0.722500 |
+| RAG predefined checks | Source attribution, grounded response and insufficient-information checks passed |
+| Agent predefined checks | Routing, workflow completion, source behavior and trace checks passed |
+| Security predefined checks | 7/7 cases passed; attack detection, normal allow and malicious retrieved-content handling passed |
+| Integration predefined checks | 5/5 cases passed; average latency 78.41 ms |
+
+Detailed results are in [final-evaluation.md](docs/final-evaluation.md).
+
 ## Tests and build
 
 ```powershell
@@ -450,9 +494,12 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Explainability and subgroup diagnostics](docs/explainability.md)
 - [MLOps layer](docs/mlops.md)
 - [Integrated assistant API](docs/integration.md)
-- [Completed Days 1-12 and remaining Day 13](docs/development-plan.md)
+- [Final architecture](docs/final-architecture.md)
+- [Final evaluation summary](docs/final-evaluation.md)
+- [Demo guide](docs/demo-guide.md)
+- [Completed Days 1-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
 The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API now loads local saved models/artifacts for classification, retrieval, RAG/agents, security and explanations, but it does not persist tickets or authenticate users. The integration remains POC-scoped and should not be treated as production-ready support automation.
 
-Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.
+POC tradeoffs and limitations: evaluations are small and predefined outside the classifier/retrieval metrics; classification probabilities are uncalibrated; retrieval relevance uses category-level matching; security is rule-based; fairness diagnostics use available metadata rather than protected demographic attributes; Day 4/5 DL runs are CPU-constrained; MLflow is local; Airflow validation is lightweight; there is no authentication/RBAC, database, persistent ticket storage, production deployment, or guarantee of production answer quality. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed.

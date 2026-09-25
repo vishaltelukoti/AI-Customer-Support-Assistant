@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import logging
+import os
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -17,7 +19,7 @@ from ..ml.baseline_data import prepare_ticket_text
 from ..ml.optimization import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 from ..monitoring.metrics import monitor
-from ..rag.rag_service import RAGConfig, RAGService, _EvaluationCaseGenerator
+from ..rag.rag_service import LocalHFGenerator, RAGConfig, RAGService, _EvaluationCaseGenerator
 from ..rag.retrieval import DEFAULT_TOP_K, RETRIEVAL_DIR, RetrievalResult, SimilarTicketRetriever
 from ..schemas.ticket import (
     ClassificationView,
@@ -35,6 +37,26 @@ from ..schemas.ticket import (
 from ..security.security_service import SecurityService
 
 INTEGRATION_DIR = ROOT / "experiments/integration"
+logger = logging.getLogger(__name__)
+
+
+def _use_local_model() -> bool:
+    """Use local generation by default; the template is a failure fallback only."""
+    return os.getenv("USE_LOCAL_MODEL", "true").strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _create_generator(config: RAGConfig):
+    if not _use_local_model():
+        logger.warning("USE_LOCAL_MODEL is disabled; using the POC template response generator.")
+        return _EvaluationCaseGenerator()
+    try:
+        return LocalHFGenerator(config.generation_model, config.max_new_tokens)
+    except Exception:
+        logger.warning(
+            "Local generation model could not be loaded; using the POC template response generator.",
+            exc_info=True,
+        )
+        return _EvaluationCaseGenerator()
 
 
 class OptimizedClassificationService:
@@ -67,10 +89,11 @@ class TicketProcessor:
         self.security = SecurityService()
         self.classifier = OptimizedClassificationService()
         self.retriever = SimilarTicketRetriever.load_index(RETRIEVAL_DIR)
+        rag_config = RAGConfig(top_k=top_k)
         self.rag_service = RAGService(
             self.retriever,
-            generator=_EvaluationCaseGenerator(),
-            config=RAGConfig(top_k=top_k),
+            generator=_create_generator(rag_config),
+            config=rag_config,
         )
         self.agent_workflow = SupportAgentWorkflow(
             RetrievalTool(self.retriever),

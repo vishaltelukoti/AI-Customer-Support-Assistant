@@ -101,8 +101,11 @@ API documentation: http://localhost:8000/docs. Health: http://localhost:8000/hea
 | APP_NAME | backend/.env or process environment | AI Customer Support Assistant |
 | CORS_ORIGINS | backend/.env or process environment | JSON array containing `http://localhost:5173` and `http://127.0.0.1:5173` |
 | VITE_API_BASE_URL | frontend/.env | `http://localhost:8000` |
+| USE_LOCAL_MODEL | backend process environment | `true`; loads local `google/flan-t5-base`, with a logged template fallback on load failure |
 
 The backend locates its `.env` relative to its own folder. Process variables take precedence. Restart servers after changing configuration. Frontend `VITE_` values are public and embedded at build time, so never put secrets there. Changing the Docker frontend URL requires rebuilding. Defaults work without `.env` files.
+
+The default live API path uses the local `google/flan-t5-base` generator. The deterministic template generator is used only when local model loading fails (with a server warning) or when `USE_LOCAL_MODEL=false` is explicitly set for a fast POC demonstration.
 
 Explicit CORS origins follow [FastAPI's CORS configuration](https://fastapi.tiangolo.com/tutorial/cors/); frontend environment handling follows [Vite's environment documentation](https://vite.dev/guide/env-and-mode).
 
@@ -499,6 +502,7 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Demo guide](docs/demo-guide.md)
 - [Completed Days 1-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
+- [Known POC limitations](docs/KNOWN_LIMITATIONS.md)
 
 The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API now loads local saved models/artifacts for classification, retrieval, RAG/agents, security and explanations, but it does not persist tickets or authenticate users. The integration remains POC-scoped and should not be treated as production-ready support automation.
 

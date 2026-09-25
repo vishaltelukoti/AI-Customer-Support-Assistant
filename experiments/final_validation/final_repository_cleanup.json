@@ -1,0 +1,172 @@
+{
+  "cleanup_date": "2026-09-25",
+  "status": "PASS",
+  "scope": "Final repository cleanup only; no application logic, model code, datasets, metrics, API behavior, frontend behavior, or dependencies were intentionally changed.",
+  "repository_size": {
+    "before_cleanup_mb_excluding_git": 521.44,
+    "after_cleanup_mb_excluding_git": 84.02,
+    "status": "PASS"
+  },
+  "removed_paths": [
+    ".pytest_cache",
+    "backend/.pytest_cache",
+    "backend/.venv",
+    "**/__pycache__",
+    "frontend/node_modules",
+    "frontend/dist",
+    "experiments/mlflow/mlruns",
+    "experiments/dl_comparison/day5/models/distilbert",
+    "data/raw/sample_tickets.csv"
+  ],
+  "cleanup_residue_check": {
+    "checked_for": [
+      "node_modules",
+      "dist",
+      "__pycache__",
+      ".pytest_cache",
+      ".venv",
+      "mlruns"
+    ],
+    "result": "NO_CLEANUP_RESIDUE_FOUND",
+    "status": "PASS"
+  },
+  "retained_large_files": [
+    {
+      "path": "data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv",
+      "size_mb": 24.79,
+      "reason": "Required source dataset for assessment traceability and reproducible preprocessing."
+    },
+    {
+      "path": "experiments/retrieval/tickets.faiss",
+      "size_mb": 16.75,
+      "reason": "Required saved FAISS retrieval index for Day 6 retrieval and integrated app startup."
+    },
+    {
+      "path": "data/processed/historical_tickets.csv",
+      "size_mb": 14.03,
+      "reason": "Required historical corpus for retrieval rebuilds, explainability tests, and validation."
+    },
+    {
+      "path": "experiments/retrieval/metadata.jsonl",
+      "size_mb": 12.41,
+      "reason": "Required FAISS position-to-ticket metadata mapping."
+    },
+    {
+      "path": "data/processed/train.csv",
+      "size_mb": 5.0,
+      "reason": "Required reproducible train split and validation/test support."
+    },
+    {
+      "path": "experiments/baseline/models/category_tfidf_logreg.joblib",
+      "size_mb": 3.51,
+      "reason": "Required baseline model artifact retained as experiment evidence."
+    },
+    {
+      "path": "experiments/optimization/models/category_optimized.joblib",
+      "size_mb": 1.68,
+      "reason": "Required optimized Day 3 category classifier artifact."
+    },
+    {
+      "path": "experiments/baseline/models/priority_tfidf_logreg.joblib",
+      "size_mb": 1.38,
+      "reason": "Required baseline priority model artifact retained as experiment evidence."
+    },
+    {
+      "path": "data/processed/validation.csv",
+      "size_mb": 1.09,
+      "reason": "Required reproducible validation split."
+    },
+    {
+      "path": "data/processed/test.csv",
+      "size_mb": 1.07,
+      "reason": "Required reproducible test split."
+    },
+    {
+      "path": "experiments/optimization/models/priority_optimized.joblib",
+      "size_mb": 0.66,
+      "reason": "Required optimized Day 3 priority classifier artifact."
+    },
+    {
+      "path": "experiments/dl_comparison/models/selected_model.joblib",
+      "size_mb": 0.61,
+      "reason": "Required lightweight selected DL-comparison-compatible model artifact."
+    }
+  ],
+  "required_artifacts": {
+    "experiments/optimization/optimization_results.json": "PASS",
+    "experiments/optimization/models/category_optimized.joblib": "PASS",
+    "experiments/optimization/models/priority_optimized.joblib": "PASS",
+    "experiments/dl_comparison/day5/dl_comparison_results.json": "PASS",
+    "experiments/dl_comparison/day5/selected_model_metadata.json": "PASS",
+    "experiments/retrieval/tickets.faiss": "PASS",
+    "experiments/retrieval/metadata.jsonl": "PASS",
+    "experiments/retrieval/retrieval_evaluation.json": "PASS",
+    "experiments/rag/rag_evaluation.json": "PASS",
+    "experiments/agents/agent_evaluation.json": "PASS",
+    "experiments/security/security_evaluation.json": "PASS",
+    "experiments/explainability/explanations.json": "PASS",
+    "experiments/explainability/fairness_evaluation.json": "PASS",
+    "experiments/mlops/ml_metrics.json": "PASS",
+    "experiments/mlops/mlflow_tracking_result.json": "PASS",
+    "experiments/integration/integration_evaluation.json": "PASS"
+  },
+  "gitignore_changes": {
+    "optimized_model_exceptions_added": "PASS",
+    "obsolete_sample_csv_exception_removed": "PASS",
+    "bulky_generated_directories_ignored": "PASS"
+  },
+  "validation": {
+    "backend_tests": {
+      "command": "python -m pytest -c backend/pytest.ini -q backend/tests",
+      "result": "143 passed, 289 warnings in 59.53s",
+      "status": "PASS"
+    },
+    "frontend_build": {
+      "command": "npm run build",
+      "result": "PASS after escalation for Windows/sandbox path access; 87 modules transformed, built in 5.62s",
+      "status": "PASS"
+    },
+    "frontend_api_smoke": {
+      "command": "npm run test:api -- --unavailable",
+      "result": "PASS",
+      "status": "PASS"
+    },
+    "optimized_model_load": {
+      "result": "category_optimized.joblib and priority_optimized.joblib loaded successfully",
+      "status": "PASS"
+    },
+    "retrieval_load": {
+      "result": "FAISS retrieval index and 11436 metadata rows loaded successfully",
+      "status": "PASS"
+    },
+    "api_smoke": {
+      "result": "Health endpoint returned 200 healthy; ticket processing returned 200 completed",
+      "status": "PASS"
+    },
+    "docker_build": {
+      "command": "docker build -t ai-customer-support-backend-final ./backend",
+      "result": "PASS after escalation for Docker profile/buildx access",
+      "status": "PASS"
+    }
+  },
+  "assessment_feature_checklist": {
+    "day_3_optimized_classification": "PASS",
+    "day_5_deep_learning_comparison": "PASS",
+    "day_6_faiss_retrieval": "PASS",
+    "day_7_rag": "PASS",
+    "day_8_langgraph_agents": "PASS",
+    "day_9_security": "PASS",
+    "day_10_explainability_fairness": "PASS",
+    "day_11_mlops": "PASS",
+    "day_12_fastapi_react_integration": "PASS",
+    "final_documentation": "PASS",
+    "repository_cleanup": "PASS"
+  },
+  "warnings": [
+    "Optimized model load emitted scikit-learn InconsistentVersionWarning because artifacts were created with sklearn 1.9.1 and the current environment has sklearn 1.9.0.",
+    "Retrieval/API smoke emitted a Hugging Face cached-model metadata network warning, but cached weights loaded and validation passed.",
+    "Frontend build and Docker build required escalated execution due local Windows/sandbox permissions, then passed.",
+    "frontend/node_modules and frontend/dist were removed after validation; run npm ci before local frontend development or rebuild."
+  ],
+  "manual_action_required": "None for assessment review. Run npm ci in frontend only if you want to rebuild or run the frontend locally after cleanup."
+}

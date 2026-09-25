@@ -43,9 +43,8 @@ Day 5 artifacts are under `experiments/dl_comparison/day5/`:
 - `dl_comparison_results.json`
 - `dl_comparison_results.md`
 - `selected_model_metadata.json`
-- `models/distilbert/`
 
-The selected DistilBERT artifact was loaded from disk and produced a valid category label in a sanity prediction. The selected-model confusion matrix is stored in the JSON artifact.
+The selected-model confusion matrix is stored in the JSON artifact. The unused DistilBERT checkpoint directory was removed during final repository cleanup because the integrated application does not load the Day 5 DL model; the assessment evidence is preserved in the result JSON, Markdown report, and selected-model metadata.
 
 ## Limitations
 

@@ -56,11 +56,11 @@ experiments/agents/ # Day 8 LangGraph workflow evaluation
 experiments/security/ # Day 9 deterministic security evaluation
 experiments/explainability/ # Day 10 explanations and subgroup diagnostics
 experiments/mlops/ # Day 11 metric summaries and MLflow run metadata
-experiments/mlflow/ # Day 11 local MLflow file store, internals ignored
+experiments/mlflow/ # ignored local MLflow run store can be regenerated
 experiments/integration/ # Day 12 integrated API/workflow evaluation
 experiments/final_validation/ # Day 13 final validation record
 airflow/                # Airflow DAG for lightweight validation
-mlflow/                 # MLflow placeholder/local support directory
+mlflow/                 # placeholder so imports prefer installed MLflow package
 docs/                   # architecture, evaluation, demo, assumptions, validation
 .github/workflows/      # backend CI workflow
 docker-compose.yml
@@ -171,7 +171,7 @@ The API accepts `{subject, body, top_k}` with `top_k` from 1 to 5. The legacy `{
 
 ## Prepare the selected ML dataset
 
-The original 20-record `sample_tickets.csv` was used to test the Day 1 foundation. It remains unchanged for historical reference and is no longer an active preprocessing input.
+The original 20-record Day 1 sample CSV was removed during final cleanup because it is not part of the selected assessment dataset and is no longer an active preprocessing input.
 
 The only selected ML input is `data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv`: **Customer IT Support - Ticket Dataset**, by **Tobias Bueck**, from [Kaggle](https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets). The [creator describes it as synthetically generated](https://softoft.de/blog/ticket-dataset/); it is not real customer data. No other dataset variants are used.
 
@@ -258,7 +258,7 @@ Run from the repository root:
 .\backend\.venv\Scripts\python.exe -m backend.app.ml.dl_training
 ```
 
-The command saves Day 5 artifacts under `experiments/dl_comparison/day5/` because the existing Day 4 artifacts on this machine are locked to SYSTEM/Administrators. The selected Day 5 model is saved as a Hugging Face Transformers artifact in `experiments/dl_comparison/day5/models/distilbert/`.
+The command saves Day 5 result artifacts under `experiments/dl_comparison/day5/` because the existing Day 4 artifacts on this machine are locked to SYSTEM/Administrators. The unused DistilBERT checkpoint directory is not retained in the cleaned repository because the integrated application does not load the Day 5 DL model.
 
 | Model | Validation macro-F1 | Test accuracy | Test macro-F1 | Test weighted-F1 |
 | --- | ---: | ---: | ---: | ---: |

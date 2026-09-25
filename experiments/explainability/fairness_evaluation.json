@@ -1,0 +1,148 @@
+{
+  "model": "Day 3 optimized category TF-IDF + Logistic Regression",
+  "dataset": {
+    "split": "test",
+    "sample_count": 2451,
+    "metadata_source": "data\\processed\\historical_tickets.csv"
+  },
+  "group_fields_considered": {
+    "evaluated": [
+      "version",
+      "type"
+    ],
+    "language": "All classification rows are English-only, so language is documented but not used for a valid subgroup comparison.",
+    "sensitive_attributes_not_inferred": [
+      "race",
+      "gender",
+      "age",
+      "religion",
+      "disability"
+    ]
+  },
+  "minimum_group_size": 50,
+  "fields": {
+    "version": {
+      "evaluated_groups": [
+        {
+          "field": "version",
+          "group": "400",
+          "sample_count": 1576,
+          "accuracy": 0.6681472081218274,
+          "precision_macro": 0.7901760407437761,
+          "recall_macro": 0.613517756748215,
+          "f1_macro": 0.6719028242993614
+        },
+        {
+          "field": "version",
+          "group": "51",
+          "sample_count": 75,
+          "accuracy": 0.6,
+          "precision_macro": 0.5615079365079365,
+          "recall_macro": 0.5180846930846931,
+          "f1_macro": 0.532016129032258
+        },
+        {
+          "field": "version",
+          "group": "52",
+          "sample_count": 800,
+          "accuracy": 0.6275,
+          "precision_macro": 0.7382610394067711,
+          "recall_macro": 0.5364778032776973,
+          "f1_macro": 0.5834556553872716
+        }
+      ],
+      "excluded_groups": {},
+      "largest_observed_differences": {
+        "accuracy": {
+          "difference": 0.0681472081218274,
+          "lowest_group": "51",
+          "highest_group": "400"
+        },
+        "precision_macro": {
+          "difference": 0.2286681042358396,
+          "lowest_group": "51",
+          "highest_group": "400"
+        },
+        "recall_macro": {
+          "difference": 0.09543306366352189,
+          "lowest_group": "51",
+          "highest_group": "400"
+        },
+        "f1_macro": {
+          "difference": 0.1398866952671034,
+          "lowest_group": "51",
+          "highest_group": "400"
+        }
+      }
+    },
+    "type": {
+      "evaluated_groups": [
+        {
+          "field": "type",
+          "group": "Change",
+          "sample_count": 250,
+          "accuracy": 0.648,
+          "precision_macro": 0.7502489884842827,
+          "recall_macro": 0.6194268182698062,
+          "f1_macro": 0.6532100460006992
+        },
+        {
+          "field": "type",
+          "group": "Incident",
+          "sample_count": 956,
+          "accuracy": 0.6861924686192469,
+          "precision_macro": 0.799067458337295,
+          "recall_macro": 0.5662669291980903,
+          "f1_macro": 0.6280032224045046
+        },
+        {
+          "field": "type",
+          "group": "Problem",
+          "sample_count": 537,
+          "accuracy": 0.6852886405959032,
+          "precision_macro": 0.8181166831594655,
+          "recall_macro": 0.6145695326419662,
+          "f1_macro": 0.6644075654125198
+        },
+        {
+          "field": "type",
+          "group": "Request",
+          "sample_count": 708,
+          "accuracy": 0.5847457627118644,
+          "precision_macro": 0.7469092398912917,
+          "recall_macro": 0.5465296658247617,
+          "f1_macro": 0.6107265442184386
+        }
+      ],
+      "excluded_groups": {},
+      "largest_observed_differences": {
+        "accuracy": {
+          "difference": 0.10144670590738247,
+          "lowest_group": "Request",
+          "highest_group": "Incident"
+        },
+        "precision_macro": {
+          "difference": 0.07120744326817385,
+          "lowest_group": "Request",
+          "highest_group": "Problem"
+        },
+        "recall_macro": {
+          "difference": 0.07289715244504447,
+          "lowest_group": "Request",
+          "highest_group": "Change"
+        },
+        "f1_macro": {
+          "difference": 0.053681021194081135,
+          "lowest_group": "Request",
+          "highest_group": "Problem"
+        }
+      }
+    }
+  },
+  "limitations": [
+    "This is a subgroup performance diagnostic, not proof of demographic fairness.",
+    "The dataset is English-only for classification, so it does not support an English-vs-German fairness comparison.",
+    "No race, gender, age, religion, disability or other sensitive attributes are inferred.",
+    "Version and type are dataset metadata fields, not protected demographic groups."
+  ]
+}

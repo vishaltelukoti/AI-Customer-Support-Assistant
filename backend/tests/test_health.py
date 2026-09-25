@@ -1,7 +1,11 @@
 def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "healthy"}
+    body = response.json()
+    assert body["status"] == "healthy"
+    assert body["service"] == "AI Customer Support Assistant"
+    assert isinstance(body["classifier_artifacts_available"], bool)
+    assert isinstance(body["retrieval_index_available"], bool)
 
 
 def test_allowed_cors_origin(client):

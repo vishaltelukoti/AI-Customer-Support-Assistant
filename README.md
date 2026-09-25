@@ -1,6 +1,6 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1-8 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, CNN/RNN/LSTM comparison, attention/DistilBERT comparison, local FAISS similar-ticket retrieval, simple grounded RAG, and a lightweight LangGraph multi-agent workflow.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers, retrieval, RAG, and agents are available through separate offline services and CLIs.
+A single-developer AI-powered customer-support POC. **Days 1-11 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, CNN/RNN/LSTM comparison, attention/DistilBERT comparison, local FAISS similar-ticket retrieval, simple grounded RAG, a lightweight LangGraph multi-agent workflow, deterministic POC security checks, model explainability/subgroup diagnostics, and a local MLOps layer.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers, retrieval, RAG, agents, security checks, explainability diagnostics, and MLOps scripts are available through separate offline services and CLIs.
 
 Planned later capabilities include API integration, security status, and classification explanations. See [the development plan](docs/development-plan.md).
 
@@ -31,6 +31,10 @@ experiments/dl_comparison/ # Day 4 and Day 5 category DL comparisons
 experiments/retrieval/ # Day 6 FAISS index, metadata, and retrieval evaluation
 experiments/rag/ # Day 7 RAG configuration and evaluation
 experiments/agents/ # Day 8 LangGraph workflow evaluation
+experiments/security/ # Day 9 deterministic security evaluation
+experiments/explainability/ # Day 10 explanations and subgroup diagnostics
+experiments/mlops/ # Day 11 metric summaries and MLflow run metadata
+experiments/mlflow/ # Day 11 local MLflow file store, internals ignored
 airflow/                # placeholder only
 mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
@@ -269,7 +273,73 @@ Simple tickets route Retrieval -> Resolution. Complex tickets route Investigatio
 | Source behavior rate | 1.000000 |
 | Trace presence rate | 1.000000 |
 
-Artifacts are saved under `experiments/agents/`. The workflow is not connected to FastAPI yet and does not implement persistent memory or the Day 9 security framework.
+Artifacts are saved under `experiments/agents/`. The workflow is not connected to FastAPI yet and does not implement persistent memory.
+
+## Security layer
+
+Day 9 adds deterministic POC security checks around the existing LangGraph workflow. Input checks block obvious prompt injection, jailbreak, and explicit secret-disclosure requests before the AI workflow runs. Explicit email, phone, and card-like values are detected and redacted before allowed workflow execution. Retrieved tickets are treated as untrusted data, and output checks replace obvious generated secrets or PII leakage with a safe fallback.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.security.security_service
+```
+
+The command saves `security_config.json`, `security_evaluation.json`, and `security_evaluation.md` under `experiments/security/`.
+
+| Metric | Value |
+| --- | ---: |
+| Security test pass rate | 1.000000 |
+| Attack detection rate | 1.000000 |
+| Normal-ticket allow rate | 1.000000 |
+| Malicious retrieved-content handling rate | 1.000000 |
+
+No API key is required. This is a lightweight rule-based POC layer, not comprehensive security, and it is not connected to FastAPI yet.
+
+## Explainability and subgroup diagnostics
+
+Day 10 explains the saved Day 3 optimized category TF-IDF + Logistic Regression model without retraining. SHAP was attempted, but the current Python 3.14 Windows environment requires Microsoft C++ Build Tools to compile SHAP, so the implementation uses exact linear TF-IDF contribution scores: `tf-idf value * saved Logistic Regression coefficient`.
+
+Run from the repository root:
+
+```powershell
+.\backend\.venv\Scripts\python.exe -m backend.app.explainability.shap_explainer
+```
+
+The command saves `explainability_config.json`, `explanations.json`, `explanations.md`, `fairness_evaluation.json`, and `fairness_evaluation.md` under `experiments/explainability/`.
+
+| Result | Value |
+| --- | ---: |
+| Predictions explained | 5 |
+| All explanations succeeded | 1 |
+| Confidence minimum | 0.174072 |
+| Confidence maximum | 0.996855 |
+
+Subgroup diagnostics use only available non-sensitive metadata: `version` and `type`. The classification data is English-only, so it does not support a valid English-vs-German fairness comparison. No sensitive demographic attributes are inferred, and the subgroup metrics are not proof of fairness or bias.
+
+## MLOps
+
+Day 11 adds local MLflow tracking, a compact metrics summary, one Airflow DAG, a backend CI workflow, in-memory monitoring counters, and an expanded health endpoint. It reuses existing Day 3 classification metrics and Day 6 retrieval metrics; no models or indexes are rebuilt.
+
+Run from the repository root:
+
+```powershell
+python -m backend.app.monitoring.mlops_metrics
+python -m backend.app.monitoring.mlflow_tracking
+```
+
+Key tracked metrics:
+
+| Metric | Value |
+| --- | ---: |
+| Category test Macro F1 | 0.641538 |
+| Category test accuracy | 0.652795 |
+| Priority test Macro F1 | 0.662208 |
+| Priority test accuracy | 0.676867 |
+| Retrieval Recall@1 / @3 / @5 | 0.656000 / 0.764000 / 0.844000 |
+| Retrieval MRR | 0.722500 |
+
+The single DAG is `ticket_processing_embedding_refresh`: `validate_data -> prepare_ticket_data -> refresh_embeddings -> validate_retrieval_index`. The CI workflow is `.github/workflows/backend-ci.yml`. Docker build validation succeeded with `docker build -t ai-customer-support-backend-day11 ./backend`, though the image is large because existing ML dependencies pull torch/transformers stacks.
 
 ## Tests and build
 
@@ -286,7 +356,7 @@ npm run test:api
 
 Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
 
-Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 5 DL tests cover CNN/RNN/LSTM/Attention construction and inference, mocked DistilBERT configuration/artifact behavior, validation-based selection, leakage metadata, selected-model loading, and valid category prediction. Day 6 retrieval tests cover embedding shape, FAISS index creation/save/load, Top-K behavior, metadata mapping, search, no self-retrieval, training-only indexing, answer exclusion, and repeatable tiny-embedder behavior. Day 7 RAG tests cover context construction, retrieved answer inclusion, source attribution, configurable Top-K, output schema, insufficient-information behavior, prompt-injection resistance, malicious retrieved content handling, and fabricated-source prevention. Day 8 agent tests cover state, routing, agent nodes, retrieval tool usage, graceful retrieval/generation failure, insufficient evidence, request-local memory, and prompt-injection-as-data behavior.
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 5 DL tests cover CNN/RNN/LSTM/Attention construction and inference, mocked DistilBERT configuration/artifact behavior, validation-based selection, leakage metadata, selected-model loading, and valid category prediction. Day 6 retrieval tests cover embedding shape, FAISS index creation/save/load, Top-K behavior, metadata mapping, search, no self-retrieval, training-only indexing, answer exclusion, and repeatable tiny-embedder behavior. Day 7 RAG tests cover context construction, retrieved answer inclusion, source attribution, configurable Top-K, output schema, insufficient-information behavior, prompt-injection resistance, malicious retrieved content handling, and fabricated-source prevention. Day 8 agent tests cover state, routing, agent nodes, retrieval tool usage, graceful retrieval/generation failure, insufficient evidence, request-local memory, and prompt-injection-as-data behavior. Day 9 security tests cover prompt injection, jailbreaks, secret requests, PII detection/redaction, normal-ticket allow behavior, malicious retrieved content as untrusted data, unsafe output fallback, blocked-workflow behavior, and deterministic checks. Day 10 explainability tests cover saved model loading, explainer initialization, vocabulary-backed feature explanations, confidence bounds, exactly five deterministic examples, allowed subgroup fields, no inferred sensitive attributes, and safe handling of small/empty groups. Day 11 MLOps tests cover metric loading, MLflow tracking config, monitoring counters/latency, health endpoint fields, Airflow DAG structure, and Docker/CI static checks.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -318,9 +388,12 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Similar-ticket retrieval](docs/retrieval.md)
 - [Suggested-resolution RAG](docs/rag.md)
 - [LangGraph agent workflow](docs/agents.md)
-- [Completed Days 1-8 and remaining Days 9-13](docs/development-plan.md)
+- [POC security layer](docs/security.md)
+- [Explainability and subgroup diagnostics](docs/explainability.md)
+- [MLOps layer](docs/mlops.md)
+- [Completed Days 1-11 and remaining Days 12-13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files, load models, search the retrieval index, call RAG, or execute the agent workflow. Offline baseline classification, optimization, category DL comparison, local similar-ticket retrieval, offline RAG suggested resolutions, and a local LangGraph workflow are implemented. API integration, security, explainability and MLOps remain planned. No persistence, authentication, fairness, monitoring or CI/CD runs now.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files, load models, search the retrieval index, call RAG, execute the agent workflow, run the security layer, or serve explanations. Offline baseline classification, optimization, category DL comparison, local similar-ticket retrieval, offline RAG suggested resolutions, a local LangGraph workflow, deterministic security checks, offline explainability/subgroup diagnostics, and local MLOps utilities are implemented. API integration remains planned. No persistence or authentication runs now.
 
 Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

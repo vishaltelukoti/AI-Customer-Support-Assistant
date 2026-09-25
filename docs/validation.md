@@ -1,5 +1,65 @@
 # Validation record
 
+## Day 11 MLOps validation (2026-09-24)
+
+Day 11 is complete. It added local POC MLOps without retraining models, rebuilding retrieval, changing RAG/agents/security/explainability, or adding API/UI integration.
+
+| Check | Result |
+| --- | --- |
+| Focused MLOps tests | 8 passed |
+| MLflow tracking | Local file-based run created |
+| MLflow run ID | `350bc9ec24cd489abd1e8fe2206ff640` |
+| Metrics summary | Classification and retrieval metrics loaded from existing artifacts |
+| Airflow DAG | `ticket_processing_embedding_refresh` with four tasks |
+| Docker build | Passed: `ai-customer-support-backend-day11:latest` |
+| CI workflow | `.github/workflows/backend-ci.yml` |
+| Monitoring | In-memory counters and latency timers |
+| Health endpoint | `/health` returns status, service name, classifier artifact availability and retrieval index availability |
+| Artifacts | `experiments/mlops/ml_metrics.json`, `ml_metrics.md`, `mlflow_config.json`, `mlflow_tracking_result.json`, `airflow_validation.md` |
+
+Docker build was successful but slow/heavy because the existing ML dependency stack pulls torch, transformers and large Linux CUDA-related wheels. MLflow uses a local file store only.
+
+## Day 10 explainability validation (2026-09-24)
+
+Day 10 is complete. It added offline explanations and subgroup diagnostics without retraining the classifier, modifying Day 3 model selection, changing RAG/agents/security, or adding API/UI integration.
+
+| Check | Result |
+| --- | --- |
+| Focused explainability tests | 8 passed |
+| Model explained | Day 3 optimized category TF-IDF + Logistic Regression |
+| Method | TF-IDF value multiplied by saved Logistic Regression coefficient |
+| SHAP attempt | Failed: SHAP wheel build requires Microsoft C++ Build Tools in this Python 3.14 Windows environment |
+| Predictions explained | 5 |
+| Confidence range | 0.174072 to 0.996855 |
+| Representative selection | Deterministic test confidence quantiles, preferring distinct predicted categories |
+| Subgroup fields | `version`, `type` |
+| Test sample count | 2,451 |
+| Sensitive attributes | Not inferred |
+| English-vs-German fairness comparison | Not performed; classification dataset is English-only |
+| Artifacts | `experiments/explainability/explainability_config.json`, `explanations.json`, `explanations.md`, `fairness_evaluation.json`, `fairness_evaluation.md` |
+
+This is a subgroup performance diagnostic, not proof that the model is fair or biased.
+
+## Day 9 security validation (2026-09-23)
+
+Day 9 is complete. It added deterministic POC security checks around the existing agent workflow without FastAPI integration, RAG redesign, retrieval rebuilding or Day 10 explainability work.
+
+| Check | Result |
+| --- | --- |
+| Focused security tests | 10 passed |
+| Clean process security evaluation | Passed |
+| Input checks | prompt injection, jailbreak, explicit secret requests, PII detection/redaction |
+| Retrieved content checks | instruction-like retrieved text treated as untrusted data |
+| Output checks | obvious generated secrets/PII blocked with safe fallback |
+| Security test pass rate | 1.000000 |
+| Attack detection rate | 1.000000 |
+| Normal-ticket allow rate | 1.000000 |
+| Malicious retrieved-content handling rate | 1.000000 |
+| Artifacts | `experiments/security/security_config.json`, `security_evaluation.json`, `security_evaluation.md` |
+| API integration | Intentionally absent |
+
+The evaluation is rule-based and POC-scoped. It does not claim comprehensive security.
+
 ## Day 8 LangGraph agent validation (2026-09-23)
 
 Day 8 is complete. It added a lightweight LangGraph multi-agent workflow without FastAPI integration, persistent memory, Day 9 security work or retrieval/RAG rebuilding.

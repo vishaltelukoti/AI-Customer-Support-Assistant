@@ -1,0 +1,17 @@
+{
+  "run_id": "350bc9ec24cd489abd1e8fe2206ff640",
+  "experiment_id": "384551459782427198",
+  "tracked_metrics": {
+    "category_test_accuracy": 0.6527947776417788,
+    "category_test_macro_f1": 0.6415383542430868,
+    "priority_test_accuracy": 0.6768665850673194,
+    "priority_test_macro_f1": 0.6622079075109244,
+    "retrieval_recall_at_1": 0.656,
+    "retrieval_recall_at_3": 0.764,
+    "retrieval_recall_at_5": 0.844,
+    "retrieval_mrr": 0.7224999999999998
+  },
+  "environment": {
+    "python": "3.14.4"
+  }
+}

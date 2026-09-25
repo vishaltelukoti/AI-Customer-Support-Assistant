@@ -1,6 +1,6 @@
 # Development plan
 
-Days 1 through 8 are complete. Later phases remain planned.
+Days 1 through 11 are complete. Later phases remain planned.
 
 | Day | Scope / status |
 | --- | --- |
@@ -12,9 +12,9 @@ Days 1 through 8 are complete. Later phases remain planned.
 | 6 | COMPLETE: local Sentence Transformer embeddings and FAISS similar-ticket retrieval |
 | 7 | COMPLETE: simple grounded RAG suggested resolutions with supporting sources |
 | 8 | COMPLETE: LangGraph multi-agent workflow for simple/complex ticket handling |
-| 9 | Security: prompt injection, jailbreak and PII checks; security status |
-| 10 | Explainability and fairness; classification explanations |
-| 11 | MLOps: MLflow, Airflow and model monitoring |
+| 9 | COMPLETE: deterministic POC security checks for prompt injection, jailbreaks, secret requests, PII, retrieved-content instructions and unsafe outputs |
+| 10 | COMPLETE: saved-model explainability, five representative explanations, confidence reporting and subgroup diagnostics |
+| 11 | COMPLETE: local MLflow tracking, one Airflow DAG, Docker/CI checks, monitoring counters, health and metrics summary |
 | 12 | Integration and testing |
 | 13 | Documentation and final demo |
 
@@ -30,6 +30,12 @@ Day 6 adds local similar-ticket retrieval. The index uses `sentence-transformers
 
 Day 7 adds a simple RAG pipeline over the Day 6 FAISS index. It retrieves top-3 similar training historical tickets, builds bounded context including prior resolutions, and uses local `google/flan-t5-base` generation with grounding rules and source attribution. The retrieval threshold is 0.55; weak evidence returns `insufficient_evidence` instead of a fabricated answer. A four-case POC evaluation checks source attribution, acceptable grounded responses, prompt-injection handling and insufficient-information behavior; all measured rates are 1.000000. No API key is required, and no FastAPI, LangGraph, agent or memory integration was added.
 
-Day 8 adds a lightweight LangGraph workflow with Retrieval, Investigation and Resolution agents. Simple tickets route Retrieval -> Resolution; complex tickets route Investigation -> Retrieval -> Resolution. The retrieval tool wraps the existing Day 6 FAISS retriever, and the Resolution Agent reuses the Day 7 RAG service. Shared state carries ticket text, complexity, retrieved sources, investigation result, final response, trace, status/error fields and request-local memory. A four-case POC evaluation reports routing accuracy 1.000000, workflow completion 1.000000, source behavior 1.000000 and trace presence 1.000000. No FastAPI integration, persistent memory or Day 9 security framework was added.
+Day 8 adds a lightweight LangGraph workflow with Retrieval, Investigation and Resolution agents. Simple tickets route Retrieval -> Resolution; complex tickets route Investigation -> Retrieval -> Resolution. The retrieval tool wraps the existing Day 6 FAISS retriever, and the Resolution Agent reuses the Day 7 RAG service. Shared state carries ticket text, complexity, retrieved sources, investigation result, final response, trace, status/error fields and request-local memory. A four-case POC evaluation reports routing accuracy 1.000000, workflow completion 1.000000, source behavior 1.000000 and trace presence 1.000000. No FastAPI integration or persistent memory was added.
 
-Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval, RAG and agent artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval, experiments/rag and experiments/agents; MLflow, Airflow and future backend modules remain placeholders. Days 9-13 in the table are planned only.
+Day 9 adds a deterministic security layer around the existing agent workflow. Input checks block obvious prompt injection, jailbreak and explicit secret-disclosure requests before workflow execution. Explicit email, phone and card-like values are detected and redacted before allowed workflow execution. Retrieved tickets are scanned as untrusted data, not instructions, and output checks replace obvious generated secrets or PII leakage with a safe fallback. The fixed seven-case POC evaluation reports security test pass rate 1.000000, attack detection rate 1.000000, normal-ticket allow rate 1.000000 and malicious retrieved-content handling rate 1.000000. No heavy dependencies, FastAPI integration, authentication redesign, RBAC, WAF, SIEM or production security framework was added.
+
+Day 10 adds offline explainability and subgroup diagnostics for the saved Day 3 optimized category TF-IDF + Logistic Regression model. SHAP was attempted but could not be installed in the current Python 3.14 Windows environment because Microsoft C++ Build Tools are required to compile the package, so the implementation uses exact linear TF-IDF contribution scores from the saved vocabulary and coefficients. Five deterministic test examples were explained, with confidence range 0.174072 to 0.996855. Subgroup diagnostics use only available non-sensitive metadata (`version` and `type`) and report held-out test metrics by group. The classification data is English-only, so no valid English-vs-German fairness comparison is possible, and no sensitive demographic attributes are inferred. No classifier retraining, FastAPI integration or UI work was added.
+
+Day 11 adds local POC MLOps. MLflow logs existing Day 3 optimized classification metrics and Day 6 retrieval metrics to a local file store; compact summaries are saved under `experiments/mlops/`. One Airflow DAG validates processed data and existing retrieval artifacts without retraining or automatic FAISS rebuilds. Docker build validation succeeded for the backend image, although existing ML dependencies make the image large. `.github/workflows/backend-ci.yml` demonstrates checkout, Python 3.12 setup, dependency installation, backend tests and Docker build. In-memory monitoring counters track request count, errors, latency, model prediction count, retrieval request count and retrieval latency. `/health` now reports service name plus cheap classifier/retrieval artifact availability. No Kubernetes, Terraform, cloud deployment, Prometheus/Grafana, database-backed monitoring, model retraining or Day 12 API/UI integration was added.
+
+Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval, RAG, agent, security, explainability and MLOps artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval, experiments/rag, experiments/agents, experiments/security, experiments/explainability, experiments/mlops and experiments/mlflow; Airflow has one DAG and future integration modules remain scoped to later days. Days 12-13 in the table are planned only.

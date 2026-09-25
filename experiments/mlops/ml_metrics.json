@@ -1,0 +1,48 @@
+{
+  "classification": {
+    "source_artifact": "experiments\\optimization\\optimization_results.json",
+    "category": {
+      "accuracy": 0.6527947776417788,
+      "macro_f1": 0.6415383542430868,
+      "selected_method": "random",
+      "parameters": {
+        "classifier__C": 10.0,
+        "classifier__class_weight": null,
+        "tfidf__max_df": 0.95,
+        "tfidf__max_features": 20000,
+        "tfidf__min_df": 1,
+        "tfidf__ngram_range": [
+          1,
+          2
+        ],
+        "tfidf__sublinear_tf": false
+      }
+    },
+    "priority": {
+      "accuracy": 0.6768665850673194,
+      "macro_f1": 0.6622079075109244,
+      "selected_method": "random",
+      "parameters": {
+        "classifier__C": 10.0,
+        "classifier__class_weight": null,
+        "tfidf__max_df": 0.95,
+        "tfidf__max_features": 20000,
+        "tfidf__min_df": 1,
+        "tfidf__ngram_range": [
+          1,
+          2
+        ],
+        "tfidf__sublinear_tf": false
+      }
+    }
+  },
+  "retrieval": {
+    "source_artifact": "experiments\\retrieval\\retrieval_evaluation.json",
+    "recall@1": 0.656,
+    "recall@3": 0.764,
+    "recall@5": 0.844,
+    "mrr": 0.7224999999999998,
+    "index_type": "IndexFlatIP",
+    "indexed_tickets": 11436
+  }
+}

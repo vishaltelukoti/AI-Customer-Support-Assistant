@@ -1,0 +1,416 @@
+{
+  "config": {
+    "model_explained": "Day 3 optimized category TF-IDF + Logistic Regression",
+    "model_path": "experiments\\optimization\\models\\category_optimized.joblib",
+    "method": "linear_tfidf_logistic_regression_contributions",
+    "method_note": "SHAP was attempted but could not be installed because this Python environment requires Microsoft C++ Build Tools to build SHAP. Contributions are computed exactly as TF-IDF value times the saved Logistic Regression coefficient for the predicted class.",
+    "selection": {
+      "split": "test",
+      "count": 5,
+      "criteria": "Deterministic confidence quantiles [0, 0.25, 0.5, 0.75, 1.0], preferring distinct predicted categories.",
+      "test_used_for_model_selection": false
+    },
+    "confidence_note": "Confidence is the saved Logistic Regression predict_proba value for the predicted class. These probabilities are not calibrated correctness probabilities.",
+    "environment": {
+      "python": "3.14.4"
+    }
+  },
+  "summary": {
+    "predictions_explained": 5,
+    "all_explanations_succeeded": true,
+    "confidence_min": 0.17407203786694783,
+    "confidence_max": 0.9968552177196106
+  },
+  "explanations": [
+    {
+      "ticket_id": "KAGGLE-f187c090e595-008850",
+      "ticket_text": "Enhance Medical Data Security Measures\n\nDear Customer Support, I am requesting an update to the security protocols that safeguard medical data to improve hospital infrastructure. This is a critical issue that demands immediate action to ensure the confidentiality, integrity, and availability of sensitive patient information. I would appreciate it if you could provide a comprehensive plan of action to address this concern, including necessary software updates, staff training, and implementation timelines. Please let me know if there are any additional steps required on my part.",
+      "actual_category": "Returns and Exchanges",
+      "predicted_category": "Billing and Payments",
+      "confidence": 0.17407203786694783,
+      "second_best_category": "Customer Service",
+      "second_best_probability": 0.16904717699642705,
+      "top_positive_features": [
+        {
+          "feature": "action",
+          "contribution": 0.254119469986126
+        },
+        {
+          "feature": "security",
+          "contribution": 0.25203635500621996
+        },
+        {
+          "feature": "action to",
+          "contribution": 0.2082062824326782
+        },
+        {
+          "feature": "safeguard medical",
+          "contribution": 0.19058596872057448
+        },
+        {
+          "feature": "this concern",
+          "contribution": 0.18606966918305107
+        },
+        {
+          "feature": "is critical",
+          "contribution": 0.18349622078994066
+        },
+        {
+          "feature": "immediate action",
+          "contribution": 0.1798014556593763
+        },
+        {
+          "feature": "including",
+          "contribution": 0.15664443707865947
+        }
+      ],
+      "top_negative_features": [
+        {
+          "feature": "training",
+          "contribution": -0.2129069775984718
+        },
+        {
+          "feature": "staff",
+          "contribution": -0.16519455753734616
+        },
+        {
+          "feature": "infrastructure",
+          "contribution": -0.16028972759639518
+        },
+        {
+          "feature": "improve",
+          "contribution": -0.1418946151893859
+        },
+        {
+          "feature": "steps",
+          "contribution": -0.12061000668525469
+        },
+        {
+          "feature": "hospital infrastructure",
+          "contribution": -0.11972129585600114
+        },
+        {
+          "feature": "sensitive patient",
+          "contribution": -0.11897470259538184
+        },
+        {
+          "feature": "to improve",
+          "contribution": -0.11015842746958342
+        }
+      ],
+      "explanation_summary": "Predicted Billing and Payments with model probability 0.174. Strongest supporting terms: action, security, action to. Strongest opposing terms: training, staff, infrastructure."
+    },
+    {
+      "ticket_id": "KAGGLE-f187c090e595-026513",
+      "ticket_text": "Challenge with Data Integration\n\nA financial company has encountered data integration issues across various platforms, which is impeding their investment optimization processes. Recent software updates might have impacted compatibility. Rebooting devices and clearing caches resolved similar issues in the past. Assistance is needed to address this matter.",
+      "actual_category": "IT Support",
+      "predicted_category": "Technical Support",
+      "confidence": 0.4475474520001091,
+      "second_best_category": "Product Support",
+      "second_best_probability": 0.36359520928617955,
+      "top_positive_features": [
+        {
+          "feature": "integration issues",
+          "contribution": 0.32122665391948746
+        },
+        {
+          "feature": "their investment",
+          "contribution": 0.3076315758404237
+        },
+        {
+          "feature": "issues",
+          "contribution": 0.24352979671518538
+        },
+        {
+          "feature": "clearing caches",
+          "contribution": 0.2131019143224965
+        },
+        {
+          "feature": "platforms which",
+          "contribution": 0.21287741723146222
+        },
+        {
+          "feature": "rebooting devices",
+          "contribution": 0.21254888439865394
+        },
+        {
+          "feature": "address this",
+          "contribution": 0.19959402530815792
+        },
+        {
+          "feature": "processes recent",
+          "contribution": 0.1874843225978392
+        }
+      ],
+      "top_negative_features": [
+        {
+          "feature": "financial",
+          "contribution": -0.2955980474092962
+        },
+        {
+          "feature": "financial company",
+          "contribution": -0.22817154118279942
+        },
+        {
+          "feature": "issues across",
+          "contribution": -0.208560617180734
+        },
+        {
+          "feature": "have impacted",
+          "contribution": -0.17404478136799778
+        },
+        {
+          "feature": "issues in",
+          "contribution": -0.17178855971099824
+        },
+        {
+          "feature": "and clearing",
+          "contribution": -0.15745148197815112
+        },
+        {
+          "feature": "their",
+          "contribution": -0.14791217758165895
+        },
+        {
+          "feature": "impeding",
+          "contribution": -0.14329709215334968
+        }
+      ],
+      "explanation_summary": "Predicted Technical Support with model probability 0.448. Strongest supporting terms: integration issues, their investment, issues. Strongest opposing terms: financial, financial company, issues across."
+    },
+    {
+      "ticket_id": "KAGGLE-f187c090e595-020230",
+      "ticket_text": "Support for Secure Medical Data Handling\n\nCustomer support, assistance in securing medical data for Firebase Healthcare. Need guidance on best practices and protocols to ensure the confidentiality and integrity of sensitive patient information. Looking to leverage Firebase's capabilities to streamline operations, with data security as the top priority.",
+      "actual_category": "IT Support",
+      "predicted_category": "IT Support",
+      "confidence": 0.5938142505695422,
+      "second_best_category": "Customer Service",
+      "second_best_probability": 0.1281090617886844,
+      "top_positive_features": [
+        {
+          "feature": "need guidance",
+          "contribution": 0.4991421262562527
+        },
+        {
+          "feature": "protocols to",
+          "contribution": 0.39144588672310754
+        },
+        {
+          "feature": "firebase",
+          "contribution": 0.27404584737395704
+        },
+        {
+          "feature": "support assistance",
+          "contribution": 0.26646381209883013
+        },
+        {
+          "feature": "information looking",
+          "contribution": 0.23354461552874853
+        },
+        {
+          "feature": "to streamline",
+          "contribution": 0.183839828832789
+        },
+        {
+          "feature": "confidentiality and",
+          "contribution": 0.1669978669937179
+        },
+        {
+          "feature": "and integrity",
+          "contribution": 0.16490608776860816
+        }
+      ],
+      "top_negative_features": [
+        {
+          "feature": "data",
+          "contribution": -0.4028464215971798
+        },
+        {
+          "feature": "data for",
+          "contribution": -0.20280024552752055
+        },
+        {
+          "feature": "capabilities to",
+          "contribution": -0.19385440408985782
+        },
+        {
+          "feature": "in securing",
+          "contribution": -0.1835815319919768
+        },
+        {
+          "feature": "protocols",
+          "contribution": -0.1632421814938466
+        },
+        {
+          "feature": "securing medical",
+          "contribution": -0.1604546907939499
+        },
+        {
+          "feature": "medical data",
+          "contribution": -0.15127623392692743
+        },
+        {
+          "feature": "medical",
+          "contribution": -0.10319673504312757
+        }
+      ],
+      "explanation_summary": "Predicted IT Support with model probability 0.594. Strongest supporting terms: need guidance, protocols to, firebase. Strongest opposing terms: data, data for, capabilities to."
+    },
+    {
+      "ticket_id": "KAGGLE-f187c090e595-019967",
+      "ticket_text": "Investigation Needed for Slow Performance in Investment Analytics Tool\n\nThe financial firm is encountering slow performance with its investment analytics tool when processing large datasets. This might be due to improper system configurations or resource limitations. We have already tried optimizing database queries and reallocating server resources, but the issues still persist. Please assist us in resolving this matter.",
+      "actual_category": "Product Support",
+      "predicted_category": "Product Support",
+      "confidence": 0.7738171995950459,
+      "second_best_category": "Technical Support",
+      "second_best_probability": 0.1855979474671469,
+      "top_positive_features": [
+        {
+          "feature": "investment analytics",
+          "contribution": 0.3578311321320642
+        },
+        {
+          "feature": "system configurations",
+          "contribution": 0.31452017335817983
+        },
+        {
+          "feature": "slow performance",
+          "contribution": 0.3135106284075203
+        },
+        {
+          "feature": "large datasets",
+          "contribution": 0.28259379768889864
+        },
+        {
+          "feature": "to improper",
+          "contribution": 0.19551123801970788
+        },
+        {
+          "feature": "or resource",
+          "contribution": 0.193271077748644
+        },
+        {
+          "feature": "processing large",
+          "contribution": 0.19157045446780904
+        },
+        {
+          "feature": "slow",
+          "contribution": 0.18927765236813515
+        }
+      ],
+      "top_negative_features": [
+        {
+          "feature": "server resources",
+          "contribution": -0.17742094913393525
+        },
+        {
+          "feature": "its investment",
+          "contribution": -0.16173772506642267
+        },
+        {
+          "feature": "tool the",
+          "contribution": -0.14248284807454997
+        },
+        {
+          "feature": "resources",
+          "contribution": -0.13045868226733628
+        },
+        {
+          "feature": "but",
+          "contribution": -0.11944269555145341
+        },
+        {
+          "feature": "configurations or",
+          "contribution": -0.11707467589786286
+        },
+        {
+          "feature": "system",
+          "contribution": -0.11645355616689439
+        },
+        {
+          "feature": "still persist",
+          "contribution": -0.11510732194313342
+        }
+      ],
+      "explanation_summary": "Predicted Product Support with model probability 0.774. Strongest supporting terms: investment analytics, system configurations, slow performance. Strongest opposing terms: server resources, its investment, tool the."
+    },
+    {
+      "ticket_id": "KAGGLE-f187c090e595-022784",
+      "ticket_text": "Problem with Financial Service Downtime\n\nA financial company experienced service outages that impacted several products, causing disruptions to data analytics and investment optimization. Restarted the affected systems and performed initial diagnostics, but the outages persist.",
+      "actual_category": "Service Outages and Maintenance",
+      "predicted_category": "Service Outages and Maintenance",
+      "confidence": 0.9968552177196106,
+      "second_best_category": "Technical Support",
+      "second_best_probability": 0.0009118311849026873,
+      "top_positive_features": [
+        {
+          "feature": "service",
+          "contribution": 2.379536468034884
+        },
+        {
+          "feature": "outages",
+          "contribution": 1.782789087222637
+        },
+        {
+          "feature": "financial",
+          "contribution": 0.6562159149035254
+        },
+        {
+          "feature": "downtime",
+          "contribution": 0.5312439091878032
+        },
+        {
+          "feature": "service outages",
+          "contribution": 0.49359304222121464
+        },
+        {
+          "feature": "disruptions",
+          "contribution": 0.4176885266300928
+        },
+        {
+          "feature": "impacted",
+          "contribution": 0.35253489006015304
+        },
+        {
+          "feature": "outages that",
+          "contribution": 0.3067460789421839
+        }
+      ],
+      "top_negative_features": [
+        {
+          "feature": "investment",
+          "contribution": -0.20009164828568737
+        },
+        {
+          "feature": "with",
+          "contribution": -0.13296937126376976
+        },
+        {
+          "feature": "data",
+          "contribution": -0.09542530075393524
+        },
+        {
+          "feature": "problem",
+          "contribution": -0.09205445671776559
+        },
+        {
+          "feature": "that impacted",
+          "contribution": -0.08184912860137705
+        },
+        {
+          "feature": "financial company",
+          "contribution": -0.06464351409235242
+        },
+        {
+          "feature": "the",
+          "contribution": -0.04744580007704273
+        },
+        {
+          "feature": "persist",
+          "contribution": -0.045672375257568815
+        }
+      ],
+      "explanation_summary": "Predicted Service Outages and Maintenance with model probability 0.997. Strongest supporting terms: service, outages, financial. Strongest opposing terms: investment, with, data."
+    }
+  ]
+}

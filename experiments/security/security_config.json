@@ -1,0 +1,5 @@
+{
+  "pii_policy": "redact",
+  "safe_refusal": "I cannot help with that request.",
+  "output_fallback": "The generated response was blocked by the output security check. Please review the ticket manually."
+}

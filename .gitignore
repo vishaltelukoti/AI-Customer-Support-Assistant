@@ -25,6 +25,7 @@ artifacts/
 *.pth
 *.onnx
 *.h5
+experiments/mlflow/mlruns/
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/sample_tickets.csv

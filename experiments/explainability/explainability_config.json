@@ -1,0 +1,16 @@
+{
+  "model_explained": "Day 3 optimized category TF-IDF + Logistic Regression",
+  "model_path": "experiments\\optimization\\models\\category_optimized.joblib",
+  "method": "linear_tfidf_logistic_regression_contributions",
+  "method_note": "SHAP was attempted but could not be installed because this Python environment requires Microsoft C++ Build Tools to build SHAP. Contributions are computed exactly as TF-IDF value times the saved Logistic Regression coefficient for the predicted class.",
+  "selection": {
+    "split": "test",
+    "count": 5,
+    "criteria": "Deterministic confidence quantiles [0, 0.25, 0.5, 0.75, 1.0], preferring distinct predicted categories.",
+    "test_used_for_model_selection": false
+  },
+  "confidence_note": "Confidence is the saved Logistic Regression predict_proba value for the predicted class. These probabilities are not calibrated correctness probabilities.",
+  "environment": {
+    "python": "3.14.4"
+  }
+}

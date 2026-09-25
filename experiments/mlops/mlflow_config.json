@@ -1,0 +1,6 @@
+{
+  "tracking_uri": "file:///C:/Users/Vishal%20Telukoti/Desktop/L-100_Data/Assessments/AI-ML_Advanced/AI-Customer-Support-Assistant/experiments/mlflow/mlruns",
+  "experiment_name": "ai-customer-support-day11",
+  "local_only": true,
+  "mlflow_ui_command": "mlflow ui --backend-store-uri file:///C:/Users/Vishal%20Telukoti/Desktop/L-100_Data/Assessments/AI-ML_Advanced/AI-Customer-Support-Assistant/experiments/mlflow/mlruns"
+}

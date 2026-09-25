@@ -1,8 +1,8 @@
 # AI Customer Support Assistant
 
-A single-developer AI-powered customer-support POC. **Days 1-11 implement the application foundation, prepared dataset, offline baseline ML classification, lightweight hyperparameter optimization, CNN/RNN/LSTM comparison, attention/DistilBERT comparison, local FAISS similar-ticket retrieval, simple grounded RAG, a lightweight LangGraph multi-agent workflow, deterministic POC security checks, model explainability/subgroup diagnostics, and a local MLOps layer.** The form submits a customer message to FastAPI and displays a temporary typed acknowledgement. Its category, priority, and confidence remain `null`; tickets are not stored. Trained classifiers, retrieval, RAG, agents, security checks, explainability diagnostics, and MLOps scripts are available through separate offline services and CLIs.
+A single-developer AI-powered customer-support POC. **Days 1-12 implement the application foundation, prepared dataset, optimized ML classification, local FAISS similar-ticket retrieval, simple grounded RAG, a lightweight LangGraph multi-agent workflow, deterministic POC security checks, model explainability/subgroup diagnostics, local MLOps, and an integrated FastAPI/UI flow.** The form submits a support-ticket subject and body, then displays classification, similar historical tickets, workflow route, suggested response, source attribution, security status, explanation terms, and timings. Tickets are not stored.
 
-Planned later capabilities include API integration, security status, and classification explanations. See [the development plan](docs/development-plan.md).
+Planned later work is final demo/documentation polish. See [the development plan](docs/development-plan.md).
 
 ## Stack and structure
 
@@ -35,6 +35,7 @@ experiments/security/ # Day 9 deterministic security evaluation
 experiments/explainability/ # Day 10 explanations and subgroup diagnostics
 experiments/mlops/ # Day 11 metric summaries and MLflow run metadata
 experiments/mlflow/ # Day 11 local MLflow file store, internals ignored
+experiments/integration/ # Day 12 integrated API/workflow evaluation
 airflow/                # placeholder only
 mlflow/                 # placeholder only
 docs/                   # architecture, dataset, assumptions, development plan
@@ -66,7 +67,7 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
-Open http://localhost:5173. Submit `I was charged twice for the same order.` to see `received`, a UUID, and unavailable AI fields. Do not overwrite an existing customized `.env` when repeating setup. On macOS/Linux use `python3`, `.venv/bin/python`, and `cp` in place of their Windows equivalents.
+Open http://localhost:5173. Submit a fictional support-ticket subject and body to see the integrated POC response. Do not overwrite an existing customized `.env` when repeating setup. On macOS/Linux use `python3`, `.venv/bin/python`, and `cp` in place of their Windows equivalents.
 
 API documentation: http://localhost:8000/docs. Health: http://localhost:8000/health. Stop either server with Ctrl+C.
 
@@ -87,27 +88,63 @@ Explicit CORS origins follow [FastAPI's CORS configuration](https://fastapi.tian
 | Method | Endpoint | Behavior |
 | --- | --- | --- |
 | GET | /health | HTTP 200: `{"status":"healthy"}` |
-| POST | /api/v1/tickets | HTTP 200 acknowledgement; HTTP 422 on invalid input |
+| POST | /api/v1/tickets | HTTP 200 integrated support-assistant response; HTTP 422 on invalid input |
 
 ```powershell
 Invoke-RestMethod http://localhost:8000/health
-Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/tickets -ContentType 'application/json' -Body '{"ticket_text":"I was charged twice for the same order."}'
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/tickets -ContentType 'application/json' -Body '{"subject":"Payment failed","body":"My card payment failed during checkout. Invoice unpaid.","top_k":3}'
 ```
 
 Example response (the UUID changes per request):
 
 ```json
 {
-  "ticket_id": "d7658bf4-05d0-4f3f-8261-adc5811c1e4d",
-  "ticket_text": "I was charged twice for the same order.",
-  "category": null,
-  "priority": null,
-  "confidence": null,
-  "status": "received"
+  "ticket": {
+    "ticket_id": "d7658bf4-05d0-4f3f-8261-adc5811c1e4d",
+    "subject": "Payment failed",
+    "body": "My card payment failed during checkout. Invoice unpaid.",
+    "ticket_text": "Payment failed\n\nMy card payment failed during checkout. Invoice unpaid."
+  },
+  "classification": {
+    "category": "Billing and Payments",
+    "category_confidence": 0.9963926576529412,
+    "priority": "medium",
+    "priority_confidence": 0.8322446406752919
+  },
+  "similar_tickets": [],
+  "workflow": {
+    "complexity": "simple",
+    "type": "simple_rag",
+    "trace": ["retrieval", "resolution"]
+  },
+  "response": {
+    "answer": "Review the similar historical resolutions...",
+    "sources": [],
+    "retrieval_status": "grounded"
+  },
+  "explanation": {
+    "predicted_category": "Billing and Payments",
+    "confidence": 0.9963926576529412,
+    "top_features": []
+  },
+  "security": {
+    "allowed": true,
+    "status": "safe",
+    "reason": "Generated response passed output security check.",
+    "category": "safe_output",
+    "matched_rule": "none"
+  },
+  "timings": {
+    "total_ms": 198.97,
+    "classification_ms": 7.54,
+    "retrieval_ms": 39.12,
+    "workflow_ms": 151.64
+  },
+  "status": "completed"
 }
 ```
 
-The API accepts 1-10,000 characters after trimming surrounding whitespace. Blank, missing, non-string or oversized text and unexpected fields are rejected. The UI handles empty input, loading, success, validation errors, API failures and a 15-second timeout.
+The API accepts `{subject, body, top_k}` with `top_k` from 1 to 5. The legacy `{ticket_text}` shape is still accepted for compatibility. Blank, missing, non-string or oversized text and unexpected fields are rejected. The UI handles empty input, loading, success, validation errors, API failures and a 15-second timeout.
 
 ## Prepare the selected ML dataset
 
@@ -341,6 +378,27 @@ Key tracked metrics:
 
 The single DAG is `ticket_processing_embedding_refresh`: `validate_data -> prepare_ticket_data -> refresh_embeddings -> validate_retrieval_index`. The CI workflow is `.github/workflows/backend-ci.yml`. Docker build validation succeeded with `docker build -t ai-customer-support-backend-day11 ./backend`, though the image is large because existing ML dependencies pull torch/transformers stacks.
 
+## Integrated assistant API
+
+Day 12 wires the prior POC pieces into the `/api/v1/tickets` API and the React UI. The backend flow is input security -> Day 3 optimized category/priority classification -> Day 6 FAISS retrieval -> deterministic complexity routing -> simple Day 7 RAG or complex Day 8 LangGraph workflow -> output security -> Day 10-style explanation -> structured API response. Day 11 monitoring records request, model-prediction and retrieval counters plus latencies.
+
+Run from the repository root:
+
+```powershell
+python -m backend.app.services.ticket_service
+```
+
+The command saves `integration_config.json`, `integration_evaluation.json`, and `integration_evaluation.md` under `experiments/integration/`.
+
+| Metric | Value |
+| --- | ---: |
+| Fixed integration cases | 5 |
+| Passed | 5 |
+| Average latency | 78.41 ms |
+| Default Top-K | 3 |
+
+The fixed evaluation covers simple payment failure, complex multiple-charge/refund/cancellation routing, prompt-injection blocking, insufficient evidence, and PII redaction. No API key is required. This is POC integration, not a production support system.
+
 ## Tests and build
 
 ```powershell
@@ -354,9 +412,9 @@ npm run build
 npm run test:api
 ```
 
-Tests cover health, schema, null AI fields, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, and allowed/rejected CORS origins. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests. No tests claim future AI functionality works.
+Tests cover health, schema, integrated ticket responses, unique IDs, whitespace normalization, invalid requests, input length boundaries, malformed JSON, allowed/rejected CORS origins, security blocks, insufficient evidence, and component-failure fallback. The frontend build includes strict TypeScript checking. `npm run test:api` requires the backend running and exercises the actual Axios service against it, including API validation errors. With the backend stopped, `npm run test:api -- --unavailable` checks connection-error handling. These service checks are not browser/UI tests.
 
-Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 5 DL tests cover CNN/RNN/LSTM/Attention construction and inference, mocked DistilBERT configuration/artifact behavior, validation-based selection, leakage metadata, selected-model loading, and valid category prediction. Day 6 retrieval tests cover embedding shape, FAISS index creation/save/load, Top-K behavior, metadata mapping, search, no self-retrieval, training-only indexing, answer exclusion, and repeatable tiny-embedder behavior. Day 7 RAG tests cover context construction, retrieved answer inclusion, source attribution, configurable Top-K, output schema, insufficient-information behavior, prompt-injection resistance, malicious retrieved content handling, and fabricated-source prevention. Day 8 agent tests cover state, routing, agent nodes, retrieval tool usage, graceful retrieval/generation failure, insufficient evidence, request-local memory, and prompt-injection-as-data behavior. Day 9 security tests cover prompt injection, jailbreaks, secret requests, PII detection/redaction, normal-ticket allow behavior, malicious retrieved content as untrusted data, unsafe output fallback, blocked-workflow behavior, and deterministic checks. Day 10 explainability tests cover saved model loading, explainer initialization, vocabulary-backed feature explanations, confidence bounds, exactly five deterministic examples, allowed subgroup fields, no inferred sensitive attributes, and safe handling of small/empty groups. Day 11 MLOps tests cover metric loading, MLflow tracking config, monitoring counters/latency, health endpoint fields, Airflow DAG structure, and Docker/CI static checks.
+Preprocessing tests use small fixtures and cover schema detection, English filtering, version overlap, conservative cleaning, privacy masks, exact deduplication, conflicting labels, grouped queue/priority splits, rare-class handling, cross-split leakage checks, output schemas, repeatability and raw-source preservation. Day 2 tests train lightweight real models, inspect exactly which text/labels are fitted, exclude held-out vocabulary and answers, validate saved artifacts, and check deterministic inference with actual probabilities. Day 3 tests execute all three search methods on a tiny fixture, verify saved optimized models and test metrics, and check that search fitting does not use test rows. Day 5 DL tests cover CNN/RNN/LSTM/Attention construction and inference, mocked DistilBERT configuration/artifact behavior, validation-based selection, leakage metadata, selected-model loading, and valid category prediction. Day 6 retrieval tests cover embedding shape, FAISS index creation/save/load, Top-K behavior, metadata mapping, search, no self-retrieval, training-only indexing, answer exclusion, and repeatable tiny-embedder behavior. Day 7 RAG tests cover context construction, retrieved answer inclusion, source attribution, configurable Top-K, output schema, insufficient-information behavior, prompt-injection resistance, malicious retrieved content handling, and fabricated-source prevention. Day 8 agent tests cover state, routing, agent nodes, retrieval tool usage, graceful retrieval/generation failure, insufficient evidence, request-local memory, and prompt-injection-as-data behavior. Day 9 security tests cover prompt injection, jailbreaks, secret requests, PII detection/redaction, normal-ticket allow behavior, malicious retrieved content as untrusted data, unsafe output fallback, blocked-workflow behavior, and deterministic checks. Day 10 explainability tests cover saved model loading, explainer initialization, vocabulary-backed feature explanations, confidence bounds, exactly five deterministic examples, allowed subgroup fields, no inferred sensitive attributes, and safe handling of small/empty groups. Day 11 MLOps tests cover metric loading, MLflow tracking config, monitoring counters/latency, health endpoint fields, Airflow DAG structure, and Docker/CI static checks. Day 12 API tests cover normal simple flow, complex flow, classification/similar-ticket/source fields, security blocks, insufficient information, invalid requests and graceful component failure.
 
 For a manual integration check, submit a valid ticket and inspect the received status; try an empty/whitespace-only ticket for validation; stop the backend and submit again to see the connection error, then restart it and retry.
 
@@ -391,9 +449,10 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [POC security layer](docs/security.md)
 - [Explainability and subgroup diagnostics](docs/explainability.md)
 - [MLOps layer](docs/mlops.md)
-- [Completed Days 1-11 and remaining Days 12-13](docs/development-plan.md)
+- [Integrated assistant API](docs/integration.md)
+- [Completed Days 1-12 and remaining Day 13](docs/development-plan.md)
 - [Validation results and browser-check limitation](docs/validation.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API does not read the raw or processed files, load models, search the retrieval index, call RAG, execute the agent workflow, run the security layer, or serve explanations. Offline baseline classification, optimization, category DL comparison, local similar-ticket retrieval, offline RAG suggested resolutions, a local LangGraph workflow, deterministic security checks, offline explainability/subgroup diagnostics, and local MLOps utilities are implemented. API integration remains planned. No persistence or authentication runs now.
+The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API now loads local saved models/artifacts for classification, retrieval, RAG/agents, security and explanations, but it does not persist tickets or authenticate users. The integration remains POC-scoped and should not be treated as production-ready support automation.
 
 Day 2 uses the unchanged selected Kaggle dataset splits. Results on synthetic data do not establish real-world performance. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed. See the validation record for verification details.

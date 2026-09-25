@@ -1,5 +1,28 @@
 # Validation record
 
+## Day 12 integration validation (2026-09-24)
+
+Day 12 is complete. It integrated the existing POC components into FastAPI and the React UI without retraining models, rebuilding retrieval, changing the Day 3 classifiers, or starting Day 13.
+
+| Check | Result |
+| --- | --- |
+| Focused ticket/API integration tests | 20 passed |
+| Full backend suite | 143 passed |
+| Clean process integration evaluation | 5 / 5 cases passed |
+| Real in-process FastAPI POST | HTTP 200, `completed`, Billing and Payments, 3 similar tickets, `simple_rag`, security `safe` |
+| Evaluation cases | simple payment, complex refund/cancellation, prompt injection, insufficient information, PII redaction |
+| Average evaluation latency | 78.41 ms |
+| Frontend build | Passed: `npm run build` |
+| Frontend unavailable-backend smoke | Passed: `npm run test:api -- --unavailable` |
+| Docker build | Passed: `ai-customer-support-backend-day12:latest` |
+| API request shape | `subject`, `body`, optional `top_k`; legacy `ticket_text` still accepted |
+| API response | classification, similar tickets, workflow, response, explanation, security and timings |
+| Monitoring | request/model/retrieval counters reused from Day 11 |
+| Health endpoint | remains cheap; artifact availability only |
+| Artifacts | `experiments/integration/integration_config.json`, `integration_evaluation.json`, `integration_evaluation.md` |
+
+During the clean integration evaluation, the local Sentence Transformer loader attempted Hugging Face metadata `HEAD` requests and hit Windows socket permission errors, then loaded cached local weights and completed successfully. Saved Day 3 classifier loading emitted scikit-learn version warnings because artifacts were created with scikit-learn 1.9.1 and this environment has 1.9.0.
+
 ## Day 11 MLOps validation (2026-09-24)
 
 Day 11 is complete. It added local POC MLOps without retraining models, rebuilding retrieval, changing RAG/agents/security/explainability, or adding API/UI integration.

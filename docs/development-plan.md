@@ -1,6 +1,6 @@
 # Development plan
 
-Days 1 through 11 are complete. Later phases remain planned.
+Days 1 through 12 are complete. The final demo/documentation phase remains planned.
 
 | Day | Scope / status |
 | --- | --- |
@@ -15,7 +15,7 @@ Days 1 through 11 are complete. Later phases remain planned.
 | 9 | COMPLETE: deterministic POC security checks for prompt injection, jailbreaks, secret requests, PII, retrieved-content instructions and unsafe outputs |
 | 10 | COMPLETE: saved-model explainability, five representative explanations, confidence reporting and subgroup diagnostics |
 | 11 | COMPLETE: local MLflow tracking, one Airflow DAG, Docker/CI checks, monitoring counters, health and metrics summary |
-| 12 | Integration and testing |
+| 12 | COMPLETE: integrated FastAPI/UI support-assistant flow with classification, retrieval, RAG/agents, security, explanations, monitoring and evaluation |
 | 13 | Documentation and final demo |
 
 Day 2 uses the unchanged English splits from the selected synthetic Kaggle CSV. Both models are trained only on train.csv; validation and test are evaluation-only. The fixed unweighted baseline has no parameter search, resampling, combined target or API integration. Full measured results, per-class reports, examples and reproducibility details are in [baseline-ml.md](baseline-ml.md). The API still returns null prediction fields.
@@ -38,4 +38,6 @@ Day 10 adds offline explainability and subgroup diagnostics for the saved Day 3 
 
 Day 11 adds local POC MLOps. MLflow logs existing Day 3 optimized classification metrics and Day 6 retrieval metrics to a local file store; compact summaries are saved under `experiments/mlops/`. One Airflow DAG validates processed data and existing retrieval artifacts without retraining or automatic FAISS rebuilds. Docker build validation succeeded for the backend image, although existing ML dependencies make the image large. `.github/workflows/backend-ci.yml` demonstrates checkout, Python 3.12 setup, dependency installation, backend tests and Docker build. In-memory monitoring counters track request count, errors, latency, model prediction count, retrieval request count and retrieval latency. `/health` now reports service name plus cheap classifier/retrieval artifact availability. No Kubernetes, Terraform, cloud deployment, Prometheus/Grafana, database-backed monitoring, model retraining or Day 12 API/UI integration was added.
 
-Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval, RAG, agent, security, explainability and MLOps artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval, experiments/rag, experiments/agents, experiments/security, experiments/explainability, experiments/mlops and experiments/mlflow; Airflow has one DAG and future integration modules remain scoped to later days. Days 12-13 in the table are planned only.
+Day 12 integrates the existing POC components behind `POST /api/v1/tickets` and updates the React UI. The request now accepts `subject`, `body` and optional `top_k`; the legacy `ticket_text` payload remains supported. The backend runs input security, Day 3 optimized classification, Day 6 FAISS retrieval, Day 8 complexity routing, simple Day 7 RAG or complex LangGraph workflow, output security and Day 10-style explanation before returning a structured response with timings. Day 11 monitoring counters are reused. The fixed five-case integration evaluation passed 5/5 with average latency 78.41 ms and saved artifacts under `experiments/integration/`. Focused ticket/API tests passed 20/20 and the full backend suite passed 143/143. Frontend TypeScript/Vite build passed. Docker backend build passed with `ai-customer-support-backend-day12:latest`. No models or indexes were retrained or rebuilt.
+
+Synthetic results do not establish real-world performance. Baseline, optimization, DL comparison, retrieval, RAG, agent, security, explainability, MLOps and integration artifacts now populate experiments/baseline, experiments/optimization, experiments/dl_comparison, experiments/retrieval, experiments/rag, experiments/agents, experiments/security, experiments/explainability, experiments/mlops, experiments/mlflow and experiments/integration; Airflow has one DAG. Day 13 remains planned only.

@@ -6,7 +6,7 @@ from app.services.ticket_service import receive_ticket
 router = APIRouter(prefix="/api/v1/tickets", tags=["tickets"])
 
 
-@router.post("", response_model=TicketResponse, summary="Receive a ticket (Day 1 placeholder)")
+@router.post("", response_model=TicketResponse, summary="Process a support ticket")
 def create_ticket(ticket: TicketCreate) -> TicketResponse:
-    """Return an acknowledgement. No persistence or AI processing is performed."""
+    """Run the integrated Day 12 support-assistant workflow."""
     return receive_ticket(ticket)

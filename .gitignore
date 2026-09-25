@@ -25,6 +25,7 @@ artifacts/
 *.pth
 *.onnx
 *.h5
+*.safetensors
 experiments/mlflow/mlruns/
 data/raw/*
 !data/raw/.gitkeep

@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.joblib binary
+*.faiss binary
+*.png binary
+*.pyc binary

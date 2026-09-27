@@ -16,6 +16,8 @@ build/
 logs/
 .DS_Store
 Thumbs.db
+# Regeneratable experiment visualizations; CSV summaries remain reviewable.
+/experiments/**/*_confusion_matrix.png
 # Future generated artifacts (source and documentation remain tracked).
 /models/
 artifacts/

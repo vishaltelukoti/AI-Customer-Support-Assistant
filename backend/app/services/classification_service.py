@@ -1,6 +1,7 @@
 """Standalone baseline inference; intentionally not wired into the ticket API."""
 
 from dataclasses import dataclass
+import logging
 from pathlib import Path
 
 import joblib
@@ -11,6 +12,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from ..ml.baseline_data import BASELINE_DIR, MODEL_FILES, prepare_ticket_text
 from ..ml.dataset_audit import CATEGORIES, PRIORITIES
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -42,6 +45,7 @@ class ClassificationService:
                 if set(model.classes_) != set(expected):
                     raise ValueError(f"Unexpected {target} labels in artifact.")
             except Exception as exc:
+                logger.exception("Baseline %s classification model validation failed", target)
                 raise ValueError(f"Cannot load valid {target} model from {path}: {exc}") from exc
             self.models[target] = model
 

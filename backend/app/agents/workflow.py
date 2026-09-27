@@ -3,6 +3,7 @@
 import argparse
 import argparse
 import json
+import logging
 import platform
 import time
 from dataclasses import asdict, dataclass
@@ -24,6 +25,7 @@ from ..rag.rag_service import (
 from ..rag.retrieval import DEFAULT_TOP_K, RETRIEVAL_DIR, RetrievalResult, SimilarTicketRetriever
 
 AGENTS_DIR = ROOT / "experiments/agents"
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -164,6 +166,7 @@ class SupportAgentWorkflow:
                 "workflow_trace": _append_trace(state, f"Retrieval Agent: retrieved {len(results)} ticket(s)."),
             }
         except Exception as exc:
+            logger.exception("Retrieval agent failed to fetch similar tickets")
             return {
                 **state,
                 "retrieved_sources": [],
@@ -204,6 +207,7 @@ class SupportAgentWorkflow:
                 "workflow_trace": _append_trace(state, "Resolution Agent: generated grounded response."),
             }
         except Exception as exc:
+            logger.exception("Resolution agent failed to generate a grounded response")
             response = {
                 "answer": "Insufficient information in retrieved historical tickets.",
                 "sources": [],

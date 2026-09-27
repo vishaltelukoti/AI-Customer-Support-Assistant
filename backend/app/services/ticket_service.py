@@ -142,6 +142,7 @@ class TicketProcessor:
         try:
             retrieved = self.retriever.search_similar_tickets(safe_text, top_k=ticket.top_k)
         except Exception:
+            logger.exception("Similar-ticket retrieval failed")
             retrieved = []
         retrieval_ms = _elapsed_ms(retrieval_started)
         monitor.record_retrieval(retrieval_ms / 1000)
@@ -199,6 +200,7 @@ class TicketProcessor:
                 ["retrieval", "resolution"],
             )
         except Exception:
+            logger.exception("Simple RAG resolution generation failed")
             return "Insufficient information in retrieved historical tickets.", [], "generation_failed", ["retrieval", "resolution"]
 
     def _run_complex(self, safe_text: str):
@@ -212,6 +214,7 @@ class TicketProcessor:
                 _public_trace(state.get("workflow_trace", [])),
             )
         except Exception:
+            logger.exception("Complex agent workflow failed")
             return "Insufficient information in retrieved historical tickets.", [], "workflow_failed", [
                 "investigation", "retrieval", "resolution"
             ]
@@ -225,6 +228,7 @@ class TicketProcessor:
                 top_features=explanation.top_positive_features[:5],
             )
         except Exception:
+            logger.exception("Ticket explanation generation failed")
             return ExplanationView(
                 predicted_category=classification.category,
                 confidence=classification.category_confidence,
@@ -247,6 +251,7 @@ def receive_ticket(ticket: TicketCreate) -> TicketResponse:
     try:
         return get_ticket_processor().process(ticket)
     except Exception:
+        logger.exception("End-to-end ticket processing failed")
         ticket_id = uuid4()
         input_text = ticket.ticket_text or f"{ticket.subject}\n\n{ticket.body}"
         subject, body = _split_safe_ticket(ticket, input_text)

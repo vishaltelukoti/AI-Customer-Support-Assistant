@@ -97,6 +97,7 @@ def _train_distilbert(train, validation, test, output_dir: Path, seed: int) -> t
             label2id=label_to_id,
         )
     except Exception as exc:  # network/cache/model errors should be recorded, not fabricated.
+        LOGGER.exception("DistilBERT model loading failed")
         reason = f"Could not load {DISTILBERT_CHECKPOINT}: {exc}"
         return {
             "validation": _failed_metrics(reason),

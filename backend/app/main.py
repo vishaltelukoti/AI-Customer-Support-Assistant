@@ -1,10 +1,14 @@
+import logging
+import time
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import time
 
 from app.api.routes import health, tickets
 from app.core.config import Settings
 from app.monitoring.metrics import monitor
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -31,6 +35,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             error = response.status_code >= 500
             return response
         except Exception:
+            logger.exception("HTTP request handling failed")
             error = True
             raise
         finally:

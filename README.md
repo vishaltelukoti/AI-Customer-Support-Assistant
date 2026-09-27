@@ -12,7 +12,7 @@ Customer-support teams need a fast way to classify incoming tickets, find releva
 - Similar-ticket retrieval using local Sentence Transformer embeddings and FAISS.
 - Suggested responses grounded in retrieved historical answers.
 - Simple/complex routing with a lightweight LangGraph multi-agent workflow.
-- Deterministic POC security checks before and after the AI workflow.
+- Deterministic POC input/output pattern filter before and after the AI workflow.
 - Classification explanations and subgroup diagnostics using available metadata.
 - Local MLOps artifacts: MLflow tracking, Airflow validation DAG, CI workflow, Docker build and in-memory monitoring.
 - React UI plus FastAPI endpoint for end-to-end demo.
@@ -345,9 +345,9 @@ Simple tickets route Retrieval -> Resolution. Complex tickets route Investigatio
 
 Artifacts are saved under `experiments/agents/`. The final integrated API now reuses this workflow for complex tickets. Persistent memory is still intentionally absent.
 
-## Security layer
+## Input/output pattern filter
 
-Day 9 adds deterministic POC security checks around the existing LangGraph workflow. Input checks block obvious prompt injection, jailbreak, and explicit secret-disclosure requests before the AI workflow runs. Explicit email, phone, and card-like values are detected and redacted before allowed workflow execution. Retrieved tickets are treated as untrusted data, and output checks replace obvious generated secrets or PII leakage with a safe fallback.
+Day 9 adds a deterministic regex-based input/output pattern filter around the existing LangGraph workflow. It blocks only obvious literal prompt-injection, jailbreak, and explicit secret-disclosure requests before the AI workflow runs. Explicit email, phone, and card-like values are detected and redacted before allowed workflow execution. Retrieved tickets are treated as untrusted data, and output checks replace obvious generated secrets or PII leakage with a safe fallback. It is a guardrail demonstration, not a comprehensive defense.
 
 Run from the repository root:
 
@@ -500,7 +500,7 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Similar-ticket retrieval](docs/retrieval.md)
 - [Suggested-resolution RAG](docs/rag.md)
 - [LangGraph agent workflow](docs/agents.md)
-- [POC security layer](docs/security.md)
+- [POC input/output pattern filter](docs/security.md)
 - [Explainability and subgroup diagnostics](docs/explainability.md)
 - [MLOps layer](docs/mlops.md)
 - [Integrated assistant API](docs/integration.md)

@@ -7,3 +7,5 @@ This repository remains a POC: it has no authentication or RBAC, rate limiting, 
 The backend container includes the saved optimized-classifier and FAISS retrieval artifacts required for its demo path. It does not download, retrain, or refresh them at startup; a production image pipeline would version, verify, and promote those artifacts separately.
 
 The tracked retrieval runtime bundle is `tickets.faiss`, `metadata.jsonl`, and `retrieval_config.json`; `python -m backend.app.rag.retrieval` regenerates it. The small retrieval evaluation JSON/Markdown reports remain tracked, while regeneratable experiment confusion-matrix PNGs are not tracked.
+
+The input/output pattern filter catches literal known phrasings only and is trivially bypassed by paraphrase; it demonstrates input/output guardrails, not a production-grade defense.

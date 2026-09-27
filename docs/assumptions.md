@@ -7,7 +7,7 @@
 - The project owner supplied the selected Kaggle dataset locally. No other variants are used. Synthetic class imbalance, annotation quality and unknown paraphrase relationships limit evaluation claims; review severity definitions before deployment.
 - Ticket intake runs the integrated local POC flow, but it does not persist tickets. Reloading the page clears the displayed result.
 - The 10,000-character limit is a POC input constraint. Surrounding whitespace is trimmed. HTTP 200 means an integrated response, blocked response or structured component-failure fallback, and HTTP 422 means invalid request.
-- The Day 9 deterministic security layer is integrated into ticket handling. It is POC-level only. The offline dataset preparation also masks obvious privacy patterns in ticket text and answers; this is not a PII-free guarantee. Use fictional tickets for demos.
+- The Day 9 deterministic input/output pattern filter is integrated into ticket handling. It is POC-level only. The offline dataset preparation also masks obvious privacy patterns in ticket text and answers; this is not a PII-free guarantee. Use fictional tickets for demos.
 - Local development uses ports 8000 and 5173. CORS origins can be changed through backend settings. Frontend configuration is bundled at build time.
 - No database, router, state-management library, or additional application framework is needed for one form.
 - The LICENSE file reserves rights pending the project owner's license choice; no open-source license is assumed.

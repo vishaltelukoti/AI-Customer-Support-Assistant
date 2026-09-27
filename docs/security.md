@@ -1,6 +1,6 @@
-# Security Layer
+# Input/output Pattern Filter Demo
 
-Day 9 adds a lightweight deterministic security layer around the existing LangGraph workflow. It is a POC control surface, not a comprehensive security framework.
+Day 9 adds a lightweight deterministic regex-based input/output pattern filter around the existing LangGraph workflow. It is a POC guardrail demonstration, not a comprehensive security framework or prompt-injection defense.
 
 ## Design
 

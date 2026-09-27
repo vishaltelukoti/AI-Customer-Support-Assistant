@@ -1,4 +1,4 @@
-"""Lightweight deterministic security layer for the Day 9 POC."""
+"""Deterministic input/output pattern filter for the Day 9 POC (regex-based; not a comprehensive defense)."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ _OUTPUT_SECRET_RULES: tuple[tuple[str, str, str], ...] = (
 
 
 class SecurityService:
-    """Deterministic input/output checks around the existing agent workflow."""
+    """Deterministic pattern-filter demo around the existing agent workflow."""
 
     def __init__(self, config: SecurityConfig = SecurityConfig()):
         self.config = config

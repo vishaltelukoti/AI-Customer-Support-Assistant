@@ -13,7 +13,7 @@ import joblib
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 from ..ml.baseline_data import prepare_ticket_text
-from ..ml.optimization import OPTIMIZED_MODEL_FILES
+from ..ml.optimization_paths import OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 
 EXPLAINABILITY_DIR = ROOT / "experiments/explainability"

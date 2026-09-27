@@ -18,7 +18,7 @@ from typing import Any
 import joblib
 import numpy as np
 
-from ..ml.optimization import OPTIMIZED_MODEL_FILES
+from ..ml.optimization_paths import OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 from .fairness import load_historical_test_records, run_fairness_evaluation
 

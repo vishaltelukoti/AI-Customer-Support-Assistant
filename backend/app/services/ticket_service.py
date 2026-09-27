@@ -16,7 +16,7 @@ import joblib
 from ..agents.workflow import AgentConfig, RetrievalTool, SupportAgentWorkflow, classify_complexity
 from ..explainability.shap_explainer import LinearTextExplainer
 from ..ml.baseline_data import prepare_ticket_text
-from ..ml.optimization import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
+from ..ml.optimization_paths import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 from ..monitoring.metrics import monitor
 from ..rag.rag_service import LocalHFGenerator, RAGConfig, RAGService, _EvaluationCaseGenerator

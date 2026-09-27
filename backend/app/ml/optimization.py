@@ -20,14 +20,10 @@ from threadpoolctl import threadpool_limits
 from .baseline_data import load_splits
 from .baseline_models import build_pipeline
 from .evaluation import METRICS, evaluate_classifier, save_confusion_matrix
+from .optimization_paths import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
 from .preprocessing import ROOT, SEED
 
 LOGGER = logging.getLogger(__name__)
-OPTIMIZATION_DIR = ROOT / "experiments/optimization"
-OPTIMIZED_MODEL_FILES = {
-    "category": "category_optimized.joblib",
-    "priority": "priority_optimized.joblib",
-}
 GRID_PARAMS = {
     "tfidf__ngram_range": [(1, 1), (1, 2)],
     "tfidf__min_df": [2],

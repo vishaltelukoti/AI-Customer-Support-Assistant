@@ -117,7 +117,8 @@ def test_receive_ticket_failure_logs_and_preserves_structured_fallback(monkeypat
     _assert_error_logged(caplog, "End-to-end ticket processing failed")
 
 
-def test_http_middleware_rethrow_logs_failure(caplog):
+def test_http_middleware_rethrow_logs_failure(monkeypatch, caplog):
+    monkeypatch.setattr(ticket_service, "initialize_ticket_processor", lambda: SimpleNamespace())
     app: FastAPI = create_app()
 
     @app.get("/logging-test-error")

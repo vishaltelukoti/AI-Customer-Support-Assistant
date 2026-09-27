@@ -239,10 +239,17 @@ class TicketProcessor:
 _processor: TicketProcessor | None = None
 
 
-def get_ticket_processor() -> TicketProcessor:
+def initialize_ticket_processor() -> TicketProcessor:
+    """Build the process-local processor during FastAPI lifespan startup only."""
     global _processor
     if _processor is None:
         _processor = TicketProcessor()
+    return _processor
+
+
+def get_ticket_processor() -> TicketProcessor:
+    if _processor is None:
+        raise RuntimeError("Ticket processor not initialized -- app startup did not complete")
     return _processor
 
 

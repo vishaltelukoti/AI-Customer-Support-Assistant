@@ -1,5 +1,6 @@
 import logging
 import time
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,8 +8,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import health, tickets
 from app.core.config import Settings
 from app.monitoring.metrics import monitor
+from app.services import ticket_service
 
 logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    processor = ticket_service.initialize_ticket_processor()
+    application.state.ticket_processor = processor
+    yield
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -17,6 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         title=settings.app_name,
         version="0.1.0",
         description="Day 1 foundation. Tickets are acknowledged, not classified or stored.",
+        lifespan=lifespan,
     )
     application.add_middleware(
         CORSMiddleware,

@@ -21,6 +21,9 @@ Thumbs.db
 artifacts/
 *.pkl
 *.joblib
+!experiments/optimization/models/
+!experiments/optimization/models/category_optimized.joblib
+!experiments/optimization/models/priority_optimized.joblib
 *.pt
 *.pth
 *.onnx
@@ -29,7 +32,6 @@ artifacts/
 experiments/mlflow/mlruns/
 data/raw/*
 !data/raw/.gitkeep
-!data/raw/sample_tickets.csv
 !data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv
 !data/raw/README.md
 data/processed/*

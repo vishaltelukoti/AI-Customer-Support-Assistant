@@ -8,7 +8,7 @@ from pathlib import Path
 try:
     from airflow import DAG
     from airflow.operators.python import PythonOperator
-except ImportError:
+except ImportError: 
     class DAG:
         def __init__(self, dag_id, **kwargs):
             self.dag_id = dag_id

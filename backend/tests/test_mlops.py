@@ -88,4 +88,7 @@ def test_docker_and_ci_configuration_static_checks():
     assert "FROM python:3.12-slim" in dockerfile
     assert "uvicorn" in dockerfile
     assert "python -m pytest -c backend/pytest.ini -q backend/tests" in workflow
-    assert "docker build -t ai-customer-support-backend ./backend" in workflow
+    assert "COPY experiments/optimization /workspace/experiments/optimization" in dockerfile
+    assert "COPY experiments/retrieval /workspace/experiments/retrieval" in dockerfile
+    assert "docker build -f backend/Dockerfile -t ai-customer-support-backend ." in workflow
+    assert "Smoke-test backend container health endpoint" in workflow

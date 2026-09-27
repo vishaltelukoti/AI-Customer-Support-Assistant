@@ -1,0 +1,7 @@
+# Offline training, experiment evaluation, local MLflow tracking, and tests.
+pytest>=8.3,<10
+httpx>=0.28,<1
+matplotlib>=3.10,<3.11
+optuna>=4.5,<4.6
+threadpoolctl>=3.5,<4
+mlflow>=3.6,<3.7

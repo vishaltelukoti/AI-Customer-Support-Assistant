@@ -3,6 +3,7 @@
 import argparse
 import importlib
 import json
+import logging
 import platform
 import time
 from dataclasses import asdict, dataclass
@@ -12,6 +13,7 @@ from typing import Protocol
 
 from ..ml.baseline_data import prepare_ticket_text
 from ..ml.preprocessing import ROOT
+from .knowledge_base import KNOWLEDGE_BASE_ARTIFACT_DIR, KnowledgeBaseResult, KnowledgeBaseRetriever
 from .retrieval import DEFAULT_TOP_K, RETRIEVAL_DIR, RetrievalResult, SimilarTicketRetriever
 
 RAG_DIR = ROOT / "experiments/rag"
@@ -20,6 +22,7 @@ DEFAULT_RETRIEVAL_THRESHOLD = 0.55
 MAX_CONTEXT_CHARS_PER_TICKET = 900
 MAX_TICKET_CHARS = 1200
 MAX_NEW_TOKENS = 120
+logger = logging.getLogger(__name__)
 
 
 class TextGenerator(Protocol):
@@ -32,6 +35,7 @@ class TextGenerator(Protocol):
 class RAGConfig:
     generation_model: str = DEFAULT_GENERATION_MODEL
     retrieval_artifact_dir: str = str(RETRIEVAL_DIR)
+    knowledge_base_artifact_dir: str = str(KNOWLEDGE_BASE_ARTIFACT_DIR)
     top_k: int = DEFAULT_TOP_K
     retrieval_threshold: float = DEFAULT_RETRIEVAL_THRESHOLD
     max_context_chars_per_ticket: int = MAX_CONTEXT_CHARS_PER_TICKET
@@ -46,6 +50,8 @@ class Source:
     category: str
     priority: str
     excerpt: str
+    source_type: str = "ticket"
+    title: str | None = None
 
 
 @dataclass(frozen=True)
@@ -91,18 +97,27 @@ def _clip(value: str, limit: int) -> str:
     return cleaned if len(cleaned) <= limit else cleaned[: limit - 3].rstrip() + "..."
 
 
-def build_context(retrieved: list[RetrievalResult], max_chars_per_ticket: int = MAX_CONTEXT_CHARS_PER_TICKET) -> str:
+def build_context(retrieved: list[RetrievalResult | KnowledgeBaseResult],
+                  max_chars_per_ticket: int = MAX_CONTEXT_CHARS_PER_TICKET) -> str:
     blocks = []
     for index, item in enumerate(retrieved, start=1):
-        blocks.append("\n".join([
-            f"Historical Ticket {index}:",
-            f"Source ID: {item.ticket_id}",
-            f"Similarity Score: {item.score:.6f}",
-            f"Ticket: {_clip(item.ticket_text, max_chars_per_ticket)}",
-            f"Category: {item.category}",
-            f"Priority: {item.priority}",
-            f"Previous Resolution: {_clip(item.answer, max_chars_per_ticket)}",
-        ]))
+        if isinstance(item, KnowledgeBaseResult):
+            blocks.append("\n".join([
+                f"Knowledge Base {index}: {item.title}",
+                f"Source ID: {item.ticket_id}",
+                f"Similarity Score: {item.score:.6f}",
+                f"Content: {_clip(item.chunk_text, max_chars_per_ticket)}",
+            ]))
+        else:
+            blocks.append("\n".join([
+                f"Historical Ticket {index}:",
+                f"Source ID: {item.ticket_id}",
+                f"Similarity Score: {item.score:.6f}",
+                f"Ticket: {_clip(item.ticket_text, max_chars_per_ticket)}",
+                f"Category: {item.category}",
+                f"Priority: {item.priority}",
+                f"Previous Resolution: {_clip(item.answer, max_chars_per_ticket)}",
+            ]))
     return "\n\n".join(blocks)
 
 
@@ -128,7 +143,17 @@ Historical support context:
 Suggested resolution:"""
 
 
-def _to_source(result: RetrievalResult) -> Source:
+def _to_source(result: RetrievalResult | KnowledgeBaseResult) -> Source:
+    if isinstance(result, KnowledgeBaseResult):
+        return Source(
+            ticket_id=result.ticket_id,
+            similarity_score=result.score,
+            category="Knowledge Base",
+            priority="policy",
+            excerpt=_clip(result.chunk_text, 220),
+            source_type="knowledge_base",
+            title=result.title,
+        )
     return Source(
         ticket_id=result.ticket_id,
         similarity_score=result.score,
@@ -138,17 +163,37 @@ def _to_source(result: RetrievalResult) -> Source:
     )
 
 
+def merge_ranked_results(tickets: list[RetrievalResult], knowledge_base: list[KnowledgeBaseResult],
+                         top_k: int) -> list[RetrievalResult | KnowledgeBaseResult]:
+    merged = [*tickets, *knowledge_base]
+    return sorted(merged, key=lambda item: (-item.score, item.ticket_id))[:top_k]
+
+
 class RAGService:
     def __init__(self, retriever: SimilarTicketRetriever, generator: TextGenerator | None = None,
-                 config: RAGConfig = RAGConfig()):
+                 config: RAGConfig = RAGConfig(), knowledge_base_retriever: KnowledgeBaseRetriever | None = None):
         self.retriever = retriever
         self.config = config
         self.generator = generator or LocalHFGenerator(config.generation_model, config.max_new_tokens)
+        self.knowledge_base_retriever = knowledge_base_retriever
 
     @classmethod
     def load(cls, retrieval_dir: Path = RETRIEVAL_DIR, generator: TextGenerator | None = None,
              config: RAGConfig = RAGConfig()) -> "RAGService":
-        return cls(SimilarTicketRetriever.load_index(retrieval_dir), generator, config)
+        return cls(
+            SimilarTicketRetriever.load_index(retrieval_dir),
+            generator,
+            config,
+            cls.load_optional_knowledge_base(Path(config.knowledge_base_artifact_dir)),
+        )
+
+    @staticmethod
+    def load_optional_knowledge_base(artifact_dir: Path = KNOWLEDGE_BASE_ARTIFACT_DIR) -> KnowledgeBaseRetriever | None:
+        try:
+            return KnowledgeBaseRetriever.load_index(artifact_dir)
+        except (FileNotFoundError, OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
+            logger.warning("Knowledge-base artifacts are unavailable; using ticket-only RAG retrieval: %s", exc)
+            return None
 
     def generate_resolution(self, ticket_text: str, top_k: int | None = None) -> RAGResponse:
         query = prepare_ticket_text(ticket_text)
@@ -160,9 +205,11 @@ class RAGService:
                                 top_k: int | None = None) -> RAGResponse:
         query = prepare_ticket_text(ticket_text)
         effective_top_k = top_k or self.config.top_k
-        strong = [item for item in retrieved if item.score >= self.config.retrieval_threshold]
+        knowledge_base = self.knowledge_base_retriever.search(query, effective_top_k) if self.knowledge_base_retriever else []
+        merged = merge_ranked_results(retrieved, knowledge_base, effective_top_k)
+        strong = [item for item in merged if item.score >= self.config.retrieval_threshold]
         sources = [_to_source(item) for item in strong]
-        retrieved_dicts = [asdict(item) for item in retrieved]
+        retrieved_dicts = [asdict(item) for item in merged]
         if not strong:
             return RAGResponse(
                 answer="Insufficient information in retrieved historical tickets.",
@@ -178,9 +225,9 @@ class RAGService:
         generated = self.generator.generate(prompt)
         if not generated:
             generated = "Insufficient information in retrieved historical tickets."
-        source_ids = ", ".join(source.ticket_id for source in sources)
-        if source_ids and not any(source.ticket_id in generated for source in sources):
-            generated = f"{generated}\n\nSources: {source_ids}"
+        source_labels = ", ".join(source.title or source.ticket_id for source in sources)
+        if source_labels and not any((source.title or source.ticket_id) in generated for source in sources):
+            generated = f"{generated}\n\nSources: {source_labels}"
         return RAGResponse(
             answer=generated,
             sources=sources,
@@ -216,6 +263,24 @@ def evaluate_rag(service: RAGService) -> dict:
             "expect_status": "grounded",
         },
         {
+            "name": "knowledge_base_refund",
+            "ticket_text": "I was charged twice for a cancelled order. When should the refund arrive?",
+            "expect_status": "grounded",
+            "expected_knowledge_base_title": "Refund Policy",
+        },
+        {
+            "name": "knowledge_base_payment",
+            "ticket_text": "My checkout payment failed. Which details can I safely check before trying again?",
+            "expect_status": "grounded",
+            "expected_knowledge_base_title": "Payment FAQ",
+        },
+        {
+            "name": "knowledge_base_shipping",
+            "ticket_text": "Tracking says delivered but my parcel is missing. What should I do?",
+            "expect_status": "grounded",
+            "expected_knowledge_base_title": "Shipping FAQ",
+        },
+        {
             "name": "network_outage",
             "ticket_text": "Our Kubernetes platform is down and barcode devices cannot connect.",
             "expect_status": "grounded",
@@ -238,7 +303,12 @@ def evaluate_rag(service: RAGService) -> dict:
         retrieved_ids = {item["ticket_id"] for item in response.retrieved_tickets}
         fabricated_sources = bool(source_ids - retrieved_ids)
         has_sources = response.retrieval_status == "insufficient_evidence" or bool(response.sources)
-        acceptable = response.retrieval_status == case["expect_status"] and has_sources and not fabricated_sources
+        expected_kb_title = case.get("expected_knowledge_base_title")
+        has_expected_kb = expected_kb_title is None or any(
+            source.source_type == "knowledge_base" and source.title == expected_kb_title
+            for source in response.sources
+        )
+        acceptable = response.retrieval_status == case["expect_status"] and has_sources and not fabricated_sources and has_expected_kb
         if response.retrieval_status == "grounded":
             acceptable = acceptable and "Sources:" in response.answer
         results.append({
@@ -247,6 +317,8 @@ def evaluate_rag(service: RAGService) -> dict:
             "retrieval_status": response.retrieval_status,
             "source_count": len(response.sources),
             "fabricated_sources": fabricated_sources,
+            "expected_knowledge_base_title": expected_kb_title,
+            "knowledge_base_source_present": has_expected_kb,
             "answer": response.answer,
             "acceptable": acceptable,
         })

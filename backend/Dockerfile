@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY experiments/optimization /workspace/experiments/optimization
 COPY experiments/retrieval /workspace/experiments/retrieval
+COPY experiments/knowledge_base /workspace/experiments/knowledge_base
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=120s --retries=3 CMD curl -f http://localhost:8000/health || exit 1
 RUN useradd --create-home appuser

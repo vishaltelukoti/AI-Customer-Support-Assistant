@@ -1,0 +1,13 @@
+{
+  "configuration": {
+    "index_type": "IndexFlatIP",
+    "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+    "normalize_embeddings": true,
+    "top_k": 3
+  },
+  "embedding_dimension": 384,
+  "embedding_input": "title_and_chunk_text",
+  "index_file": "kb.faiss",
+  "indexed_chunks": 16,
+  "metadata_file": "kb_metadata.jsonl"
+}

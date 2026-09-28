@@ -37,6 +37,8 @@ export interface TicketResponse {
       category: string
       priority: string
       excerpt?: string | null
+      source_type?: 'ticket' | 'knowledge_base'
+      title?: string | null
     }>
     retrieval_status: string
   }

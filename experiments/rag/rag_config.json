@@ -1,5 +1,6 @@
 {
   "generation_model": "google/flan-t5-base",
+  "knowledge_base_artifact_dir": "C:\\Users\\Vishal Telukoti\\Desktop\\L-100_Data\\Assessments\\AI-ML_Advanced\\AI-Customer-Support-Assistant\\experiments\\knowledge_base",
   "max_context_chars_per_ticket": 900,
   "max_new_tokens": 120,
   "max_ticket_chars": 1200,

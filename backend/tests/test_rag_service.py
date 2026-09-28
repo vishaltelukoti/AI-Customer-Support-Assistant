@@ -6,7 +6,9 @@ from app.rag.rag_service import (
     build_context,
     build_grounded_prompt,
     evaluate_rag,
+    merge_ranked_results,
 )
+from app.rag.knowledge_base import KnowledgeBaseResult
 from app.rag.retrieval import RetrievalResult
 
 
@@ -32,6 +34,18 @@ class FakeGenerator:
         return self.text
 
 
+class FakeKnowledgeBaseRetriever:
+    def search(self, query, top_k=3):
+        lower = query.lower()
+        if "refund" in lower or "charged twice" in lower:
+            return [_kb_result("Refund Policy", 0.95)][:top_k]
+        if "payment" in lower or "checkout" in lower:
+            return [_kb_result("Payment FAQ", 0.95)][:top_k]
+        if "parcel" in lower or "tracking" in lower:
+            return [_kb_result("Shipping FAQ", 0.95)][:top_k]
+        return []
+
+
 def _result(ticket_id="train-1", score=0.8, answer="Reset the account password and confirm login works.",
             ticket_text="Customer cannot login to their account."):
     return RetrievalResult(
@@ -47,6 +61,17 @@ def _result(ticket_id="train-1", score=0.8, answer="Reset the account password a
         split="train",
         type="Incident",
         tags={"tag_1": "Account"},
+    )
+
+
+def _kb_result(title="Refund Policy", score=0.8):
+    return KnowledgeBaseResult(
+        rank=1,
+        score=score,
+        ticket_id=f"kb:{title.lower().replace(' ', '_')}:1",
+        title=title,
+        file_name=f"{title.lower().replace(' ', '_')}.txt",
+        chunk_text=f"{title}: fictional support policy content.",
     )
 
 
@@ -89,6 +114,30 @@ def test_insufficient_information_behavior_does_not_call_generator():
     assert generator.prompts == []
 
 
+def test_merged_ranking_returns_knowledge_base_source_metadata():
+    merged = merge_ranked_results([_result(score=0.7)], [_kb_result(score=0.9)], top_k=2)
+    assert merged[0].source_type == "knowledge_base"
+    service = RAGService(
+        FakeRetriever([_result(score=0.7)]),
+        FakeGenerator(),
+        RAGConfig(retrieval_threshold=0.55),
+        FakeKnowledgeBaseRetriever(),
+    )
+    response = service.generate_resolution("My checkout payment failed")
+    assert any(source.source_type == "knowledge_base" and source.title == "Payment FAQ" for source in response.sources)
+
+
+def test_missing_knowledge_base_artifacts_falls_back_to_ticket_only(monkeypatch, caplog):
+    monkeypatch.setattr("app.rag.rag_service.SimilarTicketRetriever.load_index", lambda _: FakeRetriever([_result()]))
+    monkeypatch.setattr(
+        "app.rag.rag_service.KnowledgeBaseRetriever.load_index",
+        lambda _: (_ for _ in ()).throw(FileNotFoundError("missing KB artifacts")),
+    )
+    service = RAGService.load(generator=FakeGenerator())
+    assert service.knowledge_base_retriever is None
+    assert "Knowledge-base artifacts are unavailable" in caplog.text
+
+
 def test_prompt_injection_ticket_is_wrapped_with_grounding_rules():
     generator = FakeGenerator("Do not reveal secrets. Use account reset steps.")
     service = RAGService(FakeRetriever([_result(score=0.9)]), generator, RAGConfig(retrieval_threshold=0.55))
@@ -109,8 +158,14 @@ def test_malicious_historical_content_is_treated_as_reference_not_instruction():
 
 
 def test_no_fabricated_source_ids_in_evaluation():
-    service = RAGService(FakeRetriever([_result("train-1", 0.9)]), FakeGenerator("Resolution body."))
+    service = RAGService(
+        FakeRetriever([_result("train-1", 0.9)]),
+        FakeGenerator("Resolution body."),
+        knowledge_base_retriever=FakeKnowledgeBaseRetriever(),
+    )
     evaluation = evaluate_rag(service)
     grounded = [case for case in evaluation["cases"] if case["expected_status"] == "grounded"]
     assert all(not case["fabricated_sources"] for case in grounded)
     assert evaluation["metrics"]["source_attribution_rate"] == 1.0
+    kb_cases = [case for case in evaluation["cases"] if case["expected_knowledge_base_title"]]
+    assert all(case["knowledge_base_source_present"] for case in kb_cases)

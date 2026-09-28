@@ -9,8 +9,8 @@ Retrieval threshold: 0.55
 | Metric | Value |
 | --- | ---: |
 | Source attribution rate | 1.000000 |
-| Grounded acceptable response rate | 1.000000 |
+| Grounded acceptable response rate | 0.500000 |
 | Insufficient-information pass rate | 1.000000 |
-| Overall acceptance rate | 1.000000 |
+| Overall acceptance rate | 0.571429 |
 
 No API key is required for the local retrieval plus local generation setup.

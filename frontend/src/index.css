@@ -49,5 +49,6 @@ dd { margin: 0; font-weight: 500; }
 .answer, .trace { white-space: pre-wrap; overflow-wrap: anywhere; }
 .compact-list { padding-left: 18px; margin: 8px 0 0; color: #344f5a; font-size: 13px; }
 .compact-list li { margin: 5px 0; overflow-wrap: anywhere; }
+.source-tag { margin-left: 4px; color: #1b6b68; font-weight: 700; }
 footer { color: #657b85; font-size: 12px; padding: 28px 0; }
 @media (max-width: 760px) { .workspace { padding: 20px; } .workspace-grid { grid-template-columns: 1fr; } .intro { margin-top: 30px; } .panel { padding: 22px; } header { flex-wrap: wrap; } }

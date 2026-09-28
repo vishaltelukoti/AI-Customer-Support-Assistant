@@ -51,6 +51,7 @@ experiments/baseline/   # Day 2 measured results, confusion matrices, ignored mo
 experiments/optimization/ # Day 3 search results and ignored optimized model artifacts
 experiments/dl_comparison/ # Day 4 and Day 5 category DL comparisons
 experiments/retrieval/ # Day 6 FAISS index, metadata, and retrieval evaluation
+experiments/knowledge_base/ # fictional KB FAISS artifacts for RAG
 experiments/rag/ # Day 7 RAG configuration and evaluation
 experiments/agents/ # Day 8 LangGraph workflow evaluation
 experiments/security/ # Day 9 deterministic security evaluation
@@ -304,12 +305,20 @@ No API key is required for the local Sentence Transformer + FAISS retrieval impl
 
 ## Suggested-resolution RAG
 
-Day 7 adds a small local RAG pipeline on top of the Day 6 FAISS index. The flow is: incoming `ticket_text` -> retrieve similar training historical tickets -> build bounded context with prior resolutions -> generate a concise suggested resolution with `google/flan-t5-base` -> return supporting source tickets. Retrieved answer text is allowed in the generation context as historical resolution evidence, but answers are still not used for retrieval embeddings.
+Day 7 adds a small local RAG pipeline on top of the Day 6 FAISS index. The flow is: incoming `ticket_text` -> retrieve similar training historical tickets and fictional knowledge-base chunks -> rank merged evidence -> build bounded context with prior resolutions and document titles -> generate a concise suggested resolution with `google/flan-t5-base` -> return supporting sources. Retrieved answer text is allowed in the generation context as historical resolution evidence, but answers are still not used for retrieval embeddings. KB chunks use the same local Sentence Transformer and are explicitly labeled `knowledge_base`; missing KB artifacts log a warning and preserve ticket-only behavior.
 
 Run from the repository root:
 
 ```powershell
 .\backend\.venv\Scripts\python.exe -m backend.app.rag.rag_service --use-local-model-for-eval
+```
+
+Build the fictional KB index first:
+
+```powershell
+cd backend
+python -m app.rag.knowledge_base
+cd ..
 ```
 
 The command saves `rag_config.json`, `rag_evaluation.json`, and `rag_evaluation.md` under `experiments/rag/`. Default Top-K is 3 and the POC retrieval threshold is 0.55. If no retrieved ticket meets the threshold, the service returns `insufficient_evidence` and does not fabricate a resolution.

@@ -1,3 +1,10 @@
-SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC FAQ, not an approved business policy.
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional POC FAQ, not an approved business policy.
 
-Tracking details appear in order history after dispatch. Delivery estimates may change when the carrier experiences delays. If tracking shows delivered but the parcel is missing, confirm the delivery address and ask the shipping team to investigate. Address changes require manual confirmation before dispatch.
+## Delays and tracking
+Tracking details appear in sample order history after dispatch. Delivery estimates can change when a carrier reports weather, capacity, or routing delays. Support should confirm the order reference and the latest tracking event, then explain that the displayed estimate may change. Do not invent a delivery date when the tracking record does not provide one.
+
+## Missing parcels
+If tracking shows delivered but the parcel is missing, confirm the delivery address through the approved support process and ask the customer to check safe delivery locations. Create a fictional shipping-team investigation with the order reference and tracking number. The team reviews the carrier record before any replacement or refund decision is made.
+
+## Address changes
+Address changes require manual confirmation before dispatch. After dispatch, support should not promise that a carrier can redirect the parcel. Customers can view available tracking details in order history. This is fictional sample content only, not a real shipping policy.

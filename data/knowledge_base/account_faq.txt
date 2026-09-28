@@ -1,3 +1,10 @@
-SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC FAQ, not an approved business policy.
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional POC FAQ, not an approved business policy.
 
-Use the Forgot password link to request a reset email and check the spam folder. If the email does not arrive, contact support through the approved account recovery process. Profile settings contain contact and delivery details. Support agents should never ask customers to share passwords or one-time sign-in codes.
+## Login and password reset
+Use the fictional sample store's Forgot password link to request a password-reset email. Customers should check spam or filtered folders and confirm they are using the email associated with the account. A reset link should be used only by the account owner. Support agents must never request a password, one-time sign-in code, recovery code, or security answer in chat.
+
+## Locked accounts
+Repeated failed sign-in attempts can temporarily lock a sample account. Ask the customer to pause further attempts, complete the password-reset process, and try again after the lock period shown by the account screen. If the lock continues after a completed reset, collect a non-sensitive order reference or account email through the approved support form and route it for account recovery review.
+
+## Account details
+Profile settings contain fictional contact and delivery details. Customers should update their own profile where available. Changes that affect an order already in progress require manual confirmation. This material is only sample FAQ text for the POC and is not an approved account-security policy.

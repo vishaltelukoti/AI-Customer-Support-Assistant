@@ -23,13 +23,13 @@ export function TicketResult({ ticket }: { ticket: TicketResponse | null }) {
           <section className="result-section">
             <h3>Workflow</h3>
             <p>{ticket.workflow.type === 'complex_multi_agent' ? 'Complex multi-agent' : ticket.workflow.type === 'simple_rag' ? 'Simple RAG' : ticket.workflow.type === 'blocked' ? 'Blocked' : 'Component fallback'} · {ticket.workflow.complexity}</p>
-            {ticket.workflow.trace.length > 0 && <p className="trace">{ticket.workflow.trace.join(' → ')}</p>}
+            {ticket.workflow.trace.length > 0 && <p className="trace">{ticket.workflow.trace.join(' -> ')}</p>}
           </section>
           <section className="result-section">
             <h3>Resolution</h3>
             <p className="answer">{ticket.response.answer}</p>
             {ticket.response.sources.length > 0 && <ul className="compact-list">{ticket.response.sources.map((source) => (
-              <li key={source.ticket_id}>{source.ticket_id} · {source.category} · {source.similarity_score.toFixed(3)}</li>
+              <li key={source.ticket_id}>{source.title ?? source.ticket_id} {source.source_type === 'knowledge_base' && <small className="source-tag">Knowledge base</small>} · {source.category} · {source.similarity_score.toFixed(3)}</li>
             ))}</ul>}
           </section>
           <section className="result-section">
@@ -46,7 +46,7 @@ export function TicketResult({ ticket }: { ticket: TicketResponse | null }) {
           </section>
         </div>
       ) : <p className="empty-state">Submit a customer ticket to see its integrated result here.</p>}
-      <p className="result-note">Responses are grounded in retrieved synthetic historical tickets and remain POC-only.</p>
+      <p className="result-note">Responses are grounded in retrieved synthetic historical tickets and fictional knowledge-base content; they remain POC-only.</p>
     </section>
   )
 }

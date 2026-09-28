@@ -32,6 +32,11 @@ artifacts/
 *.h5
 *.safetensors
 experiments/mlflow/mlruns/
+experiments/knowledge_base/*
+!experiments/knowledge_base/.gitkeep
+!experiments/knowledge_base/kb.faiss
+!experiments/knowledge_base/kb_metadata.jsonl
+!experiments/knowledge_base/kb_config.json
 data/raw/*
 !data/raw/.gitkeep
 !data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv

@@ -67,6 +67,8 @@ class SourceView(BaseModel):
     category: str
     priority: str
     excerpt: str | None = None
+    source_type: Literal["ticket", "knowledge_base"] = "ticket"
+    title: str | None = None
 
 
 class WorkflowView(BaseModel):

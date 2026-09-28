@@ -188,7 +188,7 @@ class SecurityService:
     def _check_retrieved_items(self, retrieved_tickets: list[dict[str, Any]]) -> list[SecurityResult]:
         checks = []
         for item in retrieved_tickets:
-            text = " ".join(str(item.get(key, "")) for key in ("ticket_text", "answer"))
+            text = " ".join(str(item.get(key, "")) for key in ("ticket_text", "answer", "chunk_text"))
             result = self.check_retrieved_content(text)
             if result.category == "untrusted_retrieved_content":
                 checks.append(result)

@@ -94,6 +94,9 @@ class TicketProcessor:
             self.retriever,
             generator=_create_generator(rag_config),
             config=rag_config,
+            knowledge_base_retriever=RAGService.load_optional_knowledge_base(
+                Path(rag_config.knowledge_base_artifact_dir)
+            ),
         )
         self.agent_workflow = SupportAgentWorkflow(
             RetrievalTool(self.retriever),

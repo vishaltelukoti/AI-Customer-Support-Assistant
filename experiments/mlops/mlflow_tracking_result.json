@@ -1,6 +1,6 @@
 {
-  "run_id": "350bc9ec24cd489abd1e8fe2206ff640",
-  "experiment_id": "384551459782427198",
+  "run_id": "b7643dc74228412aa6c3ac4e129d5c4b",
+  "experiment_id": "176490633320374805",
   "tracked_metrics": {
     "category_test_accuracy": 0.6527947776417788,
     "category_test_macro_f1": 0.6415383542430868,

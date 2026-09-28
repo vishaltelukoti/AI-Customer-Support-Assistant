@@ -1,3 +1,10 @@
-SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC FAQ, not an approved business policy.
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional POC FAQ, not an approved business policy.
 
-A pending authorization may appear before a payment settles. For a possible duplicate charge, ask for the order reference and transaction dates, then have the payments team review the records. Never request a full card number or card security code. Invoices are available from the sample store's order history.
+## Failed payments
+When a payment fails at checkout, ask the customer to confirm the billing address, available funds, and whether the card issuer has declined the transaction. The customer can try again after checking those details or use another supported method. Do not ask for a full card number, card security code, password, or one-time code. If several attempts fail, route the order reference to the fictional payments support queue.
+
+## Double charges and authorizations
+A pending authorization can appear before a payment settles and may resemble a duplicate charge. Collect the order reference and transaction dates, then request a payment-record review. Avoid promising that a pending authorization has been refunded until the records confirm it. A confirmed duplicate follows the fictional refund policy and is returned to the original payment method after review.
+
+## Payment methods
+This sample checkout supports the fictional methods displayed at checkout. Invoices and payment status are available from sample order history. Support can explain an existing invoice or payment status, but must not alter payment details through chat. This FAQ is sample content only and is not a real business payment policy.

@@ -1,3 +1,10 @@
-SAMPLE KNOWLEDGE-BASE CONTENT - fictional Day 1 POC policy, not an approved business policy.
+SAMPLE KNOWLEDGE-BASE CONTENT - fictional POC policy, not an approved business policy.
 
-For this sample store, customers may request a return of an unused item within 30 days of delivery. A support agent should confirm eligibility and the order reference before proceeding. Approved refunds return to the original payment method and may take 5-10 business days. Escalate missing or incorrect refunds for manual review.
+## Duplicate charges
+If a customer reports two charges for one order, collect the order reference, transaction dates, and the last four digits only if the customer volunteers them. Explain that a pending authorization can look like a second charge while the payment provider settles the transaction. Do not request a full card number or security code. Send confirmed duplicate-charge cases to the fictional payments review queue for a transaction check.
+
+## Refund timelines
+For this fictional sample store, an approved refund is returned to the original payment method. The sample timeline is five to ten business days after approval, although a bank can display the credit later. Support should confirm the order reference and refund status before quoting the timeline. If the stated window has passed, create a manual review request rather than promising a new date.
+
+## Cancelled orders
+An order cancelled before dispatch may not capture payment, but an authorization can remain visible temporarily. If payment was captured, the order should follow the sample refund process. Confirm cancellation status and order reference, then explain whether a refund review is pending. This content is fictional and does not replace a real merchant policy.

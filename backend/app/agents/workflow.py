@@ -200,6 +200,7 @@ class SupportAgentWorkflow:
             }
             return {
                 **state,
+                "retrieved_tickets": rag_response.retrieved_tickets,
                 "final_response": response,
                 "status": "completed",
                 "workflow_trace": _append_trace(state, "Resolution Agent: generated grounded response."),

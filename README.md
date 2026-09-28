@@ -60,7 +60,6 @@ experiments/mlflow/ # ignored local MLflow run store can be regenerated
 experiments/integration/ # Day 12 integrated API/workflow evaluation
 experiments/final_validation/ # Day 13 final validation record
 airflow/                # Airflow DAG for lightweight validation
-mlflow/                 # placeholder so imports prefer installed MLflow package
 docs/                   # architecture, evaluation, demo, assumptions, validation
 .github/workflows/      # backend CI workflow
 docker-compose.yml

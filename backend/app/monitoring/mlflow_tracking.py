@@ -74,7 +74,7 @@ def run_mlflow_tracking(output_dir: Path = MLOPS_DIR, mlflow_dir: Path = MLFLOW_
 
 
 def _import_mlflow():
-    """Import the installed MLflow package despite the repo's placeholder mlflow/ directory."""
+    """Import and validate the installed MLflow package for local tracking."""
     removed = []
     root_text = str(ROOT)
     for entry in list(sys.path):

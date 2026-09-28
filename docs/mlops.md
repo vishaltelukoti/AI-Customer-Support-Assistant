@@ -31,7 +31,7 @@ Inspect with:
 mlflow ui --backend-store-uri file:///.../experiments/mlflow/mlruns
 ```
 
-The repository has a placeholder `mlflow/` directory, so the tracking module explicitly imports the installed MLflow package rather than the placeholder.
+The tracking module keeps a compatibility import helper so local execution consistently resolves the installed MLflow package.
 
 ## Metrics Summary
 

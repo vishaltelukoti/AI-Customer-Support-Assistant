@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import joblib
 
 from app.explainability.fairness import (

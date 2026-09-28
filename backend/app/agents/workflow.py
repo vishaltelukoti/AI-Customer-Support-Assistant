@@ -1,7 +1,6 @@
 """Day 8 LangGraph multi-agent workflow for support ticket investigation."""
 
 import argparse
-import argparse
 import json
 import logging
 import platform
@@ -18,7 +17,6 @@ from ..rag.rag_service import (
     DEFAULT_GENERATION_MODEL,
     DEFAULT_RETRIEVAL_THRESHOLD,
     RAGConfig,
-    RAGResponse,
     RAGService,
     _EvaluationCaseGenerator,
 )

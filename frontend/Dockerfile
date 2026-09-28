@@ -8,5 +8,9 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 FROM nginx:alpine
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+RUN sed -i 's/listen       80;/listen       8080;/' /etc/nginx/conf.d/default.conf \
+    && chown -R appuser:appuser /var/cache/nginx /var/log/nginx /var/run /etc/nginx/conf.d
+USER appuser
+EXPOSE 8080

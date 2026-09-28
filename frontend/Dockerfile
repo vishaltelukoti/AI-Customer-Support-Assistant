@@ -11,6 +11,7 @@ FROM nginx:alpine
 RUN addgroup -S appuser && adduser -S appuser -G appuser
 COPY --from=build /app/dist /usr/share/nginx/html
 RUN sed -i 's/listen       80;/listen       8080;/' /etc/nginx/conf.d/default.conf \
-    && chown -R appuser:appuser /var/cache/nginx /var/log/nginx /var/run /etc/nginx/conf.d
+    && sed -i 's#pid .*;#pid /tmp/nginx.pid;#' /etc/nginx/nginx.conf \
+    && chown -R appuser:appuser /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
 USER appuser
 EXPOSE 8080

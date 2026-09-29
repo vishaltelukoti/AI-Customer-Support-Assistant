@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, tickets
+from app.api.routes import health, monitoring, tickets
 from app.core.config import Settings
 from app.monitoring.metrics import monitor
 from app.services import ticket_service
@@ -25,7 +25,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(
         title=settings.app_name,
         version="0.1.0",
-        description="Day 1 foundation. Tickets are acknowledged, not classified or stored.",
+        description=(
+            "POC support assistant with local classification, similar-ticket retrieval, "
+            "RAG/agent routing, input/output filtering, explanations and lightweight monitoring."
+        ),
         lifespan=lifespan,
     )
     application.add_middleware(
@@ -42,7 +45,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         error = False
         try:
             response = await call_next(request)
-            error = response.status_code >= 500
+            error = response.status_code >= 400
             return response
         except Exception:
             logger.exception("HTTP request handling failed")
@@ -52,6 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             monitor.record_request(time.perf_counter() - started, error=error)
 
     application.include_router(health.router)
+    application.include_router(monitoring.router)
     application.include_router(tickets.router)
     return application
 

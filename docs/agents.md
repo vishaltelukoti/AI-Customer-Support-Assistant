@@ -2,7 +2,7 @@
 
 ## Scope
 
-Day 8 adds a lightweight LangGraph workflow for complex support-ticket handling. It does not add FastAPI integration, persistent memory, agent memory stores, production orchestration, or Day 9 security controls.
+Day 8 added a lightweight LangGraph workflow for complex support-ticket handling. Day 8 itself did not add FastAPI integration, persistent memory, agent memory stores, production orchestration, or Day 9 input/output filtering; the completed POC later reuses this workflow for complex API tickets.
 
 ## Architecture
 
@@ -65,6 +65,10 @@ Artifacts are saved in `experiments/agents/`:
 - `agent_evaluation.json`
 - `agent_evaluation.md`
 
+## Integrated Use
+
+`POST /api/v1/tickets` applies deterministic complexity routing. Simple tickets use the direct RAG path; complex tickets invoke this LangGraph workflow, whose Retrieval Agent calls the existing FAISS retrieval tool before the Resolution Agent returns a grounded response. Workflow state and memory remain request-local.
+
 ## Limitations
 
-The evaluation is small and demonstrates workflow mechanics, not real-world accuracy. Routing is heuristic. The default evaluation can use a deterministic local evaluation generator; the workflow can also load the existing local `google/flan-t5-base` generation path. No production security, human approval flow, monitoring, persistence, or API integration is included.
+The evaluation is small and demonstrates workflow mechanics, not real-world accuracy. Routing is heuristic. The default evaluation can use a deterministic local evaluation generator; the workflow can also load the existing local `google/flan-t5-base` generation path. The final API integration is POC-scale; there is still no production security, human approval flow, persistent memory, or production agent infrastructure.

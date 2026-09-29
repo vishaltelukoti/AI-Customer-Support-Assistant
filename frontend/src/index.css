@@ -46,9 +46,23 @@ dd { margin: 0; font-weight: 500; }
 .result-stack { display: grid; gap: 16px; }
 .result-section { border-top: 1px solid #edf1f3; padding-top: 14px; }
 .result-section h3 { font-size: 14px; margin: 0 0 8px; }
+.result-section h4 { font-size: 12px; margin: 14px 0 6px; color: #48616b; }
 .answer, .trace { white-space: pre-wrap; overflow-wrap: anywhere; }
+.agent-trace { margin: 8px 0 0; padding-left: 20px; color: #344f5a; font-size: 13px; }
+.agent-trace li { margin: 5px 0; text-transform: capitalize; }
+.security-status { display: inline-block; margin: 0 0 10px; padding: 5px 8px; border-radius: 5px; font-size: 12px; font-weight: 700; }
+.security-safe { color: #276347; background: #e9f5ed; }
+.security-blocked { color: #8b2d25; background: #fff1ef; }
+.abstention { margin: 0 0 12px; padding: 10px; border-left: 3px solid #b47619; background: #fff8e8; color: #744d10; font-size: 13px; }
 .compact-list { padding-left: 18px; margin: 8px 0 0; color: #344f5a; font-size: 13px; }
 .compact-list li { margin: 5px 0; overflow-wrap: anywhere; }
 .source-tag { margin-left: 4px; color: #1b6b68; font-weight: 700; }
+.monitoring-panel { margin-top: 24px; padding: 24px 28px; border-top: 1px solid #dce5e8; border-bottom: 1px solid #dce5e8; }
+.secondary-button { color: #164e63; background: #e9f1f3; padding: 9px 12px; font-size: 12px; }
+.secondary-button:hover { background: #d7e7eb; }
+.monitoring-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; margin-top: 18px; }
+.monitoring-list, .system-info dl { margin: 0; }
+.monitoring-list > div, .system-info dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid #edf1f3; font-size: 13px; }
+.system-info h3 { margin: 0 0 6px; font-size: 14px; }
 footer { color: #657b85; font-size: 12px; padding: 28px 0; }
-@media (max-width: 760px) { .workspace { padding: 20px; } .workspace-grid { grid-template-columns: 1fr; } .intro { margin-top: 30px; } .panel { padding: 22px; } header { flex-wrap: wrap; } }
+@media (max-width: 760px) { .workspace { padding: 20px; } .workspace-grid, .monitoring-grid { grid-template-columns: 1fr; } .intro { margin-top: 30px; } .panel, .monitoring-panel { padding: 22px; } header { flex-wrap: wrap; } }

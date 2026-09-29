@@ -8,7 +8,7 @@ The project uses a publicly available, synthetically generated customer-support 
 - **Synthetic provenance:** [Creator's dataset description](https://softoft.de/blog/ticket-dataset/)
 - **Only selected input:** `data/raw/aa_dataset-tickets-multi-lang-5-2-50-version.csv`
 
-No other dataset variants were downloaded, added or combined. The original 20-row Day 1 hand-written sample CSV was removed during final     cleanup because it is not part of the selected assessment dataset and is not read by the selected-data pipeline or its tests. Neither raw nor processed data is loaded directly by the API.
+No other dataset variants were downloaded, added or combined. The original 20-row Day 1 hand-written sample CSV was removed during final cleanup because it is not part of the selected assessment dataset and is not read by the selected-data pipeline or its tests. Neither raw nor processed data is loaded directly by the API.
 
 The Kaggle page describes the dataset collection; measured local values below take precedence over collection-wide descriptions. In particular, this file has two languages, eight tag columns, no ticket ID or business-type column, and lowercase `low`, `medium`, `high` priorities. Row-level `version` is not a Kaggle release number and is not a quality score.
 

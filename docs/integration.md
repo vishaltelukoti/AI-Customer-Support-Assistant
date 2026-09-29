@@ -47,7 +47,7 @@ The response contains:
 
 ## Frontend
 
-The React support page now collects subject and body, posts `top_k: 3`, and renders the integrated response. It shows classification, similar tickets, final response, sources, workflow trace, security status, explanation terms and timings. It keeps the existing validation and connection-error handling.
+The React support page now collects subject and body, posts `top_k: 3`, and renders the integrated response. It shows classification, similar tickets, final response, sources, workflow trace, security status, explanation terms, timings and the lightweight `/monitoring` summary. It keeps the existing validation and connection-error handling.
 
 ## Evaluation
 
@@ -82,7 +82,7 @@ Latest measured result:
 
 ## Monitoring
 
-The existing Day 11 in-memory monitor records request count/error/latency in middleware. The integrated ticket flow also records model prediction count and retrieval latency. `/health` remains cheap and only checks artifact availability; it does not load models or run inference.
+`GET /monitoring` exposes the existing Day 11 in-memory, process-local request/error counts, average API latency, model prediction count, retrieval request count and average retrieval latency. It also loads the saved category Macro-F1 and retrieval Recall@3 quality values. Counters reset when the backend restarts. `/health` remains cheap and only checks artifact availability; it does not load models or run inference.
 
 ## Limitations
 

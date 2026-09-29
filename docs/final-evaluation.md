@@ -1,6 +1,6 @@
 # Final Evaluation Summary
 
-This page summarizes measured POC results already generated during Days 2-12. These values are not production accuracy claims.
+This page summarizes measured POC results already generated during Days 2-13. These values are historical experiment and validation records, not production accuracy claims or a statement about a current local runtime environment.
 
 ## Classical ML
 
@@ -23,7 +23,7 @@ Source: `docs/deep-learning.md` and Day 5 artifacts. The Day 5 JSON files exist,
 | Attention | 0.044922 | 0.044922 |
 | DistilBERT | 0.121775 | 0.120542 |
 
-Selected Day 5 DL model: DistilBERT, selected by validation Macro-F1. The DL comparison stayed below the Day 3 optimized classical category model.
+Selected Day 5 DL model: DistilBERT, selected by validation Macro-F1. This is the DL-comparison winner only; the integrated application uses the stronger Day 3 optimized TF-IDF + Logistic Regression category classifier. The DL comparison stayed below that classical model.
 
 ## Retrieval
 
@@ -45,7 +45,7 @@ Source: Day 7 generated documentation and validation record.
 
 | Metric | Value |
 | --- | ---: |
-| Predefined evaluation cases | 4 |
+| Predefined evaluation cases | 7 |
 | Source attribution rate | 1.000000 |
 | Grounded acceptable response rate | 1.000000 |
 | Insufficient-information pass rate | 1.000000 |

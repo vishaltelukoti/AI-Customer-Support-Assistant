@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { MonitoringPanel } from '../components/MonitoringPanel'
 import { TicketResult } from '../components/TicketResult'
-import { getApiError, submitTicket } from '../services/api'
-import type { TicketResponse } from '../types/ticket'
+import { getApiError, getMonitoring, submitTicket } from '../services/api'
+import type { MonitoringResponse, TicketResponse } from '../types/ticket'
 
 export function SupportPage() {
   const [subject, setSubject] = useState('')
@@ -9,6 +10,25 @@ export function SupportPage() {
   const [ticket, setTicket] = useState<TicketResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [monitoring, setMonitoring] = useState<MonitoringResponse | null>(null)
+  const [monitoringLoading, setMonitoringLoading] = useState(false)
+  const [monitoringUnavailable, setMonitoringUnavailable] = useState(false)
+
+  async function refreshMonitoring() {
+    setMonitoringLoading(true)
+    try {
+      setMonitoring(await getMonitoring())
+      setMonitoringUnavailable(false)
+    } catch {
+      setMonitoringUnavailable(true)
+    } finally {
+      setMonitoringLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void refreshMonitoring()
+  }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -24,6 +44,7 @@ export function SupportPage() {
     setLoading(true)
     try {
       setTicket(await submitTicket({ subject: cleanSubject, body: cleanBody, top_k: 3 }))
+      void refreshMonitoring()
     } catch (cause) {
       setError(getApiError(cause))
     } finally {
@@ -66,6 +87,12 @@ export function SupportPage() {
         </section>
         <TicketResult ticket={ticket} />
       </div>
+      <MonitoringPanel
+        monitoring={monitoring}
+        loading={monitoringLoading}
+        unavailable={monitoringUnavailable}
+        onRefresh={() => { void refreshMonitoring() }}
+      />
       <footer>Day 12 POC · Integrated assistant workflow</footer>
     </main>
   )

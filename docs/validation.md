@@ -43,7 +43,7 @@ During the clean integration evaluation, the local Sentence Transformer loader a
 
 ## Day 11 MLOps validation (2026-09-24)
 
-Day 11 is complete. It added local POC MLOps without retraining models, rebuilding retrieval, changing RAG/agents/security/explainability, or adding API/UI integration.
+Day 11 is complete. It added local POC MLOps without retraining classifiers, changing RAG/agents/security/explainability, or adding API/UI integration. The daily DAG rebuilds retrieval artifacts from the approved training-only corpus.
 
 | Check | Result |
 | --- | --- |
@@ -51,10 +51,10 @@ Day 11 is complete. It added local POC MLOps without retraining models, rebuildi
 | MLflow tracking | Local file-based run created |
 | MLflow run ID | `350bc9ec24cd489abd1e8fe2206ff640` |
 | Metrics summary | Classification and retrieval metrics loaded from existing artifacts |
-| Airflow DAG | `ticket_processing_embedding_refresh` with four tasks |
+| Airflow DAG | `ticket_processing_embedding_refresh` runs daily: validate data, rebuild training-only vectors/FAISS, validate artifacts |
 | Docker build | Passed: `ai-customer-support-backend-day11:latest` |
-| CI workflow | `.github/workflows/backend-ci.yml` |
-| Monitoring | In-memory counters and latency timers |
+| CI workflows | Backend lint/tests/Docker health validation and frontend TypeScript/production-build validation |
+| Monitoring | In-memory, process-local counters/latency timers; `/monitoring` also exposes saved category Macro-F1 and retrieval Recall@3 |
 | Health endpoint | `/health` returns status, service name, classifier artifact availability and retrieval index availability |
 | Artifacts | `experiments/mlops/ml_metrics.json`, `ml_metrics.md`, `mlflow_config.json`, `mlflow_tracking_result.json`, `airflow_validation.md` |
 

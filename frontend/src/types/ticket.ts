@@ -62,3 +62,14 @@ export interface TicketResponse {
   }
   status: 'completed' | 'blocked' | 'error'
 }
+
+export interface MonitoringResponse {
+  request_count: number
+  error_count: number
+  average_latency_ms: number
+  model_prediction_count: number
+  retrieval_request_count: number
+  average_retrieval_latency_ms: number
+  model_quality: { metric: 'macro_f1'; value: number }
+  retrieval_quality: { metric: 'recall_at_3'; value: number }
+}

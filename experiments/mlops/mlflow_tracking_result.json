@@ -1,5 +1,5 @@
 {
-  "run_id": "b7643dc74228412aa6c3ac4e129d5c4b",
+  "run_id": "901716fa3ad04d53b12fd23a82f3d5d8",
   "experiment_id": "176490633320374805",
   "tracked_metrics": {
     "category_test_accuracy": 0.6527947776417788,
@@ -11,6 +11,10 @@
     "retrieval_recall_at_5": 0.844,
     "retrieval_mrr": 0.7224999999999998
   },
+  "tracked_model_artifacts": [
+    "models/category_optimized.joblib",
+    "models/priority_optimized.joblib"
+  ],
   "environment": {
     "python": "3.14.4"
   }

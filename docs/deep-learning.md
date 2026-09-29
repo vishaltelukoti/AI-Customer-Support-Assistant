@@ -34,6 +34,10 @@ Generated artifact: `experiments/dl_comparison/day5/dl_comparison_results.json`.
 
 Selected Day 5 DL model: DistilBERT, selected based on validation Macro-F1. Final selected-model test Macro-F1 is 0.120542.
 
+## Selection Boundary
+
+DistilBERT is the selected model within the constrained Day 5 DL comparison only. The integrated application instead loads the Day 3 optimized TF-IDF + Logistic Regression classifiers because their measured category performance is substantially stronger. These are separate selection decisions: the DL experiment winner is not the application classifier.
+
 The pretrained model completed successfully after downloading the public checkpoint into a local Hugging Face cache. No Hugging Face token or external API was used.
 
 ## Artifacts

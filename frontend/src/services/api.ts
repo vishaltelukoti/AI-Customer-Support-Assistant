@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { TicketCreate, TicketResponse } from '../types/ticket'
+import type { MonitoringResponse, TicketCreate, TicketResponse } from '../types/ticket'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
@@ -8,6 +8,11 @@ const api = axios.create({
 
 export async function submitTicket(ticket: TicketCreate): Promise<TicketResponse> {
   const response = await api.post<TicketResponse>('/api/v1/tickets', ticket)
+  return response.data
+}
+
+export async function getMonitoring(): Promise<MonitoringResponse> {
+  const response = await api.get<MonitoringResponse>('/monitoring')
   return response.data
 }
 

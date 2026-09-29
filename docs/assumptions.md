@@ -3,7 +3,7 @@
 - This is a single-developer, local assessment POC built on the existing Git repository. Its working API/UI, raw sample data, tests and Docker configuration are preserved.
 - Python 3.12+ and Node.js 22.12+ are prerequisites. Local validation uses the available Python 3.14 and Node 24; the backend Docker image uses Python 3.12.
 - Synthetic data is sufficient for this POC. All included ticket examples and knowledge-base text are fictional, not production customer data or business policy.
-- Only the selected Kaggle CSV is processed. Its ten queue labels and lowercase low/medium/high priorities are preserved; seed 42 produces grouped queue/priority 70/15/15 splits of English tickets. All source versions are retained and raw bytes stay unchanged. The old 20-row sample is historical only.
+- Only the selected Kaggle CSV is processed. Its ten queue labels and lowercase low/medium/high priorities are preserved; seed 42 produces grouped queue/priority 70/15/15 splits of English tickets. All source versions are retained and raw bytes stay unchanged. The old 20-row sample was removed and is not an active input.
 - The project owner supplied the selected Kaggle dataset locally. No other variants are used. Synthetic class imbalance, annotation quality and unknown paraphrase relationships limit evaluation claims; review severity definitions before deployment.
 - Ticket intake runs the integrated local POC flow, but it does not persist tickets. Reloading the page clears the displayed result.
 - The 10,000-character limit is a POC input constraint. Surrounding whitespace is trimmed. HTTP 200 means an integrated response, blocked response or structured component-failure fallback, and HTTP 422 means invalid request.

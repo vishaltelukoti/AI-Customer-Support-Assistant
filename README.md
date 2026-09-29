@@ -14,7 +14,7 @@ Customer-support teams need a fast way to classify incoming tickets, find releva
 - Simple/complex routing with a lightweight LangGraph multi-agent workflow.
 - Deterministic POC input/output pattern filter before and after the AI workflow.
 - Classification explanations and subgroup diagnostics using available metadata.
-- Local MLOps artifacts: MLflow tracking, Airflow validation DAG, CI workflow, Docker build and in-memory monitoring.
+- Local MLOps artifacts: MLflow tracking, daily Airflow retrieval-refresh DAG, CI workflow, Docker build and in-memory monitoring.
 - React UI plus FastAPI endpoint for end-to-end demo.
 
 ## End-to-end flow
@@ -44,7 +44,7 @@ frontend/
   .env.example
   Dockerfile
 data/
-  raw/                  # selected Kaggle CSV; legacy 20-row sample retained
+  raw/                  # selected Kaggle CSV used by preprocessing
   processed/            # train/validation/test, audit JSON, historical tickets
   knowledge_base/       # four short fictional sample documents
 experiments/baseline/   # Day 2 measured results, confusion matrices, ignored model artifacts
@@ -60,7 +60,7 @@ experiments/mlops/ # Day 11 metric summaries and MLflow run metadata
 experiments/mlflow/ # ignored local MLflow run store can be regenerated
 experiments/integration/ # Day 12 integrated API/workflow evaluation
 experiments/final_validation/ # Day 13 final validation record
-airflow/                # Airflow DAG for lightweight validation
+airflow/                # daily training-only retrieval-index refresh DAG
 docs/                   # architecture, evaluation, demo, assumptions, validation
 .github/workflows/      # backend CI workflow
 docker-compose.yml
@@ -121,10 +121,12 @@ Explicit CORS origins follow [FastAPI's CORS configuration](https://fastapi.tian
 | Method | Endpoint | Behavior |
 | --- | --- | --- |
 | GET | /health | HTTP 200: `{"status":"healthy"}` |
+| GET | /monitoring | Lightweight process-local runtime counters and saved quality metrics |
 | POST | /api/v1/tickets | HTTP 200 integrated support-assistant response; HTTP 422 on invalid input |
 
 ```powershell
 Invoke-RestMethod http://localhost:8000/health
+Invoke-RestMethod http://localhost:8000/monitoring
 Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/tickets -ContentType 'application/json' -Body '{"subject":"Payment failed","body":"My card payment failed during checkout. Invoice unpaid.","top_k":3}'
 ```
 
@@ -144,7 +146,15 @@ Example response (the UUID changes per request):
     "priority": "medium",
     "priority_confidence": 0.8322446406752919
   },
-  "similar_tickets": [],
+  "similar_tickets": [
+    {
+      "ticket_id": "KAGGLE-example-000433",
+      "score": 0.812,
+      "category": "Billing and Payments",
+      "priority": "medium",
+      "ticket_text": "A historical payment failure during checkout."
+    }
+  ],
   "workflow": {
     "complexity": "simple",
     "type": "simple_rag",
@@ -152,7 +162,17 @@ Example response (the UUID changes per request):
   },
   "response": {
     "answer": "Review the similar historical resolutions...",
-    "sources": [],
+    "sources": [
+      {
+        "ticket_id": "KAGGLE-example-000433",
+        "similarity_score": 0.812,
+        "category": "Billing and Payments",
+        "priority": "medium",
+        "excerpt": "A historical payment failure during checkout.",
+        "source_type": "ticket",
+        "title": null
+      }
+    ],
     "retrieval_status": "grounded"
   },
   "explanation": {
@@ -280,6 +300,8 @@ The command saves Day 5 result artifacts under `experiments/dl_comparison/day5/`
 
 Selected Day 5 DL model: DistilBERT, selected based on validation Macro-F1. Its final test Macro-F1 is 0.120542. This remains far below the Day 3 optimized category TF-IDF result and is not production-ready. Full measured values and limitations are in [the generated Day 5 report](experiments/dl_comparison/day5/dl_comparison_results.md) and [the DL documentation](docs/deep-learning.md).
 
+This is a DL-comparison decision, not the integrated application-model decision. The API continues to load the stronger Day 3 optimized TF-IDF + Logistic Regression classifiers; DistilBERT is the winner only within the constrained Day 5 DL comparison.
+
 ## Similar-ticket retrieval
 
 Day 6 builds local similar-ticket retrieval for future RAG work. It embeds training-only historical ticket text with `sentence-transformers/all-MiniLM-L6-v2`, stores normalized 384-dimensional vectors in a FAISS `IndexFlatIP`, and saves metadata separately so search results include ticket ID, ticket text, category, priority, answer, source/version/type, tags, and similarity score. No validation or test tickets are indexed, and answer text is not used for embeddings.
@@ -322,6 +344,8 @@ cd ..
 ```
 
 The command saves `rag_config.json`, `rag_evaluation.json`, and `rag_evaluation.md` under `experiments/rag/`. Default Top-K is 3 and the POC retrieval threshold is 0.55. If no retrieved ticket meets the threshold, the service returns `insufficient_evidence` and does not fabricate a resolution.
+
+The fixed RAG evaluation contains seven POC cases covering ticket grounding, insufficient information, prompt-injection-as-data behavior, and knowledge-base source attribution. These are narrow acceptance checks, not a general answer-quality benchmark.
 
 | Metric | Value |
 | --- | ---: |
@@ -397,7 +421,7 @@ Subgroup diagnostics use only available non-sensitive metadata: `version` and `t
 
 ## MLOps
 
-Day 11 adds local MLflow tracking, a compact metrics summary, one Airflow DAG, a backend CI workflow, in-memory monitoring counters, and an expanded health endpoint. It reuses existing Day 3 classification metrics and Day 6 retrieval metrics; no models or indexes are rebuilt.
+Day 11 adds local MLflow tracking, a compact metrics summary, one Airflow DAG, a backend CI workflow, in-memory monitoring counters, and an expanded health endpoint. MLflow records the existing selected Day 3 parameters and evaluation metrics, Day 6 retrieval metrics, run/model identity tags, and the selected `category_optimized.joblib` and `priority_optimized.joblib` artifacts under each local run. The daily DAG rebuilds the existing training-ticket Sentence Transformer embeddings and FAISS index from processed historical tickets, then validates index/metadata counts and training-only membership; it does not retrain models.
 
 Run from the repository root:
 
@@ -417,11 +441,11 @@ Key tracked metrics:
 | Retrieval Recall@1 / @3 / @5 | 0.656000 / 0.764000 / 0.844000 |
 | Retrieval MRR | 0.722500 |
 
-The single DAG is `ticket_processing_embedding_refresh`: `validate_data -> prepare_ticket_data -> refresh_embeddings -> validate_retrieval_index`. The CI workflow is `.github/workflows/backend-ci.yml`. Docker build validation succeeded with `docker build -t ai-customer-support-backend-day11 ./backend`, though the image is large because existing ML dependencies pull torch/transformers stacks.
+The single daily DAG is `ticket_processing_embedding_refresh`: `validate_data -> prepare_ticket_data -> refresh_embeddings -> validate_retrieval_index`. It overwrites rather than appends the training-only FAISS index, so a manual or scheduled rerun remains idempotent. `.github/workflows/backend-ci.yml` runs backend lint/tests, builds the container, and smoke-tests `/health`; `.github/workflows/frontend-ci.yml` runs TypeScript validation and the Vite production build. Neither workflow deploys the application. Docker validation is performed by the workflow when its runner has Docker access; the image is large because existing ML dependencies pull torch/transformers stacks.
 
 ## Integrated assistant API
 
-Day 12 wires the prior POC pieces into the `/api/v1/tickets` API and the React UI. The backend flow is input security -> Day 3 optimized category/priority classification -> Day 6 FAISS retrieval -> deterministic complexity routing -> simple Day 7 RAG or complex Day 8 LangGraph workflow -> output security -> Day 10-style explanation -> structured API response. Day 11 monitoring records request, model-prediction and retrieval counters plus latencies.
+Day 12 wires the prior POC pieces into the `/api/v1/tickets` API and the React UI. The backend flow is input security -> Day 3 optimized category/priority classification -> Day 6 FAISS retrieval -> deterministic complexity routing -> simple Day 7 RAG or complex Day 8 LangGraph workflow -> output security -> Day 10-style explanation -> structured API response. The UI presents the returned classification, retrieval, workflow, source, security and explanation evidence, and reads `GET /monitoring` for in-memory request/error counts, latency, counters, category Macro-F1 and retrieval Recall@3. These runtime counters reset on application restart and are intentionally POC-scale.
 
 Run from the repository root:
 
@@ -519,6 +543,6 @@ For another browser-accessible backend address, set `$env:VITE_API_BASE_URL='htt
 - [Validation results and browser-check limitation](docs/validation.md)
 - [Known POC limitations](docs/KNOWN_LIMITATIONS.md)
 
-The selected Kaggle tickets and legacy 20-row sample are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API now loads local saved models/artifacts for classification, retrieval, RAG/agents, security and explanations, but it does not persist tickets or authenticate users. The integration remains POC-scoped and should not be treated as production-ready support automation.
+The selected Kaggle tickets are synthetic development data; the four knowledge-base documents are fictional sample content, not business policy. The API now loads local saved models/artifacts for classification, retrieval, RAG/agents, security and explanations, but it does not persist tickets or authenticate users. The integration remains POC-scoped and should not be treated as production-ready support automation.
 
 POC tradeoffs and limitations: evaluations are small and predefined outside the classifier/retrieval metrics; classification probabilities are uncalibrated; retrieval relevance uses category-level matching; security is rule-based; fairness diagnostics use available metadata rather than protected demographic attributes; Day 4/5 DL runs are CPU-constrained; MLflow is local; Airflow validation is lightweight; there is no authentication/RBAC, database, persistent ticket storage, production deployment, or guarantee of production answer quality. A restrictive placeholder LICENSE is included; the project owner can select an open-source license if needed.

@@ -1,4 +1,4 @@
-"""Log existing Day 3 optimized model metrics to a local MLflow store."""
+"""Log existing Day 3 metrics and selected model artifacts to local MLflow."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from ..ml.optimization_paths import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 from .mlops_metrics import MLOPS_DIR, write_ml_metrics
 
@@ -25,9 +26,18 @@ def run_mlflow_tracking(output_dir: Path = MLOPS_DIR, mlflow_dir: Path = MLFLOW_
     category = metrics["classification"]["category"]
     priority = metrics["classification"]["priority"]
     retrieval = metrics["retrieval"]
+    model_paths = {
+        label: OPTIMIZATION_DIR / "models" / filename
+        for label, filename in OPTIMIZED_MODEL_FILES.items()
+    }
+    missing_models = [str(path) for path in model_paths.values() if not path.is_file()]
+    if missing_models:
+        raise FileNotFoundError(f"Selected optimized model artifacts are missing: {missing_models}")
+
     with mlflow.start_run(run_name="day3-optimized-classifiers-and-day6-retrieval") as run:
         mlflow.set_tag("model_name", "day3_optimized_tfidf_logreg")
         mlflow.set_tag("model_type", "TF-IDF + Logistic Regression")
+        mlflow.set_tag("run_purpose", "Track selected Day 3 classifier artifacts and Day 6 retrieval metrics")
         mlflow.set_tag("retrieval_index_type", retrieval["index_type"])
         mlflow.log_metric("category_test_accuracy", category["accuracy"])
         mlflow.log_metric("category_test_macro_f1", category["macro_f1"])
@@ -43,6 +53,9 @@ def run_mlflow_tracking(output_dir: Path = MLOPS_DIR, mlflow_dir: Path = MLFLOW_
                 mlflow.log_param(f"{prefix}_{name}", str(value))
         mlflow.log_param("classification_source", metrics["classification"]["source_artifact"])
         mlflow.log_param("retrieval_source", metrics["retrieval"]["source_artifact"])
+        for label, path in model_paths.items():
+            mlflow.log_artifact(str(path), artifact_path="models")
+            mlflow.set_tag(f"{label}_model_artifact", path.name)
         run_id = run.info.run_id
         experiment_id = run.info.experiment_id
 
@@ -65,6 +78,7 @@ def run_mlflow_tracking(output_dir: Path = MLOPS_DIR, mlflow_dir: Path = MLFLOW_
             "retrieval_recall_at_5": retrieval["recall@5"],
             "retrieval_mrr": retrieval["mrr"],
         },
+        "tracked_model_artifacts": [f"models/{path.name}" for path in model_paths.values()],
         "environment": {"python": platform.python_version()},
     }
     output_dir.mkdir(parents=True, exist_ok=True)

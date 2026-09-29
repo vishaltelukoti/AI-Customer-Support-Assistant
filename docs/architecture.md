@@ -1,42 +1,35 @@
-# Days 1 and 2 architecture
+# Application Architecture
+
+This document describes the implemented POC. The historical Day 1/2 design is superseded by the integrated flow in [final-architecture.md](final-architecture.md).
 
 ```mermaid
 flowchart TD
-    User[Support agent] --> Frontend[React + TypeScript frontend]
-    Frontend -->|Axios POST /api/v1/tickets| API[FastAPI + Pydantic validation]
-    API --> Service[Ticket service: UUID + acknowledgement]
-    Service -->|Typed response; AI fields null| Frontend
-    Raw[Selected synthetic Kaggle CSV] --> English[Audit versions and select English]
-    English --> Clean[Validate, clean, mask patterns and deduplicate]
-    Clean --> Split[Grouped queue/priority split with seed 42]
-    Split --> Data[Processed train / validation / test CSVs]
-    Data --> Train[train.csv only: fit two independent pipelines]
-    Train --> Category[Category: TF-IDF + Logistic Regression]
-    Train --> Priority[Priority: TF-IDF + Logistic Regression]
-    Category --> Artifacts[Saved complete joblib pipelines]
-    Priority --> Artifacts
-    Data --> Evaluate[Train / validation / test: predict only]
-    Artifacts --> Evaluate
-    Evaluate --> Reports[Metrics JSON + per-class reports + confusion matrices]
-    Ticket[Offline ticket text] --> Prepare[Shared stateless cleaning and masks]
-    Prepare --> Inference[ClassificationService: load pipelines and predict_proba]
-    Artifacts --> Inference
-    Inference --> Predictions[Category and priority with separate probabilities]
-    Service -. Planned API integration .-> Inference
+    UI[React support UI] --> API[FastAPI]
+    API --> Input[Day 9 input pattern filter]
+    Input --> Classify[Day 3 optimized TF-IDF + Logistic Regression]
+    Classify --> Retrieve[Day 6 Sentence Transformer + FAISS]
+    Retrieve --> Route{Complexity router}
+    Route -->|Simple| RAG[Day 7 local RAG]
+    Route -->|Complex| Agents[Day 8 LangGraph agents]
+    Agents --> Output[Day 9 output pattern filter]
+    RAG --> Output
+    Output --> Explain[Day 10 explanation]
+    Explain --> Response[Structured ticket response]
+    API --> Monitor[GET /monitoring]
 ```
 
-Solid arrows describe implemented workflows. Day 1 HTTP intake and Day 2 offline ML are separate: the dashed API integration is planned. The ticket service reads no dataset, model or knowledge-base files. GET `/health` reports process health, not model readiness.
+## Runtime Flow
 
-Routes own HTTP contracts; Pydantic schemas validate inputs and describe outputs; the ticket service owns acknowledgements. Settings load backend environment configuration, and Axios centralizes the frontend URL and timeout. One page needs no router. No database, background worker, authentication system or external AI service is required. Models are needed only for the separate classification service.
+`POST /api/v1/tickets` accepts a subject/body pair (or the legacy `ticket_text` field), classifies category and priority using saved Day 3 models, retrieves similar training tickets from the Day 6 FAISS index, and applies deterministic complexity routing. Simple tickets use the Day 7 grounded RAG path. Complex tickets use the Day 8 Investigation, Retrieval and Resolution agents; the Retrieval Agent uses the same FAISS service as a tool. All workflow context is request-local.
 
-The API trims surrounding whitespace and accepts 1-10,000 Unicode characters. Missing, blank, wrong-type, oversized, or extra input fields produce HTTP 422. It returns HTTP 200 with a fresh UUID, echoed normalized text, null predictions, and `received` status. IDs are acknowledgement IDs only; tickets are not persisted and there is no lookup endpoint.
+The Day 9 deterministic input/output pattern filter blocks or redacts its limited set of known patterns and treats retrieved content as untrusted data. It is a POC guardrail demonstration, not a comprehensive security system. Day 10 returns linear TF-IDF feature contributions for the category result.
 
-The preprocessing command is an offline Day 1 workflow; the API does not need to load data to acknowledge tickets. It uses all selected-file versions and targets 70/15/15 with queue/priority stratification and indivisible related-ticket groups. The 16,338 English rows produce 11,436/2,451/2,451 outputs. Answers and other metadata are preserved separately in historical_tickets.csv; the classification inputs contain only subject/body text. It uses no model, tokenizer, embeddings or external service.
+`GET /health` is a cheap artifact-availability check. `GET /monitoring` returns in-memory, process-local request/error and latency counters, model/retrieval activity counters, and saved category Macro-F1 and retrieval Recall@3 values. These counters reset whenever the backend process restarts.
 
-`baseline_data.py` loads only the four-column classification splits, verifies their audit hashes when available and rejects duplicate IDs/normalized text. `baseline_models.py` fits both vectorizers/classifiers exclusively on training text and labels, with a fixed 50,000-feature limit and one numerical thread. `evaluation.py` performs prediction-only evaluation and exports reports. Validation and test never enter a fit call. Answers are never read. The two targets have separate pipelines, not combined labels.
+## Offline Assets
 
-`classification_service.py` loads both trusted local artifacts once. It applies the same stateless cleaning/masking used when loading training text, then each saved pipeline performs TF-IDF transformation and classification. It returns a `ClassificationPrediction` dataclass with `category`, `category_confidence`, `priority`, and `priority_confidence`; probabilities come directly from the predicted class in `predict_proba`. `predict_examples.py` is the executable consumer. See [configuration, artifacts and measured results](baseline-ml.md).
+The selected synthetic Kaggle CSV is processed into deterministic train/validation/test splits. The Day 3 classifiers are fitted on training data. The Day 6 retrieval corpus contains training historical tickets only; validation and test tickets are held-out evaluation queries and are not indexed. Day 11 supplies local file-based MLflow tracking, a daily manually triggerable Airflow index-refresh DAG, and CI workflows for backend validation, frontend type checking/building, and Docker validation where the runner supports it.
 
-Future phases can integrate this service while preserving the existing response fields. New response fields should be optional; incompatible changes require API versioning. The trained models preserve all ten source queue labels and lowercase low/medium/high priorities. The legacy API response literals remain unchanged because prediction integration has not begun; their vocabularies must be addressed explicitly at integration time. Later experiments should reuse the saved split files. Tuning, deep learning, retrieval, RAG and investigation remain planned.
+## POC Boundaries
 
-Local development uses Vite on 5173 and Uvicorn on 8000. Docker builds static frontend files served by Nginx on host port 5173 and runs Uvicorn on 8000. The browser calls the public backend URL, not the Docker service hostname. CORS uses an explicit configurable origin list.
+The implementation uses local artifacts and a synthetic dataset. It has no ticket persistence, authentication/RBAC, production vector database, cloud deployment, persistent agent memory, production observability, or guarantee of support-answer quality. See [assumptions.md](assumptions.md) and [final-evaluation.md](final-evaluation.md) for scope and measured results.

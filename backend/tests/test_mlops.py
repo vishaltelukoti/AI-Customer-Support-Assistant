@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from app.monitoring.metrics import MonitoringMetrics
-from app.monitoring.mlflow_tracking import run_mlflow_tracking
+from app.monitoring.mlflow_tracking import _import_mlflow, run_mlflow_tracking
 from app.monitoring.mlops_metrics import load_ml_metrics, write_ml_metrics
 
 
@@ -31,8 +31,25 @@ def test_mlflow_tracking_configuration_writes_result(tmp_path):
     assert output["config"]["local_only"] is True
     assert "file:///" in output["config"]["tracking_uri"]
     assert output["result"]["tracked_metrics"]["category_test_macro_f1"] == 0.6415383542430868
+    assert output["result"]["tracked_model_artifacts"] == [
+        "models/category_optimized.joblib",
+        "models/priority_optimized.joblib",
+    ]
     assert (tmp_path / "mlops" / "mlflow_config.json").is_file()
     assert (tmp_path / "mlops" / "mlflow_tracking_result.json").is_file()
+
+    mlflow = _import_mlflow()
+    client = mlflow.tracking.MlflowClient(tracking_uri=output["config"]["tracking_uri"])
+    run = client.get_run(output["result"]["run_id"])
+    assert run.data.params["category_selected_method"]
+    assert run.data.metrics["category_test_macro_f1"] == 0.6415383542430868
+    assert run.data.tags["category_model_artifact"] == "category_optimized.joblib"
+    assert run.data.tags["priority_model_artifact"] == "priority_optimized.joblib"
+
+    artifacts = {item.path for item in client.list_artifacts(run.info.run_id, path="models")}
+    assert artifacts == {"models/category_optimized.joblib", "models/priority_optimized.joblib"}
+    for artifact_path in artifacts:
+        assert Path(client.download_artifacts(run.info.run_id, artifact_path)).is_file()
 
 
 def test_monitoring_counters_and_latency_tracking():
@@ -62,9 +79,12 @@ def test_airflow_dag_source_structure():
     dag_path = ROOT / "airflow/dags/ticket_processing.py"
     source = dag_path.read_text(encoding="utf-8")
     assert 'dag_id="ticket_processing_embedding_refresh"' in source
+    assert 'schedule="@daily"' in source
     for task_id in ("validate_data", "prepare_ticket_data", "refresh_embeddings", "validate_retrieval_index"):
         assert f'task_id="{task_id}"' in source
     assert "validate_data_task >> prepare_ticket_data_task >> refresh_embeddings_task >> validate_retrieval_index_task" in source
+    assert "SimilarTicketRetriever.build_index" in source
+    assert "retriever.save(artifact_dir)" in source
 
 
 def test_airflow_import_if_available():

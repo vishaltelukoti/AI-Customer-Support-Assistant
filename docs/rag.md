@@ -2,7 +2,7 @@
 
 ## Scope
 
-Day 7 implements a lightweight offline Retrieval-Augmented Generation pipeline. It does not add FastAPI endpoints, LangGraph, agents, memory, streaming generation, cloud infrastructure, hosted model APIs, or production observability.
+Day 7 implemented a lightweight Retrieval-Augmented Generation pipeline. Day 7 itself did not add FastAPI endpoints, LangGraph, agents, memory, streaming generation, cloud infrastructure, hosted model APIs, or production observability; the completed POC later reuses this RAG path for API requests.
 
 No API key is required for the local retrieval plus local generation setup.
 
@@ -92,4 +92,4 @@ python -m app.rag.knowledge_base
 
 ## Limitations
 
-The source tickets and resolutions are synthetic. Retrieval relevance is not the same as answer correctness, and the local generation model can still produce weak or overly terse responses. The POC evaluation is small and rule-based. The system is not production-ready and does not include policy validation, safety moderation, reranking, answer grading, human review workflows, API integration, or Day 9 security controls.
+The source tickets and resolutions are synthetic. Retrieval relevance is not the same as answer correctness, and the local generation model can still produce weak or overly terse responses. The POC evaluation is small and rule-based. The system is not production-ready and does not include policy validation, safety moderation, reranking, answer grading, human review workflows, or production-grade security controls.

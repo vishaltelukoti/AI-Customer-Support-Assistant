@@ -24,8 +24,8 @@ flowchart TD
 
 ## Components
 
-- React UI: collects ticket subject and body, posts `top_k`, and displays classification, similar tickets, workflow, response, sources, security, explanation and timings.
-- FastAPI: exposes `/health` and `/api/v1/tickets`. Health remains cheap and checks artifact availability only.
+- React UI: collects ticket subject and body, posts `top_k`, and displays classification, similar tickets, workflow, response, sources, security, explanation, timings and lightweight monitoring values.
+- FastAPI: exposes `/health`, `/monitoring` and `/api/v1/tickets`. Health remains cheap and checks artifact availability only.
 - Input security: deterministic Day 9 checks block prompt injection, jailbreaks and secret requests before the AI workflow. Explicit PII is redacted before allowed workflow execution.
 - Classification: saved Day 3 optimized TF-IDF + Logistic Regression models predict category and priority with uncalibrated probabilities.
 - Retrieval: Day 6 Sentence Transformer embeddings and FAISS `IndexFlatIP` return similar training historical tickets with metadata.
@@ -34,7 +34,7 @@ flowchart TD
 - LangGraph workflow: Day 8 orchestrates Investigation, Retrieval and Resolution agents with request-local state and trace.
 - Output security: Day 9 output check blocks obvious secret or PII leakage and returns a safe fallback.
 - Explainability: Day 10-style linear TF-IDF contribution scores explain category predictions.
-- Monitoring: Day 11 in-memory counters track request, model prediction and retrieval metrics.
+- Monitoring: Day 11 in-memory, process-local counters track request/error counts, API and retrieval latency, model predictions and retrieval requests. `/monitoring` also reports saved category Macro-F1 and retrieval Recall@3; counters reset at restart.
 
 ## Boundaries
 

@@ -20,7 +20,8 @@ class TinyEmbedder:
 
 def test_chunking_keeps_document_title():
     chunks = chunk_document("Refund Policy", "## Refunds\n\nRefunds take five days.\n\n## Charges\n\nDuplicate charges are reviewed.")
-    assert len(chunks) == 3
+    # Each non-empty paragraph section, including headings, is indexed independently.
+    assert len(chunks) == 4
     assert all(chunk.startswith("Refund Policy:") for chunk in chunks)
 
 

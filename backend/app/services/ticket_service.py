@@ -19,7 +19,7 @@ from ..ml.baseline_data import prepare_ticket_text
 from ..ml.optimization_paths import OPTIMIZATION_DIR, OPTIMIZED_MODEL_FILES
 from ..ml.preprocessing import ROOT
 from ..monitoring.metrics import monitor
-from ..rag.rag_service import LocalHFGenerator, RAGConfig, RAGService, _EvaluationCaseGenerator
+from ..rag.rag_service import LocalHFGenerator, RAGConfig, RAGService, TextGenerator, _EvaluationCaseGenerator
 from ..rag.retrieval import DEFAULT_TOP_K, RETRIEVAL_DIR, RetrievalResult, SimilarTicketRetriever
 from ..schemas.ticket import (
     ClassificationView,
@@ -45,7 +45,12 @@ def _use_local_model() -> bool:
     return os.getenv("USE_LOCAL_MODEL", "true").strip().lower() not in {"0", "false", "no", "off"}
 
 
-def _create_generator(config: RAGConfig):
+SimpleResolution = tuple[str, list[SourceView], str, list[str]]
+ComplexResolution = tuple[str, list[SourceView], str, list[str], str | None]
+
+
+def _create_generator(config: RAGConfig) -> TextGenerator:
+    """Create the configured local generator or the documented template fallback."""
     if not _use_local_model():
         logger.warning("USE_LOCAL_MODEL is disabled; using the POC template response generator.")
         return _EvaluationCaseGenerator()
@@ -60,6 +65,8 @@ def _create_generator(config: RAGConfig):
 
 
 class OptimizedClassificationService:
+    """Load the selected category and priority pipelines once for API inference."""
+
     def __init__(self, model_dir: Path = OPTIMIZATION_DIR / "models"):
         self.models = {
             target: joblib.load(model_dir / filename)
@@ -67,6 +74,7 @@ class OptimizedClassificationService:
         }
 
     def predict(self, ticket_text: str) -> ClassificationView:
+        """Predict category and priority with each pipeline's uncalibrated probability."""
         text = prepare_ticket_text(ticket_text)
         prediction: dict[str, Any] = {}
         for target, model in self.models.items():
@@ -84,6 +92,8 @@ class OptimizedClassificationService:
 
 
 class TicketProcessor:
+    """Orchestrate security, classification, retrieval, workflow, and explanation steps."""
+
     def __init__(self, top_k: int = DEFAULT_TOP_K):
         self.default_top_k = top_k
         self.security = SecurityService()
@@ -107,6 +117,7 @@ class TicketProcessor:
         self.explainer = LinearTextExplainer(OPTIMIZATION_DIR / "models" / OPTIMIZED_MODEL_FILES["category"])
 
     def process(self, ticket: TicketCreate) -> TicketResponse:
+        """Process one validated ticket while preserving safe fallback API responses."""
         started = time.perf_counter()
         ticket_id = uuid4()
         input_text = ticket.ticket_text or f"{ticket.subject}\n\n{ticket.body}"
@@ -200,7 +211,8 @@ class TicketProcessor:
             status="completed",
         )
 
-    def _run_simple(self, safe_text: str, retrieved: list[RetrievalResult], top_k: int):
+    def _run_simple(self, safe_text: str, retrieved: list[RetrievalResult], top_k: int) -> SimpleResolution:
+        """Run direct RAG and return the stable response components used by the API."""
         try:
             rag_response = self.rag_service.generate_from_retrieved(safe_text, retrieved, top_k)
             return (
@@ -213,7 +225,8 @@ class TicketProcessor:
             logger.exception("Simple RAG resolution generation failed")
             return "Insufficient information in retrieved historical tickets.", [], "generation_failed", ["retrieval", "resolution"]
 
-    def _run_complex(self, safe_text: str):
+    def _run_complex(self, safe_text: str) -> ComplexResolution:
+        """Run the agent workflow and expose its investigation summary and response."""
         try:
             state = self.agent_workflow.run(safe_text)
             final = state.get("final_response", {})
@@ -259,12 +272,14 @@ def initialize_ticket_processor() -> TicketProcessor:
 
 
 def get_ticket_processor() -> TicketProcessor:
+    """Return the startup-initialized processor or fail clearly before application startup."""
     if _processor is None:
         raise RuntimeError("Ticket processor not initialized -- app startup did not complete")
     return _processor
 
 
 def receive_ticket(ticket: TicketCreate) -> TicketResponse:
+    """Process a ticket at the API boundary and convert component failure to a safe response."""
     started = time.perf_counter()
     try:
         return get_ticket_processor().process(ticket)

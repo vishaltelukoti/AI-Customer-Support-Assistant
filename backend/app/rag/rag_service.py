@@ -9,7 +9,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Callable, Protocol
+from typing import Protocol, TypedDict
 
 from ..ml.baseline_data import prepare_ticket_text
 from ..ml.preprocessing import ROOT
@@ -26,9 +26,30 @@ logger = logging.getLogger(__name__)
 
 
 class TextGenerator(Protocol):
+    """Minimal interface implemented by local and deterministic generators."""
+
     model_name: str
 
     def generate(self, prompt: str) -> str: ...
+
+
+class RetrievedContentCheckResult(Protocol):
+    """Security-check result fields consumed by the RAG service."""
+
+    category: str
+
+
+class RetrievedContentChecker(Protocol):
+    """Callable boundary used to scan retrieved evidence before generation."""
+
+    def __call__(self, text: str) -> RetrievedContentCheckResult: ...
+
+
+class InvestigationContext(TypedDict):
+    """Request-scoped findings passed from investigation to response generation."""
+
+    summary: str
+    detected_issues: list[str]
 
 
 @dataclass(frozen=True)
@@ -66,6 +87,8 @@ class RAGResponse:
 
 
 class LocalHFGenerator:
+    """Load a local Hugging Face sequence-to-sequence model once for inference."""
+
     def __init__(self, model_name: str = DEFAULT_GENERATION_MODEL, max_new_tokens: int = MAX_NEW_TOKENS):
         self.model_name = model_name
         self.max_new_tokens = max_new_tokens
@@ -82,6 +105,7 @@ class LocalHFGenerator:
         self.model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
     def generate(self, prompt: str) -> str:
+        """Generate a deterministic response for a bounded grounded prompt."""
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1536)
         outputs = self.model.generate(
             **inputs,
@@ -99,6 +123,7 @@ def _clip(value: str, limit: int) -> str:
 
 def build_context(retrieved: list[RetrievalResult | KnowledgeBaseResult],
                   max_chars_per_ticket: int = MAX_CONTEXT_CHARS_PER_TICKET) -> str:
+    """Format retrieved evidence while retaining source identifiers and scores."""
     blocks = []
     for index, item in enumerate(retrieved, start=1):
         if isinstance(item, KnowledgeBaseResult):
@@ -124,8 +149,9 @@ def build_context(retrieved: list[RetrievalResult | KnowledgeBaseResult],
 def build_grounded_prompt(
     ticket_text: str,
     context: str,
-    investigation_context: dict[str, Any] | None = None,
+    investigation_context: InvestigationContext | None = None,
 ) -> str:
+    """Build a prompt that treats retrieved evidence as untrusted reference data."""
     investigation_context = investigation_context or {}
     investigation_summary = investigation_context.get("summary") or "No separate investigation summary."
     detected_issues = investigation_context.get("detected_issues") or []
@@ -186,9 +212,11 @@ def merge_ranked_results(tickets: list[RetrievalResult], knowledge_base: list[Kn
 
 
 class RAGService:
+    """Retrieve evidence, enforce abstention/security checks, and generate a response."""
+
     def __init__(self, retriever: SimilarTicketRetriever, generator: TextGenerator | None = None,
                  config: RAGConfig = RAGConfig(), knowledge_base_retriever: KnowledgeBaseRetriever | None = None,
-                 retrieved_content_checker: Callable[[str], Any] | None = None):
+                 retrieved_content_checker: RetrievedContentChecker | None = None):
         self.retriever = retriever
         self.config = config
         self.generator = generator or LocalHFGenerator(config.generation_model, config.max_new_tokens)
@@ -198,6 +226,7 @@ class RAGService:
     @classmethod
     def load(cls, retrieval_dir: Path = RETRIEVAL_DIR, generator: TextGenerator | None = None,
              config: RAGConfig = RAGConfig()) -> "RAGService":
+        """Load saved ticket and optional knowledge-base indexes from local artifacts."""
         return cls(
             SimilarTicketRetriever.load_index(retrieval_dir),
             generator,
@@ -207,6 +236,7 @@ class RAGService:
 
     @staticmethod
     def load_optional_knowledge_base(artifact_dir: Path = KNOWLEDGE_BASE_ARTIFACT_DIR) -> KnowledgeBaseRetriever | None:
+        """Load optional KB artifacts, falling back to ticket-only retrieval when invalid."""
         try:
             return KnowledgeBaseRetriever.load_index(artifact_dir)
         except (FileNotFoundError, OSError, ValueError, KeyError, json.JSONDecodeError) as exc:
@@ -214,6 +244,7 @@ class RAGService:
             return None
 
     def generate_resolution(self, ticket_text: str, top_k: int | None = None) -> RAGResponse:
+        """Retrieve evidence for a ticket and generate a grounded or abstaining response."""
         query = prepare_ticket_text(ticket_text)
         effective_top_k = top_k or self.config.top_k
         retrieved = self.retriever.search_similar_tickets(query, top_k=effective_top_k)
@@ -221,7 +252,12 @@ class RAGService:
 
     def generate_from_retrieved(self, ticket_text: str, retrieved: list[RetrievalResult],
                                 top_k: int | None = None,
-                                investigation_context: dict[str, Any] | None = None) -> RAGResponse:
+                                investigation_context: InvestigationContext | None = None) -> RAGResponse:
+        """Generate from supplied ticket results plus optional KB and investigation context.
+
+        Evidence below the configured score threshold, or evidence flagged by the
+        retrieved-content checker, produces an explicit insufficient-evidence response.
+        """
         query = prepare_ticket_text(ticket_text)
         effective_top_k = top_k or self.config.top_k
         knowledge_base = self.knowledge_base_retriever.search(query, effective_top_k) if self.knowledge_base_retriever else []

@@ -17,6 +17,7 @@ from ..ml.preprocessing import ROOT
 from ..rag.rag_service import (
     DEFAULT_GENERATION_MODEL,
     DEFAULT_RETRIEVAL_THRESHOLD,
+    InvestigationContext,
     RAGConfig,
     RAGService,
     _EvaluationCaseGenerator,
@@ -49,6 +50,7 @@ class AgentState(TypedDict, total=False):
 
 
 def classify_complexity(ticket_text: str) -> Literal["simple", "complex"]:
+    """Classify routing complexity with deterministic POC heuristics."""
     text = ticket_text.lower()
     complex_terms = (
         " and ", "multiple", "refund", "cancel", "cancellation", "charged twice",
@@ -58,6 +60,7 @@ def classify_complexity(ticket_text: str) -> Literal["simple", "complex"]:
 
 
 def route_by_complexity(state: AgentState) -> Literal["investigation", "retrieval"]:
+    """Choose whether investigation is required before retrieval."""
     return "investigation" if state.get("complexity") == "complex" else "retrieval"
 
 
@@ -66,6 +69,7 @@ def _append_trace(state: AgentState, message: str) -> list[str]:
 
 
 def _investigation_flags(ticket_text: str) -> list[str]:
+    """Extract deterministic issue indicators without treating them as verified facts."""
     text = ticket_text.lower()
     flags = [term for term in ("refund", "cancel", "charged", "outage", "multiple", "urgent") if term in text]
     patterns = (
@@ -108,6 +112,8 @@ class RetrievalTool:
 
 
 class SupportAgentWorkflow:
+    """Coordinate routing, investigation, retrieval, and grounded resolution agents."""
+
     def __init__(self, retrieval_tool: RetrievalTool, rag_service: RAGService,
                  config: AgentConfig = AgentConfig()):
         self.retrieval_tool = retrieval_tool
@@ -117,6 +123,7 @@ class SupportAgentWorkflow:
 
     @classmethod
     def load(cls, config: AgentConfig = AgentConfig(), use_local_model: bool = False) -> "SupportAgentWorkflow":
+        """Load saved retrieval artifacts and construct the request-scoped workflow."""
         retriever = SimilarTicketRetriever.load_index(Path(config.retrieval_artifact_dir))
         generator = None if use_local_model else _EvaluationCaseGenerator()
         rag_config = RAGConfig(
@@ -145,6 +152,7 @@ class SupportAgentWorkflow:
         return graph.compile()
 
     def router_agent(self, state: AgentState) -> AgentState:
+        """Set ticket complexity and retain the original ticket in request-local memory."""
         complexity = classify_complexity(state["ticket_text"])
         memory = {**state.get("memory", {}), "original_ticket": state["ticket_text"]}
         return {
@@ -156,6 +164,7 @@ class SupportAgentWorkflow:
         }
 
     def investigation_agent(self, state: AgentState) -> AgentState:
+        """Summarize complex-ticket issue indicators for the resolution step."""
         text = state["ticket_text"]
         flags = _investigation_flags(text)
         summary = (
@@ -172,6 +181,7 @@ class SupportAgentWorkflow:
         }
 
     def retrieval_agent(self, state: AgentState) -> AgentState:
+        """Fetch similar tickets while degrading safely on retrieval failure."""
         try:
             results = self.retrieval_tool(state["ticket_text"], self.config.top_k)
             return {
@@ -193,6 +203,7 @@ class SupportAgentWorkflow:
             }
 
     def resolution_agent(self, state: AgentState) -> AgentState:
+        """Generate the final response from retrieved evidence and investigation context."""
         if state.get("status") == "retrieval_failed":
             response = {
                 "answer": "Insufficient information in retrieved historical tickets.",
@@ -209,7 +220,7 @@ class SupportAgentWorkflow:
         try:
             retrieved = [RetrievalResult(**item) for item in state.get("retrieved_tickets", [])]
             memory = state.get("memory", {})
-            investigation_context = None
+            investigation_context: InvestigationContext | None = None
             if state.get("investigation_result") or memory.get("investigation_focus"):
                 investigation_context = {
                     "summary": state.get("investigation_result", ""),
@@ -252,6 +263,7 @@ class SupportAgentWorkflow:
             }
 
     def run(self, ticket_text: str) -> AgentState:
+        """Execute one workflow with fresh request-local state and memory."""
         return self.graph.invoke({
             "ticket_text": ticket_text,
             "workflow_trace": [],

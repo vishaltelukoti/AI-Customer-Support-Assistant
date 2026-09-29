@@ -20,7 +20,7 @@ The integrated flow is:
 
 1. Input security check with the Day 9 deterministic rules.
 2. PII redaction when explicit email, phone or card-like values are present.
-3. Day 3 optimized category and priority classification.
+3. Day 3 optimized TF-IDF + Logistic Regression category and priority classification. The Day 5 DistilBERT comparison model is not loaded by the API.
 4. Day 6 FAISS similar-ticket retrieval with default Top-K 3.
 5. Day 8 deterministic complexity routing.
 6. Simple tickets use Day 7 RAG directly.

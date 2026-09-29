@@ -40,6 +40,12 @@ export function TicketResult({ ticket }: { ticket: TicketResponse | null }) {
               <ol className="agent-trace">{ticket.workflow.trace.map((step) => <li key={step}>{step}</li>)}</ol>
             )}
           </section>
+          {ticket.workflow.investigation_result && (
+            <section className="result-section">
+              <h3>Investigation</h3>
+              <p>{ticket.workflow.investigation_result}</p>
+            </section>
+          )}
           <section className="result-section">
             <h3>Security</h3>
             <p>{ticket.security.reason}</p>
@@ -53,7 +59,7 @@ export function TicketResult({ ticket }: { ticket: TicketResponse | null }) {
             {ticket.response.sources.length > 0 ? (
               <ul className="compact-list">{ticket.response.sources.map((source) => (
                 <li key={source.ticket_id}>
-                  {source.title ?? source.ticket_id} {source.source_type === 'knowledge_base' && <small className="source-tag">Knowledge base</small>}
+                  {source.title ?? source.ticket_id} <small className="source-tag">{source.source_type === 'knowledge_base' ? 'Knowledge base' : 'Historical ticket'}</small>
                   {' - '}{source.category}{' - '}{source.similarity_score.toFixed(3)}
                 </li>
               ))}</ul>

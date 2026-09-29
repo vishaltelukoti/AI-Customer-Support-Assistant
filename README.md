@@ -278,9 +278,9 @@ Both selected configurations use `C=10.0`, `class_weight=None`, unigrams/bigrams
 
 ## Deep-learning comparison
 
-Day 4 compares lightweight CNN, vanilla RNN and LSTM text classifiers for the category task only. Day 5 extends the same comparison with a small attention encoder and a pretrained DistilBERT classifier. All models use cleaned `ticket_text`, the unchanged English train/validation/test split, seed 42, and validation Macro-F1 for model selection. Test metrics are final reporting only. No priority DL model, hyperparameter tuning, or API integration is included.
+Day 4 compares CNN, vanilla RNN and LSTM approaches for category classification; Day 5 adds a token-level attention encoder and pretrained `distilbert-base-uncased`. The CNN/RNN/LSTM/Attention implementations use seeded, fixed embeddings and neural-style feature-extractor weights with a separately trained Logistic Regression head. They are not end-to-end trainable neural networks, and the Attention implementation is not a Transformer. All models use the same cleaned English `ticket_text` split and seed 42. Selection uses validation Macro-F1; test Macro-F1 is reported but does not select the model. Day 5 selected DistilBERT (validation Macro-F1 `0.121775`; test Macro-F1 `0.120542`). This remains an experiment: the live API uses the Day 3 optimized classical category and priority classifiers, not Day 5 DistilBERT.
 
-TensorFlow is not compatible with the current Python 3.14 environment, so the CNN/RNN/LSTM/Attention paths use dependency-light NumPy sequence encoders with a trained Logistic Regression head. DistilBERT uses `distilbert-base-uncased`, freezes the base encoder, trains one epoch on a deterministic train-only cap of 60 examples per category, and evaluates validation/test on the full held-out splits.
+TensorFlow is not compatible with the experiment's Python 3.14 environment, so CNN/RNN/LSTM/Attention use NumPy sequence encoders with fixed seeded embeddings and encoder weights; only the Logistic Regression head is fitted. The Attention path scores and pools embedded tokens with a fixed seeded query/projection mechanism; it does not implement a Transformer. DistilBERT uses `distilbert-base-uncased`, freezes its pretrained base encoder, and trains its classification head for one epoch on a deterministic train-only cap of 60 examples per category (600 total). Validation and test metrics cover the full held-out splits.
 
 Run from the repository root:
 
@@ -288,7 +288,7 @@ Run from the repository root:
 .\backend\.venv\Scripts\python.exe -m backend.app.ml.dl_training
 ```
 
-The command saves Day 5 result artifacts under `experiments/dl_comparison/day5/` because the existing Day 4 artifacts on this machine are locked to SYSTEM/Administrators. The unused DistilBERT checkpoint directory is not retained in the cleaned repository because the integrated application does not load the Day 5 DL model.
+The command saves Day 5 comparison results and selected-model metadata under `experiments/dl_comparison/day5/`; the model directory is an experiment artifact and is not loaded by the API.
 
 | Model | Validation macro-F1 | Test accuracy | Test macro-F1 | Test weighted-F1 |
 | --- | ---: | ---: | ---: | ---: |
@@ -300,7 +300,7 @@ The command saves Day 5 result artifacts under `experiments/dl_comparison/day5/`
 
 Selected Day 5 DL model: DistilBERT, selected based on validation Macro-F1. Its final test Macro-F1 is 0.120542. This remains far below the Day 3 optimized category TF-IDF result and is not production-ready. Full measured values and limitations are in [the generated Day 5 report](experiments/dl_comparison/day5/dl_comparison_results.md) and [the DL documentation](docs/deep-learning.md).
 
-This is a DL-comparison decision, not the integrated application-model decision. The API continues to load the stronger Day 3 optimized TF-IDF + Logistic Regression classifiers; DistilBERT is the winner only within the constrained Day 5 DL comparison.
+DistilBERT is the Day 5 comparison selection only. The live API continues to load the Day 3 optimized TF-IDF + Logistic Regression classifiers for both category and priority. Integration of the selected Day 5 DL model remains an outstanding assessment gap.
 
 ## Similar-ticket retrieval
 
@@ -350,9 +350,11 @@ The fixed RAG evaluation contains seven POC cases covering ticket grounding, ins
 | Metric | Value |
 | --- | ---: |
 | Source attribution rate | 1.000000 |
-| Grounded acceptable response rate | 1.000000 |
+| Grounded acceptable response rate | 0.500000 |
 | Insufficient-information pass rate | 1.000000 |
-| Overall acceptance rate | 1.000000 |
+| Overall acceptance rate | 0.571429 |
+
+The saved evaluation records `generation_model_loaded_for_eval: false`; it used the deterministic fallback generator rather than loading FLAN-T5. These rates therefore describe that fixed fallback evaluation, not local FLAN-T5 answer quality.
 
 No API key is required for the local retrieval plus local generation setup. Day 7 itself did not implement LangGraph, agents, memory, streaming, or production observability; the final integrated API now reuses this RAG service.
 
@@ -470,7 +472,7 @@ Use [demo-guide.md](docs/demo-guide.md) for exact inputs. The five reviewer scen
 
 ## Key evaluation results
 
-All predefined POC evaluation cases passed. This does not mean production readiness.
+Predefined POC evaluations produced the results below; the RAG evaluation accepted 4 of 7 cases. These results do not mean production readiness.
 
 | Area | Result |
 | --- | --- |
@@ -478,7 +480,7 @@ All predefined POC evaluation cases passed. This does not mean production readin
 | Optimized priority classifier | Test accuracy 0.676867, Macro-F1 0.662208 |
 | Selected DL model | DistilBERT, validation Macro-F1 0.121775, test Macro-F1 0.120542 |
 | Retrieval | Recall@1 0.656000, Recall@3 0.764000, Recall@5 0.844000, MRR 0.722500 |
-| RAG predefined checks | Source attribution, grounded response and insufficient-information checks passed |
+| RAG predefined checks | Source attribution 1.0; insufficient-information handling 1.0; grounded acceptable responses 0.5; overall acceptance 0.571429 |
 | Agent predefined checks | Routing, workflow completion, source behavior and trace checks passed |
 | Security predefined checks | 7/7 cases passed; attack detection, normal allow and malicious retrieved-content handling passed |
 | Integration predefined checks | 5/5 cases passed; average latency 78.41 ms |

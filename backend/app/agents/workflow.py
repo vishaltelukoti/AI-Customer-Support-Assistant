@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import platform
+import re
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -62,6 +63,26 @@ def route_by_complexity(state: AgentState) -> Literal["investigation", "retrieva
 
 def _append_trace(state: AgentState, message: str) -> list[str]:
     return [*state.get("workflow_trace", []), message]
+
+
+def _investigation_flags(ticket_text: str) -> list[str]:
+    text = ticket_text.lower()
+    flags = [term for term in ("refund", "cancel", "charged", "outage", "multiple", "urgent") if term in text]
+    patterns = (
+        ("duplicate_charge", r"\bduplicate\s+charges?\b|\bcharged\s+(?:twice|(?:\w+|\d+)\s+times)\b"),
+        ("payment_failure", r"\b(?:payment|card|transaction)\b.{0,60}\bfail(?:ed|ure)?\b|\bfail(?:ed|ure)?\b.{0,60}\b(?:payment|card|transaction)\b"),
+        ("funds_deducted", r"\b(?:amount|money|funds?)\b.{0,40}\b(?:deducted|taken|withdrawn)\b"),
+        ("order_cancellation", r"\b(?:cancelled|canceled|cancel)\b.{0,35}\b(?:order|purchase)\b|\b(?:order|purchase)\b.{0,35}\b(?:cancelled|canceled|cancel)\b"),
+        ("delivery_not_received", r"\b(?:not received|haven't received|hasn't arrived|not arrived|delivery status)\b"),
+        ("application_crash", r"\b(?:app|application)\b.{0,40}\bcrash(?:es|ed|ing)?\b|\bcrash(?:es|ed|ing)?\b.{0,40}\b(?:app|application)\b"),
+    )
+    flags.extend(name for name, pattern in patterns if re.search(pattern, text))
+    charge_count = re.search(r"\bcharged\s+(twice|\w+|\d+)\s+times\b", text)
+    if charge_count:
+        count_words = {"twice": "2", "once": "1", "three": "3", "four": "4", "five": "5"}
+        count = count_words.get(charge_count.group(1), charge_count.group(1))
+        flags.append(f"charge_count:{count}")
+    return list(dict.fromkeys(flags))
 
 
 def _sources_from_results(results: list[RetrievalResult]) -> list[dict[str, Any]]:
@@ -136,10 +157,7 @@ class SupportAgentWorkflow:
 
     def investigation_agent(self, state: AgentState) -> AgentState:
         text = state["ticket_text"]
-        flags = []
-        for term in ("refund", "cancel", "charged", "outage", "multiple", "urgent"):
-            if term in text.lower():
-                flags.append(term)
+        flags = _investigation_flags(text)
         summary = (
             "Complex ticket requiring multi-issue support review. "
             f"Detected context terms: {', '.join(flags) if flags else 'general multi-step issue'}."
@@ -190,7 +208,19 @@ class SupportAgentWorkflow:
             }
         try:
             retrieved = [RetrievalResult(**item) for item in state.get("retrieved_tickets", [])]
-            rag_response = self.rag_service.generate_from_retrieved(state["ticket_text"], retrieved, self.config.top_k)
+            memory = state.get("memory", {})
+            investigation_context = None
+            if state.get("investigation_result") or memory.get("investigation_focus"):
+                investigation_context = {
+                    "summary": state.get("investigation_result", ""),
+                    "detected_issues": memory.get("investigation_focus", []),
+                }
+            rag_response = self.rag_service.generate_from_retrieved(
+                state["ticket_text"],
+                retrieved,
+                self.config.top_k,
+                investigation_context=investigation_context,
+            )
             response = {
                 "answer": rag_response.answer,
                 "sources": [asdict(source) for source in rag_response.sources],

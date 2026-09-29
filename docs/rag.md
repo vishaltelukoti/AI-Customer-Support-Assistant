@@ -74,9 +74,11 @@ Metrics are intentionally narrow and inspect source attribution, acceptable grou
 | Metric | Value |
 | --- | ---: |
 | Source attribution rate | 1.000000 |
-| Grounded acceptable response rate | 1.000000 |
+| Grounded acceptable response rate | 0.500000 |
 | Insufficient-information pass rate | 1.000000 |
-| Overall acceptance rate | 1.000000 |
+| Overall acceptance rate | 0.571429 |
+
+The recorded evaluation has `generation_model_loaded_for_eval: false`. It used the deterministic fallback generator, so these metrics do not measure the answer quality of the configured local FLAN-T5 model.
 
 Artifacts are saved in `experiments/rag/`:
 
@@ -92,4 +94,4 @@ python -m app.rag.knowledge_base
 
 ## Limitations
 
-The source tickets and resolutions are synthetic. Retrieval relevance is not the same as answer correctness, and the local generation model can still produce weak or overly terse responses. The POC evaluation is small and rule-based. The system is not production-ready and does not include policy validation, safety moderation, reranking, answer grading, human review workflows, or production-grade security controls.
+The source tickets and resolutions are synthetic. Retrieval relevance is not the same as answer correctness, and the local generation model can still produce weak or overly terse responses. When the local FLAN-T5 generator is used, it may reproduce details from retrieved synthetic historical examples; those details are not independently verified customer facts. The POC evaluation is small and rule-based. The system is not production-ready and does not include policy validation, safety moderation, reranking, answer grading, human review workflows, or production-grade security controls.

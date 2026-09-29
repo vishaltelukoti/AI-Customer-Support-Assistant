@@ -129,14 +129,16 @@ Day 7 is complete. It added an offline RAG suggested-resolution service over the
 | Check | Result |
 | --- | --- |
 | Focused RAG tests | 7 passed |
-| Generation model | Local `google/flan-t5-base` |
+| Configured generation model | Local `google/flan-t5-base` |
+| Generation model loaded for evaluation | false |
 | API key | Not required |
 | Retrieval config | Day 6 FAISS index, Top-K 3 |
 | Retrieval threshold | 0.55 |
-| Evaluation cases | billing/payment, outage, prompt injection, insufficient information |
+| Evaluation cases | billing/payment, outage, prompt injection, insufficient information, and three knowledge-base cases |
 | Source attribution rate | 1.000000 |
-| Grounded acceptable response rate | 1.000000 |
+| Grounded acceptable response rate | 0.500000 |
 | Insufficient-information pass rate | 1.000000 |
+| Overall acceptance rate | 0.571429 |
 | Prompt injection checks | User-ticket and retrieved-content injection covered in focused tests |
 | Artifacts | `experiments/rag/rag_config.json`, `rag_evaluation.json`, `rag_evaluation.md` |
 | API integration | Intentionally absent |

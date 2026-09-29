@@ -75,6 +75,7 @@ class WorkflowView(BaseModel):
     complexity: Literal["simple", "complex"]
     type: Literal["simple_rag", "complex_multi_agent", "blocked", "error"]
     trace: list[str] = []
+    investigation_result: str | None = None
 
 
 class ResponseView(BaseModel):

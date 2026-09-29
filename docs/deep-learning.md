@@ -2,13 +2,13 @@
 
 ## Scope
 
-Day 4 and Day 5 are category-classification experiments only. They do not train priority models and they are not integrated into the FastAPI endpoint.
+Day 4 and Day 5 are category-classification experiments only; they do not train a DL priority model. Neither the Day 5 DistilBERT selection nor the other DL experiment models are loaded by the FastAPI endpoint. The live application currently uses the Day 3 optimized classical models for both category and priority.
 
-All models use the existing English `ticket_text` split with seed 42: 11,436 train, 2,451 validation, and 2,451 test rows. Training fits on train data only. Validation Macro-F1 is the selection metric. Test metrics are final reporting only and are not used to choose a model.
+All models use the same English `ticket_text` split with seed 42: 11,436 train, 2,451 validation, and 2,451 test rows. CNN/RNN/LSTM/Attention fit their Logistic Regression heads using training data; their seeded embedding and encoder weights are fixed. DistilBERT trains its task head on a deterministic 600-example subset drawn only from training data. The selection expression uses validation Macro-F1 only. The current runner also calculates and records test metrics for each model before computing the validation-based selection; test values do not enter that selection.
 
 ## Model configurations
 
-The CNN, RNN, LSTM, and Attention models use the existing lightweight NumPy text-encoder pattern because TensorFlow is not compatible with this Python 3.14 environment. They share:
+The CNN, RNN, LSTM, and Attention implementations use a lightweight NumPy sequence-feature pattern because TensorFlow was not compatible with the experiment's Python 3.14 environment. Token embeddings and each encoder's seeded weights are fixed; the only fitted parameters are in a separate Logistic Regression classification head. These are fixed neural-style feature extractors, not end-to-end trained neural networks. They share:
 
 - vocabulary size: 5,000
 - sequence length: 60
@@ -16,9 +16,9 @@ The CNN, RNN, LSTM, and Attention models use the existing lightweight NumPy text
 - hidden dimension: 32
 - classifier head: Logistic Regression with max_iter 200
 
-Attention adds actual token-level attention over embedded token sequences, then projects the attended context before classification.
+Attention computes token scores from a fixed seeded query vector, applies a padding mask and softmax, pools the token embeddings, and applies a fixed seeded projection before classification. This is the implemented attention mechanism, not a Transformer encoder.
 
-DistilBERT uses Hugging Face Transformers with `distilbert-base-uncased`. To keep the POC runnable on CPU, the base encoder is frozen and only the classification head is fine-tuned for one epoch. Training uses a deterministic train-only cap of 60 examples per category, batch size 64, and sequence length 48. Validation and test metrics are computed on the full validation/test splits.
+DistilBERT uses the pretrained Hugging Face checkpoint `distilbert-base-uncased`. To keep the POC runnable on CPU, its base encoder is frozen and only the 10-class sequence-classification head is fine-tuned for one epoch. Training uses a deterministic train-only cap of 60 examples per category (600 examples total), batch size 64, and sequence length 48. Validation and test metrics use the full held-out splits.
 
 ## Results
 
@@ -34,9 +34,9 @@ Generated artifact: `experiments/dl_comparison/day5/dl_comparison_results.json`.
 
 Selected Day 5 DL model: DistilBERT, selected based on validation Macro-F1. Final selected-model test Macro-F1 is 0.120542.
 
-## Selection Boundary
+## Selection And Application Boundary
 
-DistilBERT is the selected model within the constrained Day 5 DL comparison only. The integrated application instead loads the Day 3 optimized TF-IDF + Logistic Regression classifiers because their measured category performance is substantially stronger. These are separate selection decisions: the DL experiment winner is not the application classifier.
+The Day 5 artifact selects DistilBERT by validation Macro-F1 (`0.121775`); its recorded test Macro-F1 is `0.120542`. The test metric is not the selection criterion. This selection applies only to the DL comparison. The live application classifier remains the Day 3 optimized TF-IDF + Logistic Regression model for category and priority. The Day 5 DistilBERT artifact is not loaded in the application.
 
 The pretrained model completed successfully after downloading the public checkpoint into a local Hugging Face cache. No Hugging Face token or external API was used.
 
@@ -48,10 +48,8 @@ Day 5 artifacts are under `experiments/dl_comparison/day5/`:
 - `dl_comparison_results.md`
 - `selected_model_metadata.json`
 
-The selected-model confusion matrix is stored in the JSON artifact. The unused DistilBERT checkpoint directory was removed during final repository cleanup because the integrated application does not load the Day 5 DL model; the assessment evidence is preserved in the result JSON, Markdown report, and selected-model metadata.
+The selected-model confusion matrix is stored in the JSON artifact. The result JSON, Markdown report, and selected-model metadata are under `experiments/dl_comparison/day5/`. The selected-model metadata points to `models/distilbert`; this experiment artifact is not used by the live classifier.
 
 ## Limitations
 
-The neural models perform poorly compared with the Day 3 optimized classical category model, whose final test Macro-F1 is 0.641538. DistilBERT was intentionally resource-capped for the POC and should not be read as a production-quality transformer training recipe. The synthetic dataset, class imbalance, frozen encoder, small fine-tuning subset, and lack of hyperparameter search all limit conclusions.
-
-The existing Day 4 artifacts in `experiments/dl_comparison/` are locked to SYSTEM/Administrators on this machine, so Day 5 artifacts were written to the `day5` subdirectory instead of overwriting those files.
+The DL experiment models perform below the Day 3 optimized classical category model, whose recorded test Macro-F1 is 0.641538. DistilBERT was intentionally resource-capped for the POC: the base encoder is frozen and its head is trained for one epoch on 600 training examples. The synthetic dataset, class imbalance, fixed random feature extractors for CNN/RNN/LSTM/Attention, frozen DistilBERT encoder, small fine-tuning subset, and lack of hyperparameter search limit conclusions. DistilBERT integration into the live API remains an outstanding assessment gap.

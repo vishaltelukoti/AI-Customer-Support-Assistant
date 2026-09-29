@@ -13,7 +13,7 @@ Source: `experiments/optimization/optimization_results.json`.
 
 ## Deep Learning
 
-Source: `docs/deep-learning.md` and Day 5 artifacts. The Day 5 JSON files exist, but on this Windows machine their contents are ACL-locked from this session.
+Source: `experiments/dl_comparison/day5/dl_comparison_results.json` and `experiments/dl_comparison/day5/dl_comparison_results.md`.
 
 | Model | Validation Macro-F1 | Test Macro-F1 |
 | --- | ---: | ---: |
@@ -23,7 +23,7 @@ Source: `docs/deep-learning.md` and Day 5 artifacts. The Day 5 JSON files exist,
 | Attention | 0.044922 | 0.044922 |
 | DistilBERT | 0.121775 | 0.120542 |
 
-Selected Day 5 DL model: DistilBERT, selected by validation Macro-F1. This is the DL-comparison winner only; the integrated application uses the stronger Day 3 optimized TF-IDF + Logistic Regression category classifier. The DL comparison stayed below that classical model.
+Selected Day 5 DL model: DistilBERT, selected by validation Macro-F1 (`0.121775`); test Macro-F1 (`0.120542`) is reported, not used for selection. This is the DL-comparison selection only. The integrated application uses the Day 3 optimized TF-IDF + Logistic Regression classifiers for both category and priority. Integration of the selected Day 5 model remains an outstanding assessment gap.
 
 ## Retrieval
 
@@ -41,17 +41,18 @@ Retrieval relevance is category-level: a retrieved ticket is relevant when it sh
 
 ## RAG
 
-Source: Day 7 generated documentation and validation record.
+Source: `experiments/rag/rag_evaluation.json`.
 
 | Metric | Value |
 | --- | ---: |
 | Predefined evaluation cases | 7 |
 | Source attribution rate | 1.000000 |
-| Grounded acceptable response rate | 1.000000 |
+| Grounded acceptable response rate | 0.500000 |
 | Insufficient-information pass rate | 1.000000 |
-| Overall acceptance rate | 1.000000 |
+| Overall acceptance rate | 0.571429 |
+| Generation model loaded for evaluation | false |
 
-These are predefined POC checks, not universal answer-quality measurements.
+These are predefined POC checks, not universal answer-quality measurements. The recorded run used the deterministic fallback generator rather than loading FLAN-T5.
 
 ## Agents
 
@@ -107,4 +108,4 @@ Source: `experiments/integration/integration_evaluation.json`.
 | Frontend build | Passed |
 | Docker build | Passed |
 
-All predefined POC evaluation cases passed.
+The recorded integration cases passed; the separate RAG evaluation accepted 4 of 7 predefined cases.

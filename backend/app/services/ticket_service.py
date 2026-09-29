@@ -97,6 +97,7 @@ class TicketProcessor:
             knowledge_base_retriever=RAGService.load_optional_knowledge_base(
                 Path(rag_config.knowledge_base_artifact_dir)
             ),
+            retrieved_content_checker=self.security.check_retrieved_content,
         )
         self.agent_workflow = SupportAgentWorkflow(
             RetrievalTool(self.retriever),
@@ -152,9 +153,10 @@ class TicketProcessor:
 
         complexity = classify_complexity(safe_text)
         workflow_started = time.perf_counter()
+        investigation_result = None
         if complexity == "complex":
             workflow_type = "complex_multi_agent"
-            answer, sources, retrieval_status, trace = self._run_complex(safe_text)
+            answer, sources, retrieval_status, trace, investigation_result = self._run_complex(safe_text)
         else:
             workflow_type = "simple_rag"
             answer, sources, retrieval_status, trace = self._run_simple(safe_text, retrieved, ticket.top_k)
@@ -174,7 +176,12 @@ class TicketProcessor:
             ticket=TicketView(ticket_id=ticket_id, subject=subject, body=body, ticket_text=safe_text),
             classification=classification,
             similar_tickets=[_similar_ticket(item) for item in retrieved],
-            workflow=WorkflowView(complexity=complexity, type=workflow_type, trace=trace),
+            workflow=WorkflowView(
+                complexity=complexity,
+                type=workflow_type,
+                trace=trace,
+                investigation_result=investigation_result,
+            ),
             response=ResponseView(answer=answer, sources=sources, retrieval_status=retrieval_status),
             explanation=explanation,
             security=SecurityView(
@@ -215,12 +222,13 @@ class TicketProcessor:
                 [_source_from_dict(item) for item in final.get("sources", [])],
                 final.get("retrieval_status", "insufficient_evidence"),
                 _public_trace(state.get("workflow_trace", [])),
+                state.get("investigation_result"),
             )
         except Exception:
             logger.exception("Complex agent workflow failed")
             return "Insufficient information in retrieved historical tickets.", [], "workflow_failed", [
                 "investigation", "retrieval", "resolution"
-            ]
+            ], None
 
     def _explain(self, ticket_text: str, classification: ClassificationView) -> ExplanationView:
         try:
@@ -391,6 +399,8 @@ def _source_from_dict(item: dict[str, Any]) -> SourceView:
         category=item.get("category", ""),
         priority=item.get("priority", ""),
         excerpt=item.get("excerpt"),
+        source_type=item.get("source_type", "ticket"),
+        title=item.get("title"),
     )
 
 

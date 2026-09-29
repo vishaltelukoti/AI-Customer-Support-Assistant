@@ -27,7 +27,7 @@ flowchart TD
 - React UI: collects ticket subject and body, posts `top_k`, and displays classification, similar tickets, workflow, response, sources, security, explanation, timings and lightweight monitoring values.
 - FastAPI: exposes `/health`, `/monitoring` and `/api/v1/tickets`. Health remains cheap and checks artifact availability only.
 - Input security: deterministic Day 9 checks block prompt injection, jailbreaks and secret requests before the AI workflow. Explicit PII is redacted before allowed workflow execution.
-- Classification: saved Day 3 optimized TF-IDF + Logistic Regression models predict category and priority with uncalibrated probabilities.
+- Classification: saved Day 3 optimized TF-IDF + Logistic Regression models predict both category and priority and return uncalibrated probabilities. The Day 5 DistilBERT comparison model is not loaded by the API.
 - Retrieval: Day 6 Sentence Transformer embeddings and FAISS `IndexFlatIP` return similar training historical tickets with metadata.
 - Complexity router: deterministic POC routing sends simple tickets to direct RAG and complex tickets through LangGraph.
 - RAG: Day 7 retrieval-grounded response generation returns insufficient information instead of fabricating when evidence is weak.

@@ -28,6 +28,7 @@ export interface TicketResponse {
     complexity: 'simple' | 'complex'
     type: 'simple_rag' | 'complex_multi_agent' | 'blocked' | 'error'
     trace: string[]
+    investigation_result: string | null
   }
   response: {
     answer: string

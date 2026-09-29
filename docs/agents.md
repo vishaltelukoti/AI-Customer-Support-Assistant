@@ -67,7 +67,7 @@ Artifacts are saved in `experiments/agents/`:
 
 ## Integrated Use
 
-`POST /api/v1/tickets` applies deterministic complexity routing. Simple tickets use the direct RAG path; complex tickets invoke this LangGraph workflow, whose Retrieval Agent calls the existing FAISS retrieval tool before the Resolution Agent returns a grounded response. Workflow state and memory remain request-local.
+`POST /api/v1/tickets` applies deterministic complexity routing. Simple tickets use the direct RAG path; complex tickets invoke this LangGraph workflow, whose Retrieval Agent calls the existing FAISS retrieval tool before the Resolution Agent returns a grounded response. For complex tickets, the existing Investigation Agent summary is returned as `workflow.investigation_result` with the workflow trace and sources. Workflow state and memory remain request-local.
 
 ## Limitations
 

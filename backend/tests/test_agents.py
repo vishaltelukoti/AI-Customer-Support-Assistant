@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.agents.workflow import (
     AgentConfig,
@@ -43,8 +43,15 @@ class FakeRetriever:
 @dataclass
 class FakeRAG:
     fail: bool = False
+    calls: list[dict] = field(default_factory=list)
 
-    def generate_from_retrieved(self, ticket_text, retrieved, top_k=None):
+    def generate_from_retrieved(self, ticket_text, retrieved, top_k=None, investigation_context=None):
+        self.calls.append({
+            "ticket_text": ticket_text,
+            "retrieved": retrieved,
+            "top_k": top_k,
+            "investigation_context": investigation_context,
+        })
         if self.fail:
             raise RuntimeError("generation unavailable")
         strong = [item for item in retrieved if item.score >= 0.55]
@@ -98,6 +105,57 @@ def test_complex_ticket_runs_investigation_before_retrieval():
     trace = " ".join(state["workflow_trace"])
     assert "Investigation Agent" in trace
     assert trace.index("Investigation Agent") < trace.index("Retrieval Agent")
+
+
+def test_multi_issue_investigation_context_reaches_resolution():
+    ticket_text = (
+        "I was charged three times because my payment appeared to fail. One order was created successfully, "
+        "but I want to cancel that order. I also want the duplicate charges refunded and need confirmation "
+        "about when the refund will arrive."
+    )
+    rag = FakeRAG()
+    workflow = _workflow(rag=rag)
+
+    state = workflow.run(ticket_text)
+
+    assert state["status"] == "completed"
+    assert state["investigation_result"]
+    context = rag.calls[0]["investigation_context"]
+    assert rag.calls[0]["ticket_text"] == ticket_text
+    assert "refund" in context["detected_issues"]
+    assert "cancel" in context["detected_issues"]
+    assert "duplicate_charge" in context["detected_issues"]
+    assert "payment_failure" in context["detected_issues"]
+    assert "charge_count:3" in context["detected_issues"]
+    assert context["summary"] == state["investigation_result"]
+    assert rag.calls[0]["retrieved"][0].ticket_id == "train-1"
+
+
+def test_investigation_flags_payment_refund_cancellation_and_delivery_cases():
+    cases = [
+        (
+            "My card payment failed during checkout, but the amount was deducted from my bank account. "
+            "Please check the payment and refund the deducted amount.",
+            {"payment_failure", "funds_deducted", "refund"},
+        ),
+        (
+            "I cancelled my order and would like to know when the refund will be credited to my bank account.",
+            {"cancel", "order_cancellation", "refund"},
+        ),
+        (
+            "My order was supposed to arrive yesterday but I still have not received it. "
+            "Please provide an update on the delivery status.",
+            {"delivery_not_received"},
+        ),
+        (
+            "The application crashes every time I open settings, even after restarting it.",
+            {"application_crash"},
+        ),
+    ]
+    workflow = _workflow()
+    for ticket_text, expected_flags in cases:
+        state = workflow.investigation_agent({"ticket_text": ticket_text, "memory": {}})
+        assert expected_flags.issubset(set(state["memory"]["investigation_focus"]))
 
 
 def test_retrieval_tool_usage_and_top_k():

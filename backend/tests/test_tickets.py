@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from uuid import UUID
 
 import pytest
@@ -45,6 +46,10 @@ class FakeProcessor:
                 "complexity": "complex" if self.mode == "complex" else "simple",
                 "type": workflow_type,
                 "trace": workflow_trace,
+                "investigation_result": (
+                    "Complex ticket requiring multi-issue support review."
+                    if self.mode == "complex" else None
+                ),
             },
             "response": {
                 "answer": "I cannot help with that request." if self.mode == "blocked"
@@ -53,9 +58,11 @@ class FakeProcessor:
                 "sources": [] if self.mode in {"blocked", "insufficient"} else [{
                     "ticket_id": "train-1",
                     "similarity_score": 0.81,
-                    "category": "Billing and Payments",
-                    "priority": "medium",
-                    "excerpt": "Historical payment failure ticket.",
+                    "category": "Knowledge Base" if self.mode == "complex" else "Billing and Payments",
+                    "priority": "policy" if self.mode == "complex" else "medium",
+                    "excerpt": "Refund Policy: fictional support policy content." if self.mode == "complex" else "Historical payment failure ticket.",
+                    "source_type": "knowledge_base" if self.mode == "complex" else "ticket",
+                    "title": "Refund Policy" if self.mode == "complex" else None,
                 }],
                 "retrieval_status": retrieval_status,
             },
@@ -105,7 +112,10 @@ def test_valid_ticket_schema_and_integrated_response(client):
     assert body["classification"]["priority"] == "medium"
     assert body["similar_tickets"][0]["ticket_id"] == "train-1"
     assert body["workflow"]["type"] == "simple_rag"
+    assert body["workflow"]["investigation_result"] is None
     assert body["response"]["sources"][0]["ticket_id"] == "train-1"
+    assert body["response"]["sources"][0]["source_type"] == "ticket"
+    assert body["response"]["sources"][0]["title"] is None
     assert body["security"]["status"] == "safe"
     assert body["explanation"]["top_features"][0]["feature"] == "payment"
     TicketResponse.model_validate(body)
@@ -127,6 +137,58 @@ def test_complex_ticket_response(client, monkeypatch):
     }).json()
     assert body["workflow"]["type"] == "complex_multi_agent"
     assert body["workflow"]["trace"] == ["investigation", "retrieval", "resolution"]
+    assert body["workflow"]["investigation_result"] == "Complex ticket requiring multi-issue support review."
+    assert body["response"]["sources"][0]["ticket_id"] == "train-1"
+    assert body["response"]["sources"][0]["similarity_score"] == 0.81
+    assert body["response"]["sources"][0]["source_type"] == "knowledge_base"
+    assert body["response"]["sources"][0]["title"] == "Refund Policy"
+
+
+def test_complex_workflow_source_serializer_preserves_rag_metadata():
+    processor = ticket_service.TicketProcessor.__new__(ticket_service.TicketProcessor)
+    processor.agent_workflow = SimpleNamespace(run=lambda _: {
+        "final_response": {
+            "answer": "Use the refund policy.",
+            "sources": [{
+                "ticket_id": "kb:refund_policy:1",
+                "similarity_score": 0.91,
+                "category": "Knowledge Base",
+                "priority": "policy",
+                "excerpt": "Refund Policy: fictional support policy content.",
+                "source_type": "knowledge_base",
+                "title": "Refund Policy",
+            }],
+            "retrieval_status": "grounded",
+        },
+        "workflow_trace": ["Investigation Agent", "Retrieval Agent", "Resolution Agent"],
+        "investigation_result": "Complex ticket requiring multi-issue support review.",
+    })
+
+    answer, sources, status, trace, investigation = processor._run_complex("I need a refund and cancellation.")
+
+    assert answer == "Use the refund policy."
+    assert status == "grounded"
+    assert trace == ["investigation", "retrieval", "resolution"]
+    assert investigation == "Complex ticket requiring multi-issue support review."
+    assert sources[0].ticket_id == "kb:refund_policy:1"
+    assert sources[0].similarity_score == 0.91
+    assert sources[0].source_type == "knowledge_base"
+    assert sources[0].title == "Refund Policy"
+
+
+def test_historical_ticket_source_serializer_keeps_existing_defaults():
+    source = ticket_service._source_from_dict({
+        "ticket_id": "train-1",
+        "similarity_score": 0.81,
+        "category": "Billing and Payments",
+        "priority": "medium",
+        "excerpt": "Historical payment failure ticket.",
+    })
+
+    assert source.ticket_id == "train-1"
+    assert source.similarity_score == 0.81
+    assert source.source_type == "ticket"
+    assert source.title is None
 
 
 def test_security_block_response(client, monkeypatch):

@@ -1,0 +1,1081 @@
+{
+  "class_balance": {
+    "classes_under_30": [],
+    "majority": "Technical Support",
+    "majority_minority_ratio": 20.072034,
+    "minority": "General Inquiry"
+  },
+  "counts": {
+    "after_cleaning": 16338,
+    "after_deduplication": 16338,
+    "duplicates_removed": 0,
+    "english": 16338,
+    "final_english": 16338,
+    "invalid_removed": 0,
+    "raw": 28587
+  },
+  "dataset": {
+    "columns": 16,
+    "creator": "Tobias Bueck",
+    "file_size_bytes": 25996354,
+    "filename": "aa_dataset-tickets-multi-lang-5-2-50-version.csv",
+    "memory_note": "UTF-8 value payload size excludes Python object overhead; not process RAM.",
+    "name": "Customer IT Support - Ticket Dataset",
+    "rows": 28587,
+    "sha256": "f187c090e59581c2bbf3aa1377c8db4dd647464ecf2ae51bf8966e42e0ed6bc0",
+    "source_url": "https://www.kaggle.com/datasets/tobiasbueck/multilingual-customer-support-tickets",
+    "synthetic": true,
+    "synthetic_provenance_url": "https://softoft.de/blog/ticket-dataset/",
+    "text_payload_utf8_bytes": 25419855
+  },
+  "duplicate_records_removed": [],
+  "duplicates_english": {
+    "exact_rows": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "exact_subject": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "normalized_body": {
+      "conflicting_label_groups": 1,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 1,
+      "groups": 1,
+      "rows_in_groups": 2,
+      "source_record_groups": [
+        [
+          10040,
+          15128
+        ]
+      ],
+      "version_pair_shared_keys": {}
+    },
+    "normalized_subject": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "normalized_ticket_text": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "obvious_body_template": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "obvious_template": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "subject_body": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "ticket_id": {
+      "available": false,
+      "reason": "No source ticket ID column."
+    }
+  },
+  "duplicates_raw": {
+    "exact_rows": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "exact_subject": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "normalized_body": {
+      "conflicting_label_groups": 2,
+      "cross_version_groups": 1,
+      "cross_version_rows": 2,
+      "excess_rows": 2,
+      "groups": 2,
+      "rows_in_groups": 4,
+      "source_record_groups": [
+        [
+          5396,
+          11626
+        ],
+        [
+          10040,
+          15128
+        ]
+      ],
+      "version_pair_shared_keys": {
+        "400|52": 1
+      }
+    },
+    "normalized_subject": {
+      "conflicting_label_groups": 1,
+      "cross_version_groups": 1,
+      "cross_version_rows": 2,
+      "excess_rows": 1,
+      "groups": 1,
+      "rows_in_groups": 2,
+      "source_record_groups": [
+        [
+          1823,
+          22570
+        ]
+      ],
+      "version_pair_shared_keys": {
+        "400|52": 1
+      }
+    },
+    "normalized_ticket_text": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "obvious_body_template": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "obvious_template": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "subject_body": {
+      "conflicting_label_groups": 0,
+      "cross_version_groups": 0,
+      "cross_version_rows": 0,
+      "excess_rows": 0,
+      "groups": 0,
+      "rows_in_groups": 0,
+      "source_record_groups": [],
+      "version_pair_shared_keys": {}
+    },
+    "ticket_id": {
+      "available": false,
+      "reason": "No source ticket ID column."
+    }
+  },
+  "english_categories": {
+    "Billing and Payments": {
+      "count": 1595,
+      "percentage": 9.762517
+    },
+    "Customer Service": {
+      "count": 2410,
+      "percentage": 14.750888
+    },
+    "General Inquiry": {
+      "count": 236,
+      "percentage": 1.444485
+    },
+    "Human Resources": {
+      "count": 348,
+      "percentage": 2.130004
+    },
+    "IT Support": {
+      "count": 1942,
+      "percentage": 11.8864
+    },
+    "Product Support": {
+      "count": 3073,
+      "percentage": 18.808912
+    },
+    "Returns and Exchanges": {
+      "count": 820,
+      "percentage": 5.018974
+    },
+    "Sales and Pre-Sales": {
+      "count": 513,
+      "percentage": 3.139919
+    },
+    "Service Outages and Maintenance": {
+      "count": 664,
+      "percentage": 4.064145
+    },
+    "Technical Support": {
+      "count": 4737,
+      "percentage": 28.993757
+    }
+  },
+  "english_priorities": {
+    "high": {
+      "count": 6346,
+      "percentage": 38.841964
+    },
+    "low": {
+      "count": 3374,
+      "percentage": 20.651243
+    },
+    "medium": {
+      "count": 6618,
+      "percentage": 40.506794
+    }
+  },
+  "english_selection": {
+    "english_rows": 16338,
+    "non_english_rows": 12249,
+    "retention_percentage": 57.151852,
+    "rule": "language == en; no automatic language inference",
+    "total_rows": 28587
+  },
+  "english_text_quality": {
+    "body": {
+      "empty_after_cleaning": 0,
+      "long_over_10000_chars": 0,
+      "max_length": 1141,
+      "mean_length": 367.6775,
+      "median_length": 377.0,
+      "min_length": 6,
+      "missing_count": 0,
+      "short_nonempty_under_20_chars": 31
+    },
+    "subject": {
+      "empty_after_cleaning": 2607,
+      "long_over_10000_chars": 0,
+      "max_length": 234,
+      "mean_length": 36.650814,
+      "median_length": 39.0,
+      "min_length": 0,
+      "missing_count": 2607,
+      "short_nonempty_under_20_chars": 443
+    },
+    "ticket_text": {
+      "empty_after_cleaning": 0,
+      "long_over_10000_chars": 0,
+      "max_length": 1184,
+      "mean_length": 406.009181,
+      "median_length": 417.0,
+      "min_length": 18,
+      "missing_count": 0,
+      "short_nonempty_under_20_chars": 1
+    }
+  },
+  "english_versions": {
+    "400": {
+      "count": 10441,
+      "percentage": 63.906231
+    },
+    "51": {
+      "count": 551,
+      "percentage": 3.372506
+    },
+    "52": {
+      "count": 5346,
+      "percentage": 32.721263
+    }
+  },
+  "field_mapping": {
+    "answer": "answer",
+    "body": "body",
+    "category": "queue",
+    "language": "language",
+    "priority": "priority",
+    "subject": "subject",
+    "tags": [
+      "tag_1",
+      "tag_2",
+      "tag_3",
+      "tag_4",
+      "tag_5",
+      "tag_6",
+      "tag_7",
+      "tag_8"
+    ],
+    "ticket_id": null,
+    "ticket_type": "type",
+    "version": "version"
+  },
+  "final_categories": {
+    "Billing and Payments": {
+      "count": 1595,
+      "percentage": 9.762517
+    },
+    "Customer Service": {
+      "count": 2410,
+      "percentage": 14.750888
+    },
+    "General Inquiry": {
+      "count": 236,
+      "percentage": 1.444485
+    },
+    "Human Resources": {
+      "count": 348,
+      "percentage": 2.130004
+    },
+    "IT Support": {
+      "count": 1942,
+      "percentage": 11.8864
+    },
+    "Product Support": {
+      "count": 3073,
+      "percentage": 18.808912
+    },
+    "Returns and Exchanges": {
+      "count": 820,
+      "percentage": 5.018974
+    },
+    "Sales and Pre-Sales": {
+      "count": 513,
+      "percentage": 3.139919
+    },
+    "Service Outages and Maintenance": {
+      "count": 664,
+      "percentage": 4.064145
+    },
+    "Technical Support": {
+      "count": 4737,
+      "percentage": 28.993757
+    }
+  },
+  "final_priorities": {
+    "high": {
+      "count": 6346,
+      "percentage": 38.841964
+    },
+    "low": {
+      "count": 3374,
+      "percentage": 20.651243
+    },
+    "medium": {
+      "count": 6618,
+      "percentage": 40.506794
+    }
+  },
+  "grouping": {
+    "largest_group": 2,
+    "multi_record_groups": 1,
+    "rows_in_multi_record_groups": 2,
+    "total_groups": 16337
+  },
+  "history_missing_answers": 3,
+  "history_policy": "Answers/metadata are separate from classification. Restrict future retrieval to split=train during evaluation.",
+  "id_strategy": "KAGGLE-<first 12 hex of raw SHA256>-<1-based zero-padded data record>; generated, not a source ID.",
+  "invalid_records": [],
+  "language_reliability": {
+    "limitation": "Labels are trusted source metadata; no automatic language detection. Manual spot checks are documented in docs/dataset.md.",
+    "missing_or_unsupported_labels": 0
+  },
+  "languages": {
+    "de": {
+      "count": 12249,
+      "percentage": 42.848148
+    },
+    "en": {
+      "count": 16338,
+      "percentage": 57.151852
+    }
+  },
+  "leakage_fields": [
+    {
+      "classification_input": true,
+      "field": "subject",
+      "reason": "Customer email subject available at submission."
+    },
+    {
+      "classification_input": true,
+      "field": "body",
+      "reason": "Customer email message available at submission."
+    },
+    {
+      "classification_input": false,
+      "field": "answer",
+      "reason": "Agent response after submission; future historical retrieval only."
+    },
+    {
+      "classification_input": false,
+      "field": "type",
+      "reason": "Source describes agent-picked ticket type; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "queue",
+      "reason": "Routing label; category prediction target, not an input."
+    },
+    {
+      "classification_input": false,
+      "field": "priority",
+      "reason": "Assigned urgency label; priority prediction target, not an input."
+    },
+    {
+      "classification_input": false,
+      "field": "language",
+      "reason": "Used only for English selection, not a classification feature."
+    },
+    {
+      "classification_input": false,
+      "field": "version",
+      "reason": "Dataset provenance/version, not customer-provided ticket content."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_1",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_2",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_3",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_4",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_5",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_6",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_7",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    },
+    {
+      "classification_input": false,
+      "field": "tag_8",
+      "reason": "Assigned tag/metadata; creation-time availability not established."
+    }
+  ],
+  "output_schemas": {
+    "historical_tickets.csv": [
+      "ticket_id",
+      "ticket_text",
+      "category",
+      "priority",
+      "answer",
+      "source_record",
+      "version",
+      "language",
+      "split",
+      "type",
+      "tag_1",
+      "tag_2",
+      "tag_3",
+      "tag_4",
+      "tag_5",
+      "tag_6",
+      "tag_7",
+      "tag_8"
+    ],
+    "test.csv": [
+      "ticket_id",
+      "ticket_text",
+      "category",
+      "priority"
+    ],
+    "train.csv": [
+      "ticket_id",
+      "ticket_text",
+      "category",
+      "priority"
+    ],
+    "validation.csv": [
+      "ticket_id",
+      "ticket_text",
+      "category",
+      "priority"
+    ]
+  },
+  "output_sha256": {
+    "historical_tickets.csv": "ab09c8aee33df5affa05053a9f50d0e998241c4d9223afacbc2e2520fcec5bbf",
+    "test.csv": "7078fa22d7510476bb2191c027ec474cfea5c62fb30faa48854e3431178a21ee",
+    "train.csv": "f1e027454bb4f3d52304bc808a025083e9b821fedc9c6e84dbadbd11bd76a1df",
+    "validation.csv": "044ad717a86e9437e8be8592a4b80686d7f4da2a110bdbd13e09556ff46ea734"
+  },
+  "pii": {
+    "answer": {
+      "account_number": {
+        "action": "replace matched span with [ACCOUNT_NUMBER]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "card_like": {
+        "action": "replace matched span with [CARD_LIKE]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "email": {
+        "action": "replace matched span with [EMAIL]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "long_numeric_id": {
+        "action": "replace matched span with [LONG_NUMERIC_ID]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "phone": {
+        "action": "replace matched span with [PHONE]",
+        "occurrences": 70,
+        "records": 70
+      },
+      "url": {
+        "action": "replace matched span with [URL]",
+        "occurrences": 0,
+        "records": 0
+      }
+    },
+    "ticket_text": {
+      "account_number": {
+        "action": "replace matched span with [ACCOUNT_NUMBER]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "card_like": {
+        "action": "replace matched span with [CARD_LIKE]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "email": {
+        "action": "replace matched span with [EMAIL]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "long_numeric_id": {
+        "action": "replace matched span with [LONG_NUMERIC_ID]",
+        "occurrences": 0,
+        "records": 0
+      },
+      "phone": {
+        "action": "replace matched span with [PHONE]",
+        "occurrences": 1,
+        "records": 1
+      },
+      "url": {
+        "action": "replace matched span with [URL]",
+        "occurrences": 0,
+        "records": 0
+      }
+    }
+  },
+  "privacy_limitations": "Pattern audit only, with ordered non-overlapping masking. Names, addresses, unusual phone formats and contextual identifiers may remain. URLs and numeric patterns may be nonpersonal; masked conservatively. No PII-free claim. Counts cover valid English records before deduplication.",
+  "raw_categories": {
+    "Billing and Payments": {
+      "count": 2788,
+      "percentage": 9.752685
+    },
+    "Customer Service": {
+      "count": 4268,
+      "percentage": 14.929863
+    },
+    "General Inquiry": {
+      "count": 405,
+      "percentage": 1.416728
+    },
+    "Human Resources": {
+      "count": 576,
+      "percentage": 2.014902
+    },
+    "IT Support": {
+      "count": 3433,
+      "percentage": 12.008955
+    },
+    "Product Support": {
+      "count": 5252,
+      "percentage": 18.371987
+    },
+    "Returns and Exchanges": {
+      "count": 1437,
+      "percentage": 5.02676
+    },
+    "Sales and Pre-Sales": {
+      "count": 918,
+      "percentage": 3.21125
+    },
+    "Service Outages and Maintenance": {
+      "count": 1148,
+      "percentage": 4.015811
+    },
+    "Technical Support": {
+      "count": 8362,
+      "percentage": 29.251058
+    }
+  },
+  "raw_priorities": {
+    "high": {
+      "count": 11178,
+      "percentage": 39.10169
+    },
+    "low": {
+      "count": 5894,
+      "percentage": 20.617763
+    },
+    "medium": {
+      "count": 11515,
+      "percentage": 40.280547
+    }
+  },
+  "schema": [
+    {
+      "dtype": "string",
+      "missing_count": 3838,
+      "missing_percentage": 13.425683,
+      "name": "subject",
+      "storage_type": "str",
+      "unique_nonmissing": 24749
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "body",
+      "storage_type": "str",
+      "unique_nonmissing": 28587
+    },
+    {
+      "dtype": "string",
+      "missing_count": 7,
+      "missing_percentage": 0.024487,
+      "name": "answer",
+      "storage_type": "str",
+      "unique_nonmissing": 28580
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "type",
+      "storage_type": "str",
+      "unique_nonmissing": 4
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "queue",
+      "storage_type": "str",
+      "unique_nonmissing": 10
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "priority",
+      "storage_type": "str",
+      "unique_nonmissing": 3
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "language",
+      "storage_type": "str",
+      "unique_nonmissing": 2
+    },
+    {
+      "dtype": "integer-like string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "version",
+      "storage_type": "str",
+      "unique_nonmissing": 3
+    },
+    {
+      "dtype": "string",
+      "missing_count": 0,
+      "missing_percentage": 0.0,
+      "name": "tag_1",
+      "storage_type": "str",
+      "unique_nonmissing": 116
+    },
+    {
+      "dtype": "string",
+      "missing_count": 13,
+      "missing_percentage": 0.045475,
+      "name": "tag_2",
+      "storage_type": "str",
+      "unique_nonmissing": 256
+    },
+    {
+      "dtype": "string",
+      "missing_count": 136,
+      "missing_percentage": 0.475741,
+      "name": "tag_3",
+      "storage_type": "str",
+      "unique_nonmissing": 392
+    },
+    {
+      "dtype": "string",
+      "missing_count": 3058,
+      "missing_percentage": 10.69717,
+      "name": "tag_4",
+      "storage_type": "str",
+      "unique_nonmissing": 554
+    },
+    {
+      "dtype": "string",
+      "missing_count": 14042,
+      "missing_percentage": 49.120229,
+      "name": "tag_5",
+      "storage_type": "str",
+      "unique_nonmissing": 602
+    },
+    {
+      "dtype": "string",
+      "missing_count": 22713,
+      "missing_percentage": 79.452199,
+      "name": "tag_6",
+      "storage_type": "str",
+      "unique_nonmissing": 575
+    },
+    {
+      "dtype": "string",
+      "missing_count": 26547,
+      "missing_percentage": 92.863889,
+      "name": "tag_7",
+      "storage_type": "str",
+      "unique_nonmissing": 427
+    },
+    {
+      "dtype": "string",
+      "missing_count": 28022,
+      "missing_percentage": 98.023577,
+      "name": "tag_8",
+      "storage_type": "str",
+      "unique_nonmissing": 224
+    }
+  ],
+  "split": {
+    "fallbacks": [
+      "Mixed-label identity group KAGGLE-f187c090e595-010040 (2 rows) reserved for training."
+    ],
+    "method": "Joint queue/priority stratification with indivisible identity groups; largest-deficit allocation.",
+    "seed": 42,
+    "sets": {
+      "test": {
+        "categories": {
+          "Billing and Payments": {
+            "count": 241,
+            "percentage": 9.832721
+          },
+          "Customer Service": {
+            "count": 361,
+            "percentage": 14.728682
+          },
+          "General Inquiry": {
+            "count": 36,
+            "percentage": 1.468788
+          },
+          "Human Resources": {
+            "count": 52,
+            "percentage": 2.121583
+          },
+          "IT Support": {
+            "count": 292,
+            "percentage": 11.913505
+          },
+          "Product Support": {
+            "count": 461,
+            "percentage": 18.80865
+          },
+          "Returns and Exchanges": {
+            "count": 123,
+            "percentage": 5.01836
+          },
+          "Sales and Pre-Sales": {
+            "count": 76,
+            "percentage": 3.100775
+          },
+          "Service Outages and Maintenance": {
+            "count": 99,
+            "percentage": 4.039168
+          },
+          "Technical Support": {
+            "count": 710,
+            "percentage": 28.967768
+          }
+        },
+        "max_categories_deviation_percentage_points": 0.070204,
+        "max_priorities_deviation_percentage_points": 0.074317,
+        "percentage": 15.001836,
+        "priorities": {
+          "high": {
+            "count": 953,
+            "percentage": 38.882089
+          },
+          "low": {
+            "count": 507,
+            "percentage": 20.685435
+          },
+          "medium": {
+            "count": 991,
+            "percentage": 40.432477
+          }
+        },
+        "rows": 2451,
+        "versions": {
+          "400": {
+            "count": 1576,
+            "percentage": 64.300286
+          },
+          "51": {
+            "count": 75,
+            "percentage": 3.059976
+          },
+          "52": {
+            "count": 800,
+            "percentage": 32.639739
+          }
+        }
+      },
+      "train": {
+        "categories": {
+          "Billing and Payments": {
+            "count": 1116,
+            "percentage": 9.758657
+          },
+          "Customer Service": {
+            "count": 1687,
+            "percentage": 14.751661
+          },
+          "General Inquiry": {
+            "count": 164,
+            "percentage": 1.434068
+          },
+          "Human Resources": {
+            "count": 244,
+            "percentage": 2.133613
+          },
+          "IT Support": {
+            "count": 1358,
+            "percentage": 11.874781
+          },
+          "Product Support": {
+            "count": 2151,
+            "percentage": 18.809024
+          },
+          "Returns and Exchanges": {
+            "count": 574,
+            "percentage": 5.019237
+          },
+          "Sales and Pre-Sales": {
+            "count": 360,
+            "percentage": 3.147954
+          },
+          "Service Outages and Maintenance": {
+            "count": 465,
+            "percentage": 4.066107
+          },
+          "Technical Support": {
+            "count": 3317,
+            "percentage": 29.004897
+          }
+        },
+        "max_categories_deviation_percentage_points": 0.011619,
+        "max_priorities_deviation_percentage_points": 0.023112,
+        "percentage": 69.996328,
+        "priorities": {
+          "high": {
+            "count": 4441,
+            "percentage": 38.833508
+          },
+          "low": {
+            "count": 2360,
+            "percentage": 20.636586
+          },
+          "medium": {
+            "count": 4635,
+            "percentage": 40.529906
+          }
+        },
+        "rows": 11436,
+        "versions": {
+          "400": {
+            "count": 7324,
+            "percentage": 64.043372
+          },
+          "51": {
+            "count": 394,
+            "percentage": 3.445261
+          },
+          "52": {
+            "count": 3718,
+            "percentage": 32.511368
+          }
+        }
+      },
+      "validation": {
+        "categories": {
+          "Billing and Payments": {
+            "count": 238,
+            "percentage": 9.710322
+          },
+          "Customer Service": {
+            "count": 362,
+            "percentage": 14.769482
+          },
+          "General Inquiry": {
+            "count": 36,
+            "percentage": 1.468788
+          },
+          "Human Resources": {
+            "count": 52,
+            "percentage": 2.121583
+          },
+          "IT Support": {
+            "count": 292,
+            "percentage": 11.913505
+          },
+          "Product Support": {
+            "count": 461,
+            "percentage": 18.80865
+          },
+          "Returns and Exchanges": {
+            "count": 123,
+            "percentage": 5.01836
+          },
+          "Sales and Pre-Sales": {
+            "count": 77,
+            "percentage": 3.141575
+          },
+          "Service Outages and Maintenance": {
+            "count": 100,
+            "percentage": 4.079967
+          },
+          "Technical Support": {
+            "count": 710,
+            "percentage": 28.967768
+          }
+        },
+        "max_categories_deviation_percentage_points": 0.052195,
+        "max_priorities_deviation_percentage_points": 0.034192,
+        "percentage": 15.001836,
+        "priorities": {
+          "high": {
+            "count": 952,
+            "percentage": 38.841289
+          },
+          "low": {
+            "count": 507,
+            "percentage": 20.685435
+          },
+          "medium": {
+            "count": 992,
+            "percentage": 40.473276
+          }
+        },
+        "rows": 2451,
+        "versions": {
+          "400": {
+            "count": 1541,
+            "percentage": 62.872297
+          },
+          "51": {
+            "count": 82,
+            "percentage": 3.345573
+          },
+          "52": {
+            "count": 828,
+            "percentage": 33.78213
+          }
+        }
+      }
+    },
+    "target_ratios": [
+      0.7,
+      0.15,
+      0.15
+    ]
+  },
+  "verification": {
+    "cross_split_grouping_key_overlap": 0,
+    "cross_split_identity_group_overlap": 0,
+    "cross_split_normalized_text_overlap": 0,
+    "generated_ids_unique": true
+  },
+  "version_decision": "Retain every version. Exact combined text is deduplicated after masking; no version-number selection. Shared nonempty source ID, normalized subject/body/text, or obvious long template links records into one split. Generic repeated bodies are grouping signals only, not deletion evidence. No semantic/paraphrase or cross-language equivalence guarantee is made.",
+  "versions": {
+    "400": {
+      "count": 18599,
+      "percentage": 65.061042
+    },
+    "51": {
+      "count": 869,
+      "percentage": 3.039843
+    },
+    "52": {
+      "count": 9119,
+      "percentage": 31.899115
+    }
+  }
+}
